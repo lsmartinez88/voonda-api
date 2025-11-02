@@ -1,0 +1,299 @@
+// Prisma schema para Voonda API - Sistema de gestión de vehículos
+// Basado en la estructura de Supabase PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ====================================
+// ESTRUCTURA MULTI-EMPRESA Y USUARIOS
+// ====================================
+
+// Tabla de empresas - núcleo del sistema multi-tenant
+model Empresa {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre      String   @db.VarChar(200)
+  descripcion String?  @db.Text
+  logo_url    String?  @db.Text
+  activa      Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  usuarios      Usuario[]
+  vehiculos     Vehiculo[]
+  publicaciones Publicacion[]
+  clientes      Cliente[]
+  operaciones   Operacion[]
+
+  @@index([activa], name: "idx_empresas_activa")
+  @@map("empresas")
+}
+
+// Tabla de roles del sistema
+model Rol {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre      String   @unique @db.VarChar(50) // colaborador, administrador_empresa, administrador_general
+  descripcion String?  @db.Text
+  permisos    Json?    @db.JsonB // Estructura JSON con permisos específicos
+  activo      Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  usuarios Usuario[]
+
+  @@index([activo], name: "idx_roles_activo")
+  @@map("roles")
+}
+
+// Modelo de usuarios mejorado con empresa y roles
+model Usuario {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  nombre     String   @db.VarChar(200)
+  apellido   String?  @db.VarChar(200)
+  telefono   String?  @db.VarChar(20)
+  activo     Boolean  @default(true)
+  
+  // Relación con empresa (null para administrador general)
+  empresa_id String?  @db.Uuid
+  empresa    Empresa? @relation(fields: [empresa_id], references: [id])
+  
+  // Relación con rol
+  rol_id     String   @db.Uuid
+  rol        Rol      @relation(fields: [rol_id], references: [id])
+  
+  // Metadatos de auditoría
+  ultimo_login      DateTime? @db.Timestamptz(6)
+  intentos_fallidos Int       @default(0)
+  bloqueado_hasta   DateTime? @db.Timestamptz(6)
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([empresa_id], name: "idx_usuarios_empresa_id")
+  @@index([rol_id], name: "idx_usuarios_rol_id")
+  @@index([activo], name: "idx_usuarios_activo")
+  @@index([email], name: "idx_usuarios_email")
+  @@map("usuarios")
+}
+
+// Tabla de referencia de modelos de autos (GENÉRICA - Sin empresa_id)
+// Define las características estándar de cada modelo, marca, versión y año
+model ModeloAuto {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Información básica del modelo
+  marca                 String    @db.Text
+  modelo                String    @db.Text  
+  version               String?   @db.Text
+  modelo_ano            Int
+  segmento_modelo       String?   @db.Text
+  
+  // Especificaciones técnicas del motor
+  motorizacion          String?   @db.Text
+  combustible           String?   @db.Text
+  caja                  String?   @db.Text
+  traccion              String?   @db.Text
+  cilindrada            Int?
+  potencia_hp           Int?
+  torque_nm             Int?
+  rendimiento_mixto     Decimal?  @db.Decimal(5,2)
+  velocidad_max         Int?
+  
+  // Dimensiones físicas
+  largo                 Int?
+  ancho                 Int?
+  alto                  Int?
+  capacidad_baul        Int?
+  capacidad_combustible Int?
+  
+  // Equipamiento y seguridad
+  airbags               Int?
+  abs                   Boolean?  @default(false)
+  control_estabilidad   Boolean?  @default(false)
+  climatizador          Boolean?  @default(false)
+  multimedia            String?   @db.Text
+  asistencia_manejo     String?   @db.Text
+  frenos                String?   @db.Text
+  neumaticos            String?   @db.Text
+  llantas               String?   @db.Text
+  
+  // Información adicional
+  url_ficha             String?   @db.Text
+  ficha_breve           String?   @db.Text
+  modelo_rag            String?   @db.Text
+  
+  // Timestamps
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  vehiculos             Vehiculo[]
+
+  @@unique([marca, modelo, version, modelo_ano], name: "modelo_autos_unique_cols")
+  @@index([marca, modelo], name: "idx_modelo_autos_marca_modelo")
+  @@map("modelo_autos")
+}
+
+// Tabla de estados de vehículo (global, reutilizable)
+model EstadoVehiculo {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo      String   @unique @db.VarChar(100)
+  nombre      String   @db.VarChar(200)
+  descripcion String?  @db.Text
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  vehiculos   Vehiculo[]
+
+  @@index([codigo], name: "idx_estadovehiculo_codigo")
+  @@map("estados_vehiculos")
+}
+
+// Tabla de vehículos - Representa unidades individuales disponibles, reservadas o vendidas
+model Vehiculo {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Referencia a empresa (OBLIGATORIA)
+  empresa_id        String    @db.Uuid
+  empresa           Empresa   @relation(fields: [empresa_id], references: [id])
+  
+  // Referencia al modelo (OBLIGATORIA)
+  modelo_id         String    @db.Uuid
+  modelo_auto       ModeloAuto @relation(fields: [modelo_id], references: [id])
+  
+  // Información específica de la unidad
+  patente           String?   @db.Text
+  vehiculo_ano      Int
+  kilometros        Int       @default(0)
+  valor             Decimal?  @db.Decimal(12,2)
+  moneda            String?   @default("ARS") @db.Text
+  // Estado ahora referenciado desde la tabla EstadoVehiculo
+  estado_id         String?   @db.Uuid
+  estado            EstadoVehiculo? @relation(fields: [estado_id], references: [id])
+  tipo_operacion    String?   @db.Text
+  publicacion_web   String?   @default("false") @db.Text
+  publicacion_api_call String? @default("false") @db.Text
+  fecha_ingreso     DateTime? @db.Date
+  observaciones     String?   @db.Text
+  
+  // Timestamps
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  publicaciones     Publicacion[]
+  operaciones       Operacion[]
+
+  @@index([empresa_id], name: "idx_vehiculos_empresa_id")
+  @@index([modelo_id], name: "idx_vehiculos_modelo_id")
+  @@index([estado_id], name: "idx_vehiculos_estado_id")
+  @@index([valor], name: "idx_vehiculos_valor")
+  @@index([fecha_ingreso], name: "idx_vehiculos_fecha_ingreso")
+  @@index([patente], name: "idx_vehiculos_patente")
+  @@map("vehiculos")
+}
+
+// Tabla de publicaciones - Registra las publicaciones de vehículos en plataformas
+model Publicacion {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Referencia a empresa (OBLIGATORIA)
+  empresa_id            String    @db.Uuid
+  empresa               Empresa   @relation(fields: [empresa_id], references: [id])
+  
+  // Referencia al vehículo (OBLIGATORIA)
+  vehiculo_id           String    @db.Uuid
+  vehiculo              Vehiculo  @relation(fields: [vehiculo_id], references: [id])
+  
+  // Información de la publicación
+  plataforma            String    @db.Text
+  publicacion_web       String?   @db.Text
+  publicacion_api_call  String?   @db.Text
+  url_ficha             String?   @db.Text
+  titulo_legible        String?   @db.Text
+  ficha_breve           String?   @db.Text
+  fecha_publicacion     DateTime? @db.Date
+  activo                Boolean   @default(true)
+  
+  // Timestamps
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([empresa_id], name: "idx_publicaciones_empresa_id")
+  @@index([vehiculo_id], name: "idx_publicaciones_vehiculo_id")
+  @@index([plataforma], name: "idx_publicaciones_plataforma")
+  @@index([activo], name: "idx_publicaciones_activo")
+  @@map("publicaciones")
+}
+
+// Tabla de clientes - Datos de clientes o interesados
+model Cliente {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Referencia a empresa (OBLIGATORIA)
+  empresa_id    String    @db.Uuid
+  empresa       Empresa   @relation(fields: [empresa_id], references: [id])
+  
+  // Información del cliente
+  nombre        String    @db.Text
+  telefono      String?   @db.Text
+  email         String?   @db.Text
+  origen        String?   @db.Text
+  comentarios   String?   @db.Text
+  
+  // Timestamps
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  operaciones   Operacion[]
+
+  @@index([empresa_id], name: "idx_clientes_empresa_id")
+  @@index([telefono], name: "idx_clientes_telefono")
+  @@index([email], name: "idx_clientes_email")
+  @@map("clientes")
+}
+
+// Tabla de operaciones - Registro de ventas, reservas y permutas
+model Operacion {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Referencia a empresa (OBLIGATORIA)
+  empresa_id        String    @db.Uuid
+  empresa           Empresa   @relation(fields: [empresa_id], references: [id])
+  
+  // Referencias (OBLIGATORIAS)
+  vehiculo_id       String    @db.Uuid
+  vehiculo          Vehiculo  @relation(fields: [vehiculo_id], references: [id])
+  
+  cliente_id        String    @db.Uuid
+  cliente           Cliente   @relation(fields: [cliente_id], references: [id])
+  
+  // Información de la operación
+  tipo              String    @db.Text
+  monto             Decimal?  @db.Decimal(12,2)
+  moneda            String?   @default("ARS") @db.Text
+  fecha_operacion   DateTime? @db.Date
+  estado            String    @default("Pendiente") @db.Text
+  observaciones     String?   @db.Text
+  
+  // Timestamps
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([empresa_id], name: "idx_operaciones_empresa_id")
+  @@index([vehiculo_id], name: "idx_operaciones_vehiculo_id")
+  @@index([cliente_id], name: "idx_operaciones_cliente_id")
+  @@index([tipo], name: "idx_operaciones_tipo")
+  @@index([fecha_operacion], name: "idx_operaciones_fecha_operacion")
+  @@index([estado], name: "idx_operaciones_estado")
+  @@map("operaciones")
+}

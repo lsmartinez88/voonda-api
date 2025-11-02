@@ -1,0 +1,686 @@
+🚀 Servidor Voonda API con Prisma ejecutándose en puerto 3001
+🌍 Entorno: development
+📡 URL: http://localhost:3001
+🏥 Health check: http://localhost:3001/health
+💾 DB Health: http://localhost:3001/db-health
+🔗 ORM: Prisma
+prisma:info Starting a postgresql pool with 21 connections.
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+prisma:query UPDATE "public"."usuarios" SET "intentos_fallidos" = $1, "bloqueado_hasta" = $2, "ultimo_login" = $3, "updated_at" = $4 WHERE ("public"."usuarios"."id" = $5 AND 1=1) RETURNING "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at"
+::1 - - [01/Nov/2025:04:13:35 +0000] "POST /api/auth/login HTTP/1.1" 200 1497 "-" "curl/8.7.1"
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+🚀 Usuario admin.empresa@voonda.com solicitó procesamiento completo de 1 vehículos
+🚀 Iniciando procesamiento completo de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📦 Batch ID: batch_1761970416096_bqw66mu3i
+📋 Paso 1: Procesando modelos...
+🔍 Procesando 1 modelos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📝 Insertando 1 modelos únicos
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."modelo_autos" ("empresa_id","marca","modelo","año","versión","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING
+prisma:query COMMIT
+✅ Modelos insertados correctamente
+prisma:query SELECT "public"."modelo_autos"."id", "public"."modelo_autos"."empresa_id", "public"."modelo_autos"."marca", "public"."modelo_autos"."modelo", "public"."modelo_autos"."año", "public"."modelo_autos"."precio_venta_estimado", "public"."modelo_autos"."versión", "public"."modelo_autos"."motorización", "public"."modelo_autos"."combustible", "public"."modelo_autos"."caja", "public"."modelo_autos"."tracción", "public"."modelo_autos"."puertas", "public"."modelo_autos"."segmento", "public"."modelo_autos"."cilindrada", "public"."modelo_autos"."potencia_hp", "public"."modelo_autos"."torque_nm", "public"."modelo_autos"."airbags", "public"."modelo_autos"."abs", "public"."modelo_autos"."control_estabilidad", "public"."modelo_autos"."climatizador", "public"."modelo_autos"."multimedia", "public"."modelo_autos"."frenos", "public"."modelo_autos"."neumaticos", "public"."modelo_autos"."llantas", "public"."modelo_autos"."asistencia_manejo", "public"."modelo_autos"."rendimiento_mixto", "public"."modelo_autos"."capacidad_baul", "public"."modelo_autos"."capacidad_combustible", "public"."modelo_autos"."velocidad_max", "public"."modelo_autos"."largo", "public"."modelo_autos"."ancho", "public"."modelo_autos"."alto", "public"."modelo_autos"."url_ficha", "public"."modelo_autos"."informacion_rag", "public"."modelo_autos"."created_at", "public"."modelo_autos"."updated_at" FROM "public"."modelo_autos" WHERE ("public"."modelo_autos"."empresa_id" = $1 AND "public"."modelo_autos"."marca" = $2 AND "public"."modelo_autos"."modelo" = $3 AND "public"."modelo_autos"."año" = $4 AND "public"."modelo_autos"."versión" = $5) LIMIT $6 OFFSET $7
+✅ Procesados 1 modelos con IDs
+🔗 Paso 2: Vinculando vehículos con modelos...
+🔄 Paso 3: Actualizando vehículos...
+🔄 Iniciando swap de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88, lote batch_1761970416096_bqw66mu3i
+📊 Procesando 1 vehículos
+prisma:query BEGIN
+prisma:query UPDATE "public"."vehiculos" SET "activo" = $1, "updated_at" = $2 WHERE ("public"."vehiculos"."empresa_id" = $3 AND "public"."vehiculos"."activo" = $4)
+prisma:query COMMIT
+🔴 Desactivados 0 vehículos existentes
+prisma:query SELECT "public"."vehiculos"."id", "public"."vehiculos"."created_at", "public"."vehiculos"."updated_at", "public"."vehiculos"."empresa_id", "public"."vehiculos"."marca", "public"."vehiculos"."modelo", "public"."vehiculos"."version", "public"."vehiculos"."vehiculo_ano", "public"."vehiculos"."modelo_ano", "public"."vehiculos"."patente", "public"."vehiculos"."dominio", "public"."vehiculos"."kilometros", "public"."vehiculos"."valor", "public"."vehiculos"."moneda", "public"."vehiculos"."condicion", "public"."vehiculos"."vendedor", "public"."vehiculos"."fecha_ingreso", "public"."vehiculos"."fecha_reserva", "public"."vehiculos"."fecha_entrega", "public"."vehiculos"."publicacion_web", "public"."vehiculos"."publicacion_api_call", "public"."vehiculos"."publi_insta", "public"."vehiculos"."publi_face", "public"."vehiculos"."publi_mer_lib", "public"."vehiculos"."publi_mark_p", "public"."vehiculos"."motorizacion", "public"."vehiculos"."combustible", "public"."vehiculos"."cilindrada", "public"."vehiculos"."potencia_hp", "public"."vehiculos"."torque_nm", "public"."vehiculos"."caja", "public"."vehiculos"."traccion", "public"."vehiculos"."puertas", "public"."vehiculos"."segmento_modelo", "public"."vehiculos"."largo", "public"."vehiculos"."ancho", "public"."vehiculos"."alto", "public"."vehiculos"."airbags", "public"."vehiculos"."abs", "public"."vehiculos"."control_estabilidad", "public"."vehiculos"."climatizador", "public"."vehiculos"."multimedia", "public"."vehiculos"."asistencia_manejo", "public"."vehiculos"."frenos", "public"."vehiculos"."neumaticos", "public"."vehiculos"."llantas", "public"."vehiculos"."rendimiento_mixto", "public"."vehiculos"."capacidad_baul", "public"."vehiculos"."capacidad_combustible", "public"."vehiculos"."velocidad_max", "public"."vehiculos"."url_ficha", "public"."vehiculos"."modelo_rag", "public"."vehiculos"."titulo_legible", "public"."vehiculos"."ficha_breve", "public"."vehiculos"."estado", "public"."vehiculos"."pendientes_preparacion", "public"."vehiculos"."activo", "public"."vehiculos"."sincronizado_sheets", "public"."vehiculos"."sheets_row_id", "public"."vehiculos"."año", "public"."vehiculos"."modelo_año", "public"."vehiculos"."precio", "public"."vehiculos"."precio_publicado", "public"."vehiculos"."precio_contado", "public"."vehiculos"."ubicacion", "public"."vehiculos"."categoria", "public"."vehiculos"."imagenes_url", "public"."vehiculos"."color", "public"."vehiculos"."color_interior", "public"."vehiculos"."detalle_estado", "public"."vehiculos"."revisado_mecanico", "public"."vehiculos"."manuales_seg_llave", "public"."vehiculos"."titular_unico", "public"."vehiculos"."tipo_titularidad", "public"."vehiculos"."condicion_iva", "public"."vehiculos"."vencimiento_vtv", "public"."vehiculos"."acepta_permuta", "public"."vehiculos"."financiable", "public"."vehiculos"."anticipo_sugerido", "public"."vehiculos"."cuota_estimativa", "public"."vehiculos"."modelo_id", "public"."vehiculos"."batch_id" FROM "public"."vehiculos" WHERE ("public"."vehiculos"."patente" = $1 AND "public"."vehiculos"."empresa_id" = $2) LIMIT $3 OFFSET $4
+❌ Error procesando vehículo: PrismaClientValidationError: 
+Invalid `prisma.vehiculo.create()` invocation in
+/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35
+
+  157   actualizados++;
+  158 } else {
+  159   // Insertar nuevo vehículo
+→ 160   await prisma.vehiculo.create({
+          data: {
+            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",
+            modelo_id: "520b09d6-1a3e-4547-8d03-d6bae0baa05a",
+            patente: "TEST001",
+            dominio: "TEST001",
+            color: "Blanco",
+            color_interior: "Negro",
+            kilometros: 25000,
+            año: 2020,
+            vehiculo_ano: 2020,
+            precio_publicado: null,
+            precio_contado: null,
+            valor: 2500000,
+            moneda: "ARS",
+            estado: "Disponible",
+            ubicacion: "Buenos Aires",
+            categoria: "Sedan",
+            imagenes_url: null,
+            publicacion_web: true,
+                             ~~~~
+            publicacion_api_call: "true",
+            activo: true,
+            batch_id: "batch_1761970416096_bqw66mu3i",
+            updated_at: new Date("2025-11-01T04:13:38.078Z")
+          }
+        })
+
+Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.
+    at Nn (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at ei.handleRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6911)
+    at ei.handleAndLogRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6593)
+    at ei.request (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6300)
+    at async a (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:130:9551)
+    at async swapVehiculosInPlace (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:13)
+    at async procesarVehiculosCompleto (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:246:27)
+    at async exports.procesarVehiculosCompletoEndpoint (/Users/lucasmartinez/Voonda/voonda-api/controllers/syncController.js:121:23) {
+  clientVersion: '6.18.0'
+}
+✅ Swap completado: {
+  vehiculosDesactivados: 0,
+  vehiculosInsertados: 0,
+  vehiculosActualizados: 0,
+  errores: 1
+}
+🎉 Procesamiento completo exitoso: {
+  success: true,
+  batchId: 'batch_1761970416096_bqw66mu3i',
+  empresaId: 'eb209d17-ee6f-4188-9abb-6d36cc87ba88',
+  modelos: { procesados: 1, exitosos: 1 },
+  vehiculos: {
+    vehiculosDesactivados: 0,
+    vehiculosInsertados: 0,
+    vehiculosActualizados: 0,
+    errores: 1
+  },
+  errores: [
+    {
+      vehiculo: [Object],
+      error: '\n' +
+        'Invalid `prisma.vehiculo.create()` invocation in\n' +
+        '/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35\n' +
+        '\n' +
+        '  157   actualizados++;\n' +
+        '  158 } else {\n' +
+        '  159   // Insertar nuevo vehículo\n' +
+        '→ 160   await prisma.vehiculo.create({\n' +
+        '          data: {\n' +
+        '            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",\n' +
+        '            modelo_id: "520b09d6-1a3e-4547-8d03-d6bae0baa05a",\n' +
+        '            patente: "TEST001",\n' +
+        '            dominio: "TEST001",\n' +
+        '            color: "Blanco",\n' +
+        '            color_interior: "Negro",\n' +
+        '            kilometros: 25000,\n' +
+        '            año: 2020,\n' +
+        '            vehiculo_ano: 2020,\n' +
+        '            precio_publicado: null,\n' +
+        '            precio_contado: null,\n' +
+        '            valor: 2500000,\n' +
+        '            moneda: "ARS",\n' +
+        '            estado: "Disponible",\n' +
+        '            ubicacion: "Buenos Aires",\n' +
+        '            categoria: "Sedan",\n' +
+        '            imagenes_url: null,\n' +
+        '            publicacion_web: true,\n' +
+        '                             ~~~~\n' +
+        '            publicacion_api_call: "true",\n' +
+        '            activo: true,\n' +
+        '            batch_id: "batch_1761970416096_bqw66mu3i",\n' +
+        '            updated_at: new Date("2025-11-01T04:13:38.078Z")\n' +
+        '          }\n' +
+        '        })\n' +
+        '\n' +
+        'Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.'
+    }
+  ],
+  timestamp: '2025-11-01T04:13:38.485Z'
+}
+::1 - - [01/Nov/2025:04:13:38 +0000] "POST /api/sync/vehiculos-completo HTTP/1.1" 200 2076 "-" "curl/8.7.1"
+prisma:query SELECT 1
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+prisma:query UPDATE "public"."usuarios" SET "intentos_fallidos" = $1, "bloqueado_hasta" = $2, "ultimo_login" = $3, "updated_at" = $4 WHERE ("public"."usuarios"."id" = $5 AND 1=1) RETURNING "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at"
+::1 - - [01/Nov/2025:04:14:07 +0000] "POST /api/auth/login HTTP/1.1" 200 1497 "-" "curl/8.7.1"
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+🚀 Usuario admin.empresa@voonda.com solicitó procesamiento completo de 1 vehículos
+🚀 Iniciando procesamiento completo de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📦 Batch ID: batch_1761970448456_hkrlgd3k9
+📋 Paso 1: Procesando modelos...
+🔍 Procesando 1 modelos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📝 Insertando 1 modelos únicos
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."modelo_autos" ("empresa_id","marca","modelo","año","versión","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING
+prisma:query COMMIT
+✅ Modelos insertados correctamente
+prisma:query SELECT "public"."modelo_autos"."id", "public"."modelo_autos"."empresa_id", "public"."modelo_autos"."marca", "public"."modelo_autos"."modelo", "public"."modelo_autos"."año", "public"."modelo_autos"."precio_venta_estimado", "public"."modelo_autos"."versión", "public"."modelo_autos"."motorización", "public"."modelo_autos"."combustible", "public"."modelo_autos"."caja", "public"."modelo_autos"."tracción", "public"."modelo_autos"."puertas", "public"."modelo_autos"."segmento", "public"."modelo_autos"."cilindrada", "public"."modelo_autos"."potencia_hp", "public"."modelo_autos"."torque_nm", "public"."modelo_autos"."airbags", "public"."modelo_autos"."abs", "public"."modelo_autos"."control_estabilidad", "public"."modelo_autos"."climatizador", "public"."modelo_autos"."multimedia", "public"."modelo_autos"."frenos", "public"."modelo_autos"."neumaticos", "public"."modelo_autos"."llantas", "public"."modelo_autos"."asistencia_manejo", "public"."modelo_autos"."rendimiento_mixto", "public"."modelo_autos"."capacidad_baul", "public"."modelo_autos"."capacidad_combustible", "public"."modelo_autos"."velocidad_max", "public"."modelo_autos"."largo", "public"."modelo_autos"."ancho", "public"."modelo_autos"."alto", "public"."modelo_autos"."url_ficha", "public"."modelo_autos"."informacion_rag", "public"."modelo_autos"."created_at", "public"."modelo_autos"."updated_at" FROM "public"."modelo_autos" WHERE ("public"."modelo_autos"."empresa_id" = $1 AND "public"."modelo_autos"."marca" = $2 AND "public"."modelo_autos"."modelo" = $3 AND "public"."modelo_autos"."año" = $4 AND "public"."modelo_autos"."versión" = $5) LIMIT $6 OFFSET $7
+✅ Procesados 1 modelos con IDs
+🔗 Paso 2: Vinculando vehículos con modelos...
+🔄 Paso 3: Actualizando vehículos...
+🔄 Iniciando swap de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88, lote batch_1761970448456_hkrlgd3k9
+📊 Procesando 1 vehículos
+prisma:query BEGIN
+prisma:query UPDATE "public"."vehiculos" SET "activo" = $1, "updated_at" = $2 WHERE ("public"."vehiculos"."empresa_id" = $3 AND "public"."vehiculos"."activo" = $4)
+prisma:query COMMIT
+🔴 Desactivados 0 vehículos existentes
+prisma:query SELECT "public"."vehiculos"."id", "public"."vehiculos"."created_at", "public"."vehiculos"."updated_at", "public"."vehiculos"."empresa_id", "public"."vehiculos"."marca", "public"."vehiculos"."modelo", "public"."vehiculos"."version", "public"."vehiculos"."vehiculo_ano", "public"."vehiculos"."modelo_ano", "public"."vehiculos"."patente", "public"."vehiculos"."dominio", "public"."vehiculos"."kilometros", "public"."vehiculos"."valor", "public"."vehiculos"."moneda", "public"."vehiculos"."condicion", "public"."vehiculos"."vendedor", "public"."vehiculos"."fecha_ingreso", "public"."vehiculos"."fecha_reserva", "public"."vehiculos"."fecha_entrega", "public"."vehiculos"."publicacion_web", "public"."vehiculos"."publicacion_api_call", "public"."vehiculos"."publi_insta", "public"."vehiculos"."publi_face", "public"."vehiculos"."publi_mer_lib", "public"."vehiculos"."publi_mark_p", "public"."vehiculos"."motorizacion", "public"."vehiculos"."combustible", "public"."vehiculos"."cilindrada", "public"."vehiculos"."potencia_hp", "public"."vehiculos"."torque_nm", "public"."vehiculos"."caja", "public"."vehiculos"."traccion", "public"."vehiculos"."puertas", "public"."vehiculos"."segmento_modelo", "public"."vehiculos"."largo", "public"."vehiculos"."ancho", "public"."vehiculos"."alto", "public"."vehiculos"."airbags", "public"."vehiculos"."abs", "public"."vehiculos"."control_estabilidad", "public"."vehiculos"."climatizador", "public"."vehiculos"."multimedia", "public"."vehiculos"."asistencia_manejo", "public"."vehiculos"."frenos", "public"."vehiculos"."neumaticos", "public"."vehiculos"."llantas", "public"."vehiculos"."rendimiento_mixto", "public"."vehiculos"."capacidad_baul", "public"."vehiculos"."capacidad_combustible", "public"."vehiculos"."velocidad_max", "public"."vehiculos"."url_ficha", "public"."vehiculos"."modelo_rag", "public"."vehiculos"."titulo_legible", "public"."vehiculos"."ficha_breve", "public"."vehiculos"."estado", "public"."vehiculos"."pendientes_preparacion", "public"."vehiculos"."activo", "public"."vehiculos"."sincronizado_sheets", "public"."vehiculos"."sheets_row_id", "public"."vehiculos"."año", "public"."vehiculos"."modelo_año", "public"."vehiculos"."precio", "public"."vehiculos"."precio_publicado", "public"."vehiculos"."precio_contado", "public"."vehiculos"."ubicacion", "public"."vehiculos"."categoria", "public"."vehiculos"."imagenes_url", "public"."vehiculos"."color", "public"."vehiculos"."color_interior", "public"."vehiculos"."detalle_estado", "public"."vehiculos"."revisado_mecanico", "public"."vehiculos"."manuales_seg_llave", "public"."vehiculos"."titular_unico", "public"."vehiculos"."tipo_titularidad", "public"."vehiculos"."condicion_iva", "public"."vehiculos"."vencimiento_vtv", "public"."vehiculos"."acepta_permuta", "public"."vehiculos"."financiable", "public"."vehiculos"."anticipo_sugerido", "public"."vehiculos"."cuota_estimativa", "public"."vehiculos"."modelo_id", "public"."vehiculos"."batch_id" FROM "public"."vehiculos" WHERE ("public"."vehiculos"."patente" = $1 AND "public"."vehiculos"."empresa_id" = $2) LIMIT $3 OFFSET $4
+❌ Error procesando vehículo: PrismaClientValidationError: 
+Invalid `prisma.vehiculo.create()` invocation in
+/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35
+
+  157   actualizados++;
+  158 } else {
+  159   // Insertar nuevo vehículo
+→ 160   await prisma.vehiculo.create({
+          data: {
+            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",
+            modelo_id: "520b09d6-1a3e-4547-8d03-d6bae0baa05a",
+            patente: "TEST002",
+            dominio: "TEST002",
+            color: "Azul",
+            color_interior: "Negro",
+            kilometros: 15000,
+            año: 2020,
+            vehiculo_ano: 2020,
+            precio_publicado: null,
+            precio_contado: null,
+            valor: 2800000,
+            moneda: "ARS",
+            estado: "Disponible",
+            ubicacion: "Córdoba",
+            categoria: "Sedan",
+            imagenes_url: null,
+            publicacion_web: true,
+                             ~~~~
+            publicacion_api_call: "false",
+            activo: true,
+            batch_id: "batch_1761970448456_hkrlgd3k9",
+            updated_at: new Date("2025-11-01T04:14:09.798Z")
+          }
+        })
+
+Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.
+    at Nn (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at ei.handleRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6911)
+    at ei.handleAndLogRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6593)
+    at ei.request (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6300)
+    at async a (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:130:9551)
+    at async swapVehiculosInPlace (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:13)
+    at async procesarVehiculosCompleto (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:246:27)
+    at async exports.procesarVehiculosCompletoEndpoint (/Users/lucasmartinez/Voonda/voonda-api/controllers/syncController.js:121:23) {
+  clientVersion: '6.18.0'
+}
+✅ Swap completado: {
+  vehiculosDesactivados: 0,
+  vehiculosInsertados: 0,
+  vehiculosActualizados: 0,
+  errores: 1
+}
+🎉 Procesamiento completo exitoso: {
+  success: true,
+  batchId: 'batch_1761970448456_hkrlgd3k9',
+  empresaId: 'eb209d17-ee6f-4188-9abb-6d36cc87ba88',
+  modelos: { procesados: 1, exitosos: 1 },
+  vehiculos: {
+    vehiculosDesactivados: 0,
+    vehiculosInsertados: 0,
+    vehiculosActualizados: 0,
+    errores: 1
+  },
+  errores: [
+    {
+      vehiculo: [Object],
+      error: '\n' +
+        'Invalid `prisma.vehiculo.create()` invocation in\n' +
+        '/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35\n' +
+        '\n' +
+        '  157   actualizados++;\n' +
+        '  158 } else {\n' +
+        '  159   // Insertar nuevo vehículo\n' +
+        '→ 160   await prisma.vehiculo.create({\n' +
+        '          data: {\n' +
+        '            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",\n' +
+        '            modelo_id: "520b09d6-1a3e-4547-8d03-d6bae0baa05a",\n' +
+        '            patente: "TEST002",\n' +
+        '            dominio: "TEST002",\n' +
+        '            color: "Azul",\n' +
+        '            color_interior: "Negro",\n' +
+        '            kilometros: 15000,\n' +
+        '            año: 2020,\n' +
+        '            vehiculo_ano: 2020,\n' +
+        '            precio_publicado: null,\n' +
+        '            precio_contado: null,\n' +
+        '            valor: 2800000,\n' +
+        '            moneda: "ARS",\n' +
+        '            estado: "Disponible",\n' +
+        '            ubicacion: "Córdoba",\n' +
+        '            categoria: "Sedan",\n' +
+        '            imagenes_url: null,\n' +
+        '            publicacion_web: true,\n' +
+        '                             ~~~~\n' +
+        '            publicacion_api_call: "false",\n' +
+        '            activo: true,\n' +
+        '            batch_id: "batch_1761970448456_hkrlgd3k9",\n' +
+        '            updated_at: new Date("2025-11-01T04:14:09.798Z")\n' +
+        '          }\n' +
+        '        })\n' +
+        '\n' +
+        'Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.'
+    }
+  ],
+  timestamp: '2025-11-01T04:14:09.999Z'
+}
+::1 - - [01/Nov/2025:04:14:10 +0000] "POST /api/sync/vehiculos-completo HTTP/1.1" 200 2057 "-" "curl/8.7.1"
+prisma:query SELECT 1
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+prisma:query UPDATE "public"."usuarios" SET "intentos_fallidos" = $1, "bloqueado_hasta" = $2, "ultimo_login" = $3, "updated_at" = $4 WHERE ("public"."usuarios"."id" = $5 AND 1=1) RETURNING "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at"
+::1 - - [01/Nov/2025:04:14:33 +0000] "POST /api/auth/login HTTP/1.1" 200 1497 "-" "curl/8.7.1"
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+🚀 Usuario admin.empresa@voonda.com solicitó procesamiento completo de 1 vehículos
+🚀 Iniciando procesamiento completo de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📦 Batch ID: batch_1761970473598_kn1hvfmbo
+📋 Paso 1: Procesando modelos...
+🔍 Procesando 1 modelos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📝 Insertando 1 modelos únicos
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."modelo_autos" ("empresa_id","marca","modelo","año","versión","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING
+prisma:query COMMIT
+✅ Modelos insertados correctamente
+prisma:query SELECT "public"."modelo_autos"."id", "public"."modelo_autos"."empresa_id", "public"."modelo_autos"."marca", "public"."modelo_autos"."modelo", "public"."modelo_autos"."año", "public"."modelo_autos"."precio_venta_estimado", "public"."modelo_autos"."versión", "public"."modelo_autos"."motorización", "public"."modelo_autos"."combustible", "public"."modelo_autos"."caja", "public"."modelo_autos"."tracción", "public"."modelo_autos"."puertas", "public"."modelo_autos"."segmento", "public"."modelo_autos"."cilindrada", "public"."modelo_autos"."potencia_hp", "public"."modelo_autos"."torque_nm", "public"."modelo_autos"."airbags", "public"."modelo_autos"."abs", "public"."modelo_autos"."control_estabilidad", "public"."modelo_autos"."climatizador", "public"."modelo_autos"."multimedia", "public"."modelo_autos"."frenos", "public"."modelo_autos"."neumaticos", "public"."modelo_autos"."llantas", "public"."modelo_autos"."asistencia_manejo", "public"."modelo_autos"."rendimiento_mixto", "public"."modelo_autos"."capacidad_baul", "public"."modelo_autos"."capacidad_combustible", "public"."modelo_autos"."velocidad_max", "public"."modelo_autos"."largo", "public"."modelo_autos"."ancho", "public"."modelo_autos"."alto", "public"."modelo_autos"."url_ficha", "public"."modelo_autos"."informacion_rag", "public"."modelo_autos"."created_at", "public"."modelo_autos"."updated_at" FROM "public"."modelo_autos" WHERE ("public"."modelo_autos"."empresa_id" = $1 AND "public"."modelo_autos"."marca" = $2 AND "public"."modelo_autos"."modelo" = $3 AND "public"."modelo_autos"."año" = $4 AND "public"."modelo_autos"."versión" = $5) LIMIT $6 OFFSET $7
+✅ Procesados 1 modelos con IDs
+🔗 Paso 2: Vinculando vehículos con modelos...
+🔄 Paso 3: Actualizando vehículos...
+🔄 Iniciando swap de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88, lote batch_1761970473598_kn1hvfmbo
+📊 Procesando 1 vehículos
+prisma:query BEGIN
+prisma:query UPDATE "public"."vehiculos" SET "activo" = $1, "updated_at" = $2 WHERE ("public"."vehiculos"."empresa_id" = $3 AND "public"."vehiculos"."activo" = $4)
+prisma:query COMMIT
+🔴 Desactivados 0 vehículos existentes
+prisma:query SELECT "public"."vehiculos"."id", "public"."vehiculos"."created_at", "public"."vehiculos"."updated_at", "public"."vehiculos"."empresa_id", "public"."vehiculos"."marca", "public"."vehiculos"."modelo", "public"."vehiculos"."version", "public"."vehiculos"."vehiculo_ano", "public"."vehiculos"."modelo_ano", "public"."vehiculos"."patente", "public"."vehiculos"."dominio", "public"."vehiculos"."kilometros", "public"."vehiculos"."valor", "public"."vehiculos"."moneda", "public"."vehiculos"."condicion", "public"."vehiculos"."vendedor", "public"."vehiculos"."fecha_ingreso", "public"."vehiculos"."fecha_reserva", "public"."vehiculos"."fecha_entrega", "public"."vehiculos"."publicacion_web", "public"."vehiculos"."publicacion_api_call", "public"."vehiculos"."publi_insta", "public"."vehiculos"."publi_face", "public"."vehiculos"."publi_mer_lib", "public"."vehiculos"."publi_mark_p", "public"."vehiculos"."motorizacion", "public"."vehiculos"."combustible", "public"."vehiculos"."cilindrada", "public"."vehiculos"."potencia_hp", "public"."vehiculos"."torque_nm", "public"."vehiculos"."caja", "public"."vehiculos"."traccion", "public"."vehiculos"."puertas", "public"."vehiculos"."segmento_modelo", "public"."vehiculos"."largo", "public"."vehiculos"."ancho", "public"."vehiculos"."alto", "public"."vehiculos"."airbags", "public"."vehiculos"."abs", "public"."vehiculos"."control_estabilidad", "public"."vehiculos"."climatizador", "public"."vehiculos"."multimedia", "public"."vehiculos"."asistencia_manejo", "public"."vehiculos"."frenos", "public"."vehiculos"."neumaticos", "public"."vehiculos"."llantas", "public"."vehiculos"."rendimiento_mixto", "public"."vehiculos"."capacidad_baul", "public"."vehiculos"."capacidad_combustible", "public"."vehiculos"."velocidad_max", "public"."vehiculos"."url_ficha", "public"."vehiculos"."modelo_rag", "public"."vehiculos"."titulo_legible", "public"."vehiculos"."ficha_breve", "public"."vehiculos"."estado", "public"."vehiculos"."pendientes_preparacion", "public"."vehiculos"."activo", "public"."vehiculos"."sincronizado_sheets", "public"."vehiculos"."sheets_row_id", "public"."vehiculos"."año", "public"."vehiculos"."modelo_año", "public"."vehiculos"."precio", "public"."vehiculos"."precio_publicado", "public"."vehiculos"."precio_contado", "public"."vehiculos"."ubicacion", "public"."vehiculos"."categoria", "public"."vehiculos"."imagenes_url", "public"."vehiculos"."color", "public"."vehiculos"."color_interior", "public"."vehiculos"."detalle_estado", "public"."vehiculos"."revisado_mecanico", "public"."vehiculos"."manuales_seg_llave", "public"."vehiculos"."titular_unico", "public"."vehiculos"."tipo_titularidad", "public"."vehiculos"."condicion_iva", "public"."vehiculos"."vencimiento_vtv", "public"."vehiculos"."acepta_permuta", "public"."vehiculos"."financiable", "public"."vehiculos"."anticipo_sugerido", "public"."vehiculos"."cuota_estimativa", "public"."vehiculos"."modelo_id", "public"."vehiculos"."batch_id" FROM "public"."vehiculos" WHERE ("public"."vehiculos"."patente" = $1 AND "public"."vehiculos"."empresa_id" = $2) LIMIT $3 OFFSET $4
+❌ Error procesando vehículo: PrismaClientValidationError: 
+Invalid `prisma.vehiculo.create()` invocation in
+/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35
+
+  157   actualizados++;
+  158 } else {
+  159   // Insertar nuevo vehículo
+→ 160   await prisma.vehiculo.create({
+          data: {
+            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",
+            modelo_id: "98eac71c-8875-4b85-b09f-0c11badd7815",
+            patente: "TEST003",
+            dominio: "TEST003",
+            color: "Rojo",
+            color_interior: "Negro",
+            kilometros: 10000,
+            año: 2021,
+            vehiculo_ano: 2021,
+            precio_publicado: null,
+            precio_contado: null,
+            valor: 3200000,
+            moneda: "ARS",
+            estado: "Disponible",
+            ubicacion: "Buenos Aires",
+            categoria: "Sedan",
+            imagenes_url: null,
+            publicacion_web: true,
+                             ~~~~
+            publicacion_api_call: "true",
+            activo: true,
+            batch_id: "batch_1761970473598_kn1hvfmbo",
+            updated_at: new Date("2025-11-01T04:14:34.938Z")
+          }
+        })
+
+Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.
+    at Nn (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at ei.handleRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6911)
+    at ei.handleAndLogRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6593)
+    at ei.request (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6300)
+    at async a (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:130:9551)
+    at async swapVehiculosInPlace (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:13)
+    at async procesarVehiculosCompleto (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:246:27)
+    at async exports.procesarVehiculosCompletoEndpoint (/Users/lucasmartinez/Voonda/voonda-api/controllers/syncController.js:121:23) {
+  clientVersion: '6.18.0'
+}
+✅ Swap completado: {
+  vehiculosDesactivados: 0,
+  vehiculosInsertados: 0,
+  vehiculosActualizados: 0,
+  errores: 1
+}
+🎉 Procesamiento completo exitoso: {
+  success: true,
+  batchId: 'batch_1761970473598_kn1hvfmbo',
+  empresaId: 'eb209d17-ee6f-4188-9abb-6d36cc87ba88',
+  modelos: { procesados: 1, exitosos: 1 },
+  vehiculos: {
+    vehiculosDesactivados: 0,
+    vehiculosInsertados: 0,
+    vehiculosActualizados: 0,
+    errores: 1
+  },
+  errores: [
+    {
+      vehiculo: [Object],
+      error: '\n' +
+        'Invalid `prisma.vehiculo.create()` invocation in\n' +
+        '/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35\n' +
+        '\n' +
+        '  157   actualizados++;\n' +
+        '  158 } else {\n' +
+        '  159   // Insertar nuevo vehículo\n' +
+        '→ 160   await prisma.vehiculo.create({\n' +
+        '          data: {\n' +
+        '            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",\n' +
+        '            modelo_id: "98eac71c-8875-4b85-b09f-0c11badd7815",\n' +
+        '            patente: "TEST003",\n' +
+        '            dominio: "TEST003",\n' +
+        '            color: "Rojo",\n' +
+        '            color_interior: "Negro",\n' +
+        '            kilometros: 10000,\n' +
+        '            año: 2021,\n' +
+        '            vehiculo_ano: 2021,\n' +
+        '            precio_publicado: null,\n' +
+        '            precio_contado: null,\n' +
+        '            valor: 3200000,\n' +
+        '            moneda: "ARS",\n' +
+        '            estado: "Disponible",\n' +
+        '            ubicacion: "Buenos Aires",\n' +
+        '            categoria: "Sedan",\n' +
+        '            imagenes_url: null,\n' +
+        '            publicacion_web: true,\n' +
+        '                             ~~~~\n' +
+        '            publicacion_api_call: "true",\n' +
+        '            activo: true,\n' +
+        '            batch_id: "batch_1761970473598_kn1hvfmbo",\n' +
+        '            updated_at: new Date("2025-11-01T04:14:34.938Z")\n' +
+        '          }\n' +
+        '        })\n' +
+        '\n' +
+        'Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.'
+    }
+  ],
+  timestamp: '2025-11-01T04:14:35.140Z'
+}
+::1 - - [01/Nov/2025:04:14:35 +0000] "POST /api/sync/vehiculos-completo HTTP/1.1" 200 2055 "-" "curl/8.7.1"
+prisma:query SELECT 1
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+prisma:query UPDATE "public"."usuarios" SET "intentos_fallidos" = $1, "bloqueado_hasta" = $2, "ultimo_login" = $3, "updated_at" = $4 WHERE ("public"."usuarios"."id" = $5 AND 1=1) RETURNING "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at"
+::1 - - [01/Nov/2025:04:14:56 +0000] "POST /api/auth/login HTTP/1.1" 200 1497 "-" "curl/8.7.1"
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+🚀 Usuario admin.empresa@voonda.com solicitó procesamiento completo de 1 vehículos
+🚀 Iniciando procesamiento completo de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📦 Batch ID: batch_1761970497454_5l47qhtm1
+📋 Paso 1: Procesando modelos...
+🔍 Procesando 1 modelos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📝 Insertando 1 modelos únicos
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."modelo_autos" ("empresa_id","marca","modelo","año","versión","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING
+prisma:query COMMIT
+✅ Modelos insertados correctamente
+prisma:query SELECT "public"."modelo_autos"."id", "public"."modelo_autos"."empresa_id", "public"."modelo_autos"."marca", "public"."modelo_autos"."modelo", "public"."modelo_autos"."año", "public"."modelo_autos"."precio_venta_estimado", "public"."modelo_autos"."versión", "public"."modelo_autos"."motorización", "public"."modelo_autos"."combustible", "public"."modelo_autos"."caja", "public"."modelo_autos"."tracción", "public"."modelo_autos"."puertas", "public"."modelo_autos"."segmento", "public"."modelo_autos"."cilindrada", "public"."modelo_autos"."potencia_hp", "public"."modelo_autos"."torque_nm", "public"."modelo_autos"."airbags", "public"."modelo_autos"."abs", "public"."modelo_autos"."control_estabilidad", "public"."modelo_autos"."climatizador", "public"."modelo_autos"."multimedia", "public"."modelo_autos"."frenos", "public"."modelo_autos"."neumaticos", "public"."modelo_autos"."llantas", "public"."modelo_autos"."asistencia_manejo", "public"."modelo_autos"."rendimiento_mixto", "public"."modelo_autos"."capacidad_baul", "public"."modelo_autos"."capacidad_combustible", "public"."modelo_autos"."velocidad_max", "public"."modelo_autos"."largo", "public"."modelo_autos"."ancho", "public"."modelo_autos"."alto", "public"."modelo_autos"."url_ficha", "public"."modelo_autos"."informacion_rag", "public"."modelo_autos"."created_at", "public"."modelo_autos"."updated_at" FROM "public"."modelo_autos" WHERE ("public"."modelo_autos"."empresa_id" = $1 AND "public"."modelo_autos"."marca" = $2 AND "public"."modelo_autos"."modelo" = $3 AND "public"."modelo_autos"."año" = $4 AND "public"."modelo_autos"."versión" = $5) LIMIT $6 OFFSET $7
+✅ Procesados 1 modelos con IDs
+🔗 Paso 2: Vinculando vehículos con modelos...
+🔄 Paso 3: Actualizando vehículos...
+🔄 Iniciando swap de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88, lote batch_1761970497454_5l47qhtm1
+📊 Procesando 1 vehículos
+prisma:query BEGIN
+prisma:query UPDATE "public"."vehiculos" SET "activo" = $1, "updated_at" = $2 WHERE ("public"."vehiculos"."empresa_id" = $3 AND "public"."vehiculos"."activo" = $4)
+prisma:query COMMIT
+🔴 Desactivados 0 vehículos existentes
+prisma:query SELECT "public"."vehiculos"."id", "public"."vehiculos"."created_at", "public"."vehiculos"."updated_at", "public"."vehiculos"."empresa_id", "public"."vehiculos"."marca", "public"."vehiculos"."modelo", "public"."vehiculos"."version", "public"."vehiculos"."vehiculo_ano", "public"."vehiculos"."modelo_ano", "public"."vehiculos"."patente", "public"."vehiculos"."dominio", "public"."vehiculos"."kilometros", "public"."vehiculos"."valor", "public"."vehiculos"."moneda", "public"."vehiculos"."condicion", "public"."vehiculos"."vendedor", "public"."vehiculos"."fecha_ingreso", "public"."vehiculos"."fecha_reserva", "public"."vehiculos"."fecha_entrega", "public"."vehiculos"."publicacion_web", "public"."vehiculos"."publicacion_api_call", "public"."vehiculos"."publi_insta", "public"."vehiculos"."publi_face", "public"."vehiculos"."publi_mer_lib", "public"."vehiculos"."publi_mark_p", "public"."vehiculos"."motorizacion", "public"."vehiculos"."combustible", "public"."vehiculos"."cilindrada", "public"."vehiculos"."potencia_hp", "public"."vehiculos"."torque_nm", "public"."vehiculos"."caja", "public"."vehiculos"."traccion", "public"."vehiculos"."puertas", "public"."vehiculos"."segmento_modelo", "public"."vehiculos"."largo", "public"."vehiculos"."ancho", "public"."vehiculos"."alto", "public"."vehiculos"."airbags", "public"."vehiculos"."abs", "public"."vehiculos"."control_estabilidad", "public"."vehiculos"."climatizador", "public"."vehiculos"."multimedia", "public"."vehiculos"."asistencia_manejo", "public"."vehiculos"."frenos", "public"."vehiculos"."neumaticos", "public"."vehiculos"."llantas", "public"."vehiculos"."rendimiento_mixto", "public"."vehiculos"."capacidad_baul", "public"."vehiculos"."capacidad_combustible", "public"."vehiculos"."velocidad_max", "public"."vehiculos"."url_ficha", "public"."vehiculos"."modelo_rag", "public"."vehiculos"."titulo_legible", "public"."vehiculos"."ficha_breve", "public"."vehiculos"."estado", "public"."vehiculos"."pendientes_preparacion", "public"."vehiculos"."activo", "public"."vehiculos"."sincronizado_sheets", "public"."vehiculos"."sheets_row_id", "public"."vehiculos"."año", "public"."vehiculos"."modelo_año", "public"."vehiculos"."precio", "public"."vehiculos"."precio_publicado", "public"."vehiculos"."precio_contado", "public"."vehiculos"."ubicacion", "public"."vehiculos"."categoria", "public"."vehiculos"."imagenes_url", "public"."vehiculos"."color", "public"."vehiculos"."color_interior", "public"."vehiculos"."detalle_estado", "public"."vehiculos"."revisado_mecanico", "public"."vehiculos"."manuales_seg_llave", "public"."vehiculos"."titular_unico", "public"."vehiculos"."tipo_titularidad", "public"."vehiculos"."condicion_iva", "public"."vehiculos"."vencimiento_vtv", "public"."vehiculos"."acepta_permuta", "public"."vehiculos"."financiable", "public"."vehiculos"."anticipo_sugerido", "public"."vehiculos"."cuota_estimativa", "public"."vehiculos"."modelo_id", "public"."vehiculos"."batch_id" FROM "public"."vehiculos" WHERE ("public"."vehiculos"."patente" = $1 AND "public"."vehiculos"."empresa_id" = $2) LIMIT $3 OFFSET $4
+❌ Error procesando vehículo: PrismaClientValidationError: 
+Invalid `prisma.vehiculo.create()` invocation in
+/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35
+
+  157   actualizados++;
+  158 } else {
+  159   // Insertar nuevo vehículo
+→ 160   await prisma.vehiculo.create({
+          data: {
+            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",
+            modelo_id: "1d000875-fd3e-46f7-8feb-947138bb9730",
+            patente: "TEST004",
+            dominio: "TEST004",
+            color: "Negro",
+            color_interior: "Gris",
+            kilometros: 35000,
+            año: 2019,
+            vehiculo_ano: 2019,
+            precio_publicado: null,
+            precio_contado: null,
+            valor: 2200000,
+            moneda: "ARS",
+            estado: "Disponible",
+            ubicacion: "Rosario",
+            categoria: "Hatchback",
+            imagenes_url: null,
+            publicacion_web: false,
+                             ~~~~~
+            publicacion_api_call: "true",
+            activo: true,
+            batch_id: "batch_1761970497454_5l47qhtm1",
+            updated_at: new Date("2025-11-01T04:14:58.792Z")
+          }
+        })
+
+Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.
+    at Nn (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at ei.handleRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6911)
+    at ei.handleAndLogRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6593)
+    at ei.request (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6300)
+    at async a (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:130:9551)
+    at async swapVehiculosInPlace (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:13)
+    at async procesarVehiculosCompleto (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:246:27)
+    at async exports.procesarVehiculosCompletoEndpoint (/Users/lucasmartinez/Voonda/voonda-api/controllers/syncController.js:121:23) {
+  clientVersion: '6.18.0'
+}
+✅ Swap completado: {
+  vehiculosDesactivados: 0,
+  vehiculosInsertados: 0,
+  vehiculosActualizados: 0,
+  errores: 1
+}
+🎉 Procesamiento completo exitoso: {
+  success: true,
+  batchId: 'batch_1761970497454_5l47qhtm1',
+  empresaId: 'eb209d17-ee6f-4188-9abb-6d36cc87ba88',
+  modelos: { procesados: 1, exitosos: 1 },
+  vehiculos: {
+    vehiculosDesactivados: 0,
+    vehiculosInsertados: 0,
+    vehiculosActualizados: 0,
+    errores: 1
+  },
+  errores: [
+    {
+      vehiculo: [Object],
+      error: '\n' +
+        'Invalid `prisma.vehiculo.create()` invocation in\n' +
+        '/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:35\n' +
+        '\n' +
+        '  157   actualizados++;\n' +
+        '  158 } else {\n' +
+        '  159   // Insertar nuevo vehículo\n' +
+        '→ 160   await prisma.vehiculo.create({\n' +
+        '          data: {\n' +
+        '            empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",\n' +
+        '            modelo_id: "1d000875-fd3e-46f7-8feb-947138bb9730",\n' +
+        '            patente: "TEST004",\n' +
+        '            dominio: "TEST004",\n' +
+        '            color: "Negro",\n' +
+        '            color_interior: "Gris",\n' +
+        '            kilometros: 35000,\n' +
+        '            año: 2019,\n' +
+        '            vehiculo_ano: 2019,\n' +
+        '            precio_publicado: null,\n' +
+        '            precio_contado: null,\n' +
+        '            valor: 2200000,\n' +
+        '            moneda: "ARS",\n' +
+        '            estado: "Disponible",\n' +
+        '            ubicacion: "Rosario",\n' +
+        '            categoria: "Hatchback",\n' +
+        '            imagenes_url: null,\n' +
+        '            publicacion_web: false,\n' +
+        '                             ~~~~~\n' +
+        '            publicacion_api_call: "true",\n' +
+        '            activo: true,\n' +
+        '            batch_id: "batch_1761970497454_5l47qhtm1",\n' +
+        '            updated_at: new Date("2025-11-01T04:14:58.792Z")\n' +
+        '          }\n' +
+        '        })\n' +
+        '\n' +
+        'Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.'
+    }
+  ],
+  timestamp: '2025-11-01T04:14:58.990Z'
+}
+::1 - - [01/Nov/2025:04:14:58 +0000] "POST /api/sync/vehiculos-completo HTTP/1.1" 200 2054 "-" "curl/8.7.1"
+prisma:query SELECT 1
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+prisma:query UPDATE "public"."usuarios" SET "intentos_fallidos" = $1, "bloqueado_hasta" = $2, "ultimo_login" = $3, "updated_at" = $4 WHERE ("public"."usuarios"."id" = $5 AND 1=1) RETURNING "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at"
+::1 - - [01/Nov/2025:04:15:51 +0000] "POST /api/auth/login HTTP/1.1" 200 1497 "-" "curl/8.7.1"
+prisma:query SELECT "public"."usuarios"."id", "public"."usuarios"."email", "public"."usuarios"."password", "public"."usuarios"."nombre", "public"."usuarios"."apellido", "public"."usuarios"."telefono", "public"."usuarios"."activo", "public"."usuarios"."empresa_id", "public"."usuarios"."rol_id", "public"."usuarios"."ultimo_login", "public"."usuarios"."intentos_fallidos", "public"."usuarios"."bloqueado_hasta", "public"."usuarios"."created_at", "public"."usuarios"."updated_at" FROM "public"."usuarios" WHERE ("public"."usuarios"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."empresas"."id", "public"."empresas"."nombre", "public"."empresas"."descripcion", "public"."empresas"."logo_url", "public"."empresas"."activa", "public"."empresas"."created_at", "public"."empresas"."updated_at" FROM "public"."empresas" WHERE "public"."empresas"."id" IN ($1) OFFSET $2
+prisma:query SELECT "public"."roles"."id", "public"."roles"."nombre", "public"."roles"."descripcion", "public"."roles"."permisos", "public"."roles"."activo", "public"."roles"."created_at" FROM "public"."roles" WHERE "public"."roles"."id" IN ($1) OFFSET $2
+🚀 Usuario admin.empresa@voonda.com solicitó procesamiento completo de 1 vehículos
+🚀 Iniciando procesamiento completo de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📦 Batch ID: batch_1761970552227_u2ctl3t6s
+📋 Paso 1: Procesando modelos...
+🔍 Procesando 1 modelos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88
+📝 Insertando 1 modelos únicos
+prisma:query BEGIN
+prisma:query INSERT INTO "public"."modelo_autos" ("empresa_id","marca","modelo","año","versión","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING
+prisma:query COMMIT
+✅ Modelos insertados correctamente
+prisma:query SELECT "public"."modelo_autos"."id", "public"."modelo_autos"."empresa_id", "public"."modelo_autos"."marca", "public"."modelo_autos"."modelo", "public"."modelo_autos"."año", "public"."modelo_autos"."precio_venta_estimado", "public"."modelo_autos"."versión", "public"."modelo_autos"."motorización", "public"."modelo_autos"."combustible", "public"."modelo_autos"."caja", "public"."modelo_autos"."tracción", "public"."modelo_autos"."puertas", "public"."modelo_autos"."segmento", "public"."modelo_autos"."cilindrada", "public"."modelo_autos"."potencia_hp", "public"."modelo_autos"."torque_nm", "public"."modelo_autos"."airbags", "public"."modelo_autos"."abs", "public"."modelo_autos"."control_estabilidad", "public"."modelo_autos"."climatizador", "public"."modelo_autos"."multimedia", "public"."modelo_autos"."frenos", "public"."modelo_autos"."neumaticos", "public"."modelo_autos"."llantas", "public"."modelo_autos"."asistencia_manejo", "public"."modelo_autos"."rendimiento_mixto", "public"."modelo_autos"."capacidad_baul", "public"."modelo_autos"."capacidad_combustible", "public"."modelo_autos"."velocidad_max", "public"."modelo_autos"."largo", "public"."modelo_autos"."ancho", "public"."modelo_autos"."alto", "public"."modelo_autos"."url_ficha", "public"."modelo_autos"."informacion_rag", "public"."modelo_autos"."created_at", "public"."modelo_autos"."updated_at" FROM "public"."modelo_autos" WHERE ("public"."modelo_autos"."empresa_id" = $1 AND "public"."modelo_autos"."marca" = $2 AND "public"."modelo_autos"."modelo" = $3 AND "public"."modelo_autos"."año" = $4 AND "public"."modelo_autos"."versión" = $5) LIMIT $6 OFFSET $7
+✅ Procesados 1 modelos con IDs
+🔗 Paso 2: Vinculando vehículos con modelos...
+🔄 Paso 3: Actualizando vehículos...
+🔄 Iniciando swap de vehículos para empresa eb209d17-ee6f-4188-9abb-6d36cc87ba88, lote batch_1761970552227_u2ctl3t6s
+📊 Procesando 1 vehículos
+prisma:query BEGIN
+prisma:query UPDATE "public"."vehiculos" SET "activo" = $1, "updated_at" = $2 WHERE ("public"."vehiculos"."empresa_id" = $3 AND "public"."vehiculos"."activo" = $4)
+prisma:query COMMIT
+🔴 Desactivados 0 vehículos existentes
+prisma:query SELECT "public"."vehiculos"."id", "public"."vehiculos"."created_at", "public"."vehiculos"."updated_at", "public"."vehiculos"."empresa_id", "public"."vehiculos"."marca", "public"."vehiculos"."modelo", "public"."vehiculos"."version", "public"."vehiculos"."vehiculo_ano", "public"."vehiculos"."modelo_ano", "public"."vehiculos"."patente", "public"."vehiculos"."dominio", "public"."vehiculos"."kilometros", "public"."vehiculos"."valor", "public"."vehiculos"."moneda", "public"."vehiculos"."condicion", "public"."vehiculos"."vendedor", "public"."vehiculos"."fecha_ingreso", "public"."vehiculos"."fecha_reserva", "public"."vehiculos"."fecha_entrega", "public"."vehiculos"."publicacion_web", "public"."vehiculos"."publicacion_api_call", "public"."vehiculos"."publi_insta", "public"."vehiculos"."publi_face", "public"."vehiculos"."publi_mer_lib", "public"."vehiculos"."publi_mark_p", "public"."vehiculos"."motorizacion", "public"."vehiculos"."combustible", "public"."vehiculos"."cilindrada", "public"."vehiculos"."potencia_hp", "public"."vehiculos"."torque_nm", "public"."vehiculos"."caja", "public"."vehiculos"."traccion", "public"."vehiculos"."puertas", "public"."vehiculos"."segmento_modelo", "public"."vehiculos"."largo", "public"."vehiculos"."ancho", "public"."vehiculos"."alto", "public"."vehiculos"."airbags", "public"."vehiculos"."abs", "public"."vehiculos"."control_estabilidad", "public"."vehiculos"."climatizador", "public"."vehiculos"."multimedia", "public"."vehiculos"."asistencia_manejo", "public"."vehiculos"."frenos", "public"."vehiculos"."neumaticos", "public"."vehiculos"."llantas", "public"."vehiculos"."rendimiento_mixto", "public"."vehiculos"."capacidad_baul", "public"."vehiculos"."capacidad_combustible", "public"."vehiculos"."velocidad_max", "public"."vehiculos"."url_ficha", "public"."vehiculos"."modelo_rag", "public"."vehiculos"."titulo_legible", "public"."vehiculos"."ficha_breve", "public"."vehiculos"."estado", "public"."vehiculos"."pendientes_preparacion", "public"."vehiculos"."activo", "public"."vehiculos"."sincronizado_sheets", "public"."vehiculos"."sheets_row_id", "public"."vehiculos"."año", "public"."vehiculos"."modelo_año", "public"."vehiculos"."precio", "public"."vehiculos"."precio_publicado", "public"."vehiculos"."precio_contado", "public"."vehiculos"."ubicacion", "public"."vehiculos"."categoria", "public"."vehiculos"."imagenes_url", "public"."vehiculos"."color", "public"."vehiculos"."color_interior", "public"."vehiculos"."detalle_estado", "public"."vehiculos"."revisado_mecanico", "public"."vehiculos"."manuales_seg_llave", "public"."vehiculos"."titular_unico", "public"."vehiculos"."tipo_titularidad", "public"."vehiculos"."condicion_iva", "public"."vehiculos"."vencimiento_vtv", "public"."vehiculos"."acepta_permuta", "public"."vehiculos"."financiable", "public"."vehiculos"."anticipo_sugerido", "public"."vehiculos"."cuota_estimativa", "public"."vehiculos"."modelo_id", "public"."vehiculos"."batch_id" FROM "public"."vehiculos" WHERE ("public"."vehiculos"."patente" = $1 AND "public"."vehiculos"."empresa_id" = $2) LIMIT $3 OFFSET $4
+❌ Error procesando vehículo: PrismaClientValidationError: 
+Invalid `prisma.vehiculo.create()` invocation:
+
+{
+  data: {
+    empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",
+    modelo_id: "895f7f80-deb7-4312-aa70-55e263097d58",
+    patente: "TEST005",
+    dominio: "TEST005",
+    color: "Blanco",
+    color_interior: "Negro",
+    kilometros: 40000,
+    año: 2018,
+    vehiculo_ano: 2018,
+    precio_publicado: null,
+    precio_contado: null,
+    valor: 2100000,
+    moneda: "ARS",
+    estado: "Disponible",
+    ubicacion: "La Plata",
+    categoria: "Sedan",
+    imagenes_url: null,
+    publicacion_web: true,
+                     ~~~~
+    publicacion_api_call: "false",
+    activo: true,
+    batch_id: "batch_1761970552227_u2ctl3t6s",
+    updated_at: new Date("2025-11-01T04:15:53.560Z")
+  }
+}
+
+Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.
+    at Nn (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at ei.handleRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6911)
+    at ei.handleAndLogRequestError (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6593)
+    at ei.request (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:121:6300)
+    at async a (/Users/lucasmartinez/Voonda/voonda-api/node_modules/@prisma/client/runtime/library.js:130:9551)
+    at async swapVehiculosInPlace (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:160:13)
+    at async procesarVehiculosCompleto (/Users/lucasmartinez/Voonda/voonda-api/utils/vehiculosSync.js:246:27)
+    at async exports.procesarVehiculosCompletoEndpoint (/Users/lucasmartinez/Voonda/voonda-api/controllers/syncController.js:121:23) {
+  clientVersion: '6.18.0'
+}
+✅ Swap completado: {
+  vehiculosDesactivados: 0,
+  vehiculosInsertados: 0,
+  vehiculosActualizados: 0,
+  errores: 1
+}
+🎉 Procesamiento completo exitoso: {
+  success: true,
+  batchId: 'batch_1761970552227_u2ctl3t6s',
+  empresaId: 'eb209d17-ee6f-4188-9abb-6d36cc87ba88',
+  modelos: { procesados: 1, exitosos: 1 },
+  vehiculos: {
+    vehiculosDesactivados: 0,
+    vehiculosInsertados: 0,
+    vehiculosActualizados: 0,
+    errores: 1
+  },
+  errores: [
+    {
+      vehiculo: [Object],
+      error: '\n' +
+        'Invalid `prisma.vehiculo.create()` invocation:\n' +
+        '\n' +
+        '{\n' +
+        '  data: {\n' +
+        '    empresa_id: "eb209d17-ee6f-4188-9abb-6d36cc87ba88",\n' +
+        '    modelo_id: "895f7f80-deb7-4312-aa70-55e263097d58",\n' +
+        '    patente: "TEST005",\n' +
+        '    dominio: "TEST005",\n' +
+        '    color: "Blanco",\n' +
+        '    color_interior: "Negro",\n' +
+        '    kilometros: 40000,\n' +
+        '    año: 2018,\n' +
+        '    vehiculo_ano: 2018,\n' +
+        '    precio_publicado: null,\n' +
+        '    precio_contado: null,\n' +
+        '    valor: 2100000,\n' +
+        '    moneda: "ARS",\n' +
+        '    estado: "Disponible",\n' +
+        '    ubicacion: "La Plata",\n' +
+        '    categoria: "Sedan",\n' +
+        '    imagenes_url: null,\n' +
+        '    publicacion_web: true,\n' +
+        '                     ~~~~\n' +
+        '    publicacion_api_call: "false",\n' +
+        '    activo: true,\n' +
+        '    batch_id: "batch_1761970552227_u2ctl3t6s",\n' +
+        '    updated_at: new Date("2025-11-01T04:15:53.560Z")\n' +
+        '  }\n' +
+        '}\n' +
+        '\n' +
+        'Argument `publicacion_web`: Invalid value provided. Expected String or Null, provided Boolean.'
+    }
+  ],
+  timestamp: '2025-11-01T04:15:53.763Z'
+}
+::1 - - [01/Nov/2025:04:15:53 +0000] "POST /api/sync/vehiculos-completo HTTP/1.1" 200 1662 "-" "curl/8.7.1"
+🔌 Desconectando Prisma...
+
+📡 SIGTERM recibido, cerrando servidor gracefully...

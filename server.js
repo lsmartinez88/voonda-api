@@ -10,6 +10,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./swagger.config');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const { prisma } = require('./utils/prisma');
@@ -25,6 +27,8 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost:3001',
       'https://voonda.com',
+      'https://api.fratelli.voonda.net',
+      'https://fratelli.voonda.net',
       process.env.FRONTEND_URL
     ];
     
@@ -47,9 +51,14 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
       imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
     }
   }
 }));
@@ -73,6 +82,50 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Swagger Documentation
+try {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+    explorer: true,
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      docExpansion: 'none',
+      filter: true,
+      showRequestHeaders: true,
+    },
+    customSiteTitle: 'Voonda API Documentation',
+    customfavIcon: '/assets/favicon.ico',
+    customCss: `
+      .swagger-ui .topbar { display: none }
+      .swagger-ui .info .title { color: #2c3e50; }
+      .swagger-ui .scheme-container { background: #f8f9fa; border-left: 4px solid #007bff; }
+    `
+  }));
+  console.log('📖 Swagger UI disponible en /api-docs');
+} catch (error) {
+  console.error('❌ Error configurando Swagger UI:', error.message);
+  
+  // Fallback: endpoint simple de documentación
+  app.get('/api-docs', (req, res) => {
+    res.json({
+      error: 'Swagger UI no disponible',
+      message: 'Documentación disponible en el README',
+      documentation: {
+        github: 'https://github.com/lsmartinez88/voonda-api',
+        frontend_docs: '/frontend-api-docs.md'
+      },
+      endpoints: {
+        health: '/health',
+        'db-health': '/db-health',
+        auth: '/api/auth',
+        vehiculos: '/api/vehiculos',
+        empresas: '/api/empresas',
+        estados: '/api/estados'
+      }
+    });
+  });
+}
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -92,9 +145,9 @@ app.get('/db-health', async (req, res) => {
     await prisma.$queryRaw`SELECT 1`;
     res.json({
       status: 'OK',
-      database: 'Connected',
-      orm: 'Prisma',
-      timestamp: new Date().toISOString()
+      message: 'Database connection is healthy',
+      timestamp: new Date().toISOString(),
+      database: 'PostgreSQL'
     });
   } catch (error) {
     console.error('Database connection error:', error);
@@ -103,6 +156,24 @@ app.get('/db-health', async (req, res) => {
       database: 'Disconnected',
       error: error.message,
       timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Servir documentación frontend como texto
+app.get('/frontend-api-docs.md', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  try {
+    const docsPath = path.join(__dirname, 'frontend-api-docs.md');
+    const content = fs.readFileSync(docsPath, 'utf8');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.send(content);
+  } catch (error) {
+    res.status(404).json({
+      error: 'Documentation not found',
+      message: 'Frontend documentation is not available'
     });
   }
 });
@@ -118,6 +189,13 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Voonda API con Prisma ORM',
     version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    server: 'https://api.fratelli.voonda.net',
+    documentation: {
+      swagger: '/api-docs',
+      frontend: '/frontend-api-docs.md',
+      github: 'https://github.com/lsmartinez88/voonda-api'
+    },
     endpoints: {
       health: '/health',
       'db-health': '/db-health',
@@ -125,8 +203,7 @@ app.get('/', (req, res) => {
       vehiculos: '/api/vehiculos',
       empresas: '/api/empresas',
       estados: '/api/estados'
-    },
-    documentation: 'https://github.com/voonda/voonda-api'
+    }
   });
 });
 

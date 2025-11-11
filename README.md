@@ -1,599 +1,285 @@
-﻿# Voonda API
+﻿# 🚗 Voonda API - Sistema de Gestión de Vehículos
 
-API completa para la gestión de vehículos con autenticación JWT, construida con **Node.js/Express** y Supabase.
+API REST completa para gestión de vehículos con autenticación JWT y sistema multi-empresa, construida con Node.js, Express, Prisma ORM y PostgreSQL.
 
-## Características
+## 🚀 Características Principales
 
-- ✅ **Autenticación JWT** - Sistema completo de autenticación con tokens seguros
-- ✅ **CRUD Vehículos** - Operaciones completas para gestión de vehículos
-- ✅ **Base de datos Supabase** - Integración con PostgreSQL a través de Supabase
-- ✅ **Validaciones robustas** - Validación de datos con Joi
-- ✅ **Middleware de seguridad** - Autenticación, CORS, helmet y rate limiting
-- ✅ **Filtros y paginación** - Sistema avanzado de búsqueda y paginación
-- ✅ **Manejo de errores** - Respuestas consistentes y logging de errores
-- ✅ **Rate limiting** - Protección contra abuso de la API
-- ✅ **Análisis de DB** - Script para analizar estructura de base de datos automáticamente
-- ✅ **Compresión** - Compresión automática de respuestas
+- ✅ **Autenticación JWT** con sistema multi-tenant
+- ✅ **CRUD completo de vehículos** con filtros avanzados
+- ✅ **Sistema de estados** para vehículos (Salón, Consignación, etc.)
+- ✅ **Paginación y búsqueda** optimizada
+- ✅ **Arquitectura multi-empresa** con control de acceso
+- ✅ **Documentación Swagger** interactiva
+- ✅ **Validación robusta** con Joi
+- ✅ **Rate limiting** y seguridad
+- ✅ **Deploy listo para Vercel**
 
-## Tecnologías
+## 📖 Documentación
 
-- **Node.js** - Runtime de JavaScript
-- **Express.js** - Framework web minimalista y rápido
-- **Supabase** - Base de datos PostgreSQL como servicio
-- **JWT** - Autenticación mediante tokens
-- **Joi** - Validación de esquemas
-- **bcryptjs** - Hashing de contraseñas
-- **Helmet** - Seguridad con headers HTTP
-- **Morgan** - Logging de requests HTTP
-- **Compression** - Compresión gzip
+- **Swagger UI:** `https://api.fratelli.voonda.net/api-docs`
+- **Documentación Frontend:** [`frontend-api-docs.md`](./frontend-api-docs.md)
+- **Guía de Deploy:** [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md)
+- **API Base:** `https://api.fratelli.voonda.net`
 
-## Instalación
+## 🛠️ Tecnologías
 
-1. **Clonar el repositorio**
+- **Backend:** Node.js + Express.js
+- **ORM:** Prisma
+- **Base de Datos:** PostgreSQL
+- **Autenticación:** JWT
+- **Validación:** Joi
+- **Documentación:** Swagger UI
+- **Deploy:** Vercel Ready
+
+## 📦 Instalación Rápida
+
+### 1. Clonar repositorio
 ```bash
-git clone <repository-url>
+git clone <tu-repo>
 cd voonda-api
-```
-
-2. **Instalar dependencias**
-```bash
 npm install
 ```
 
-3. **Configurar variables de entorno**
-
-Crear un archivo `.env` en la raíz del proyecto:
+### 2. Configurar base de datos
 ```bash
-touch .env
+# Copia el archivo de ambiente
+cp .env.example .env
+
+# Edita .env con tu DATABASE_URL y JWT_SECRET
+nano .env
 ```
 
-Editar `.env` con tus credenciales:
-```env
-# Configuración de Supabase
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-# Configuración de JWT
-JWT_SECRET=your-super-secure-jwt-secret-key-at-least-32-characters-long
-
-# Configuración del servidor
-PORT=3001
-NODE_ENV=development
-
-# Configuración de CORS
-FRONTEND_URL=http://localhost:3000
-```
-
-4. **Configurar base de datos en Supabase**
-
-Crear las siguientes tablas en Supabase:
-
-```sql
--- Tabla de usuarios
-CREATE TABLE usuarios (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Tabla de modelos de autos (referencia)
-CREATE TABLE modelo_autos (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  marca VARCHAR(50) NOT NULL,
-  modelo VARCHAR(50) NOT NULL,
-  año INTEGER NOT NULL,
-  combustible VARCHAR(20) NOT NULL,
-  caja VARCHAR(20) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Tabla de vehículos
-CREATE TABLE vehiculos (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  marca VARCHAR(50) NOT NULL,
-  modelo VARCHAR(50) NOT NULL,
-  vehiculo_ano INTEGER NOT NULL,
-  estado VARCHAR(20) NOT NULL CHECK (estado IN ('disponible', 'vendido', 'reservado', 'mantenimiento')),
-  valor DECIMAL(12,2) NOT NULL,
-  combustible VARCHAR(20) NOT NULL CHECK (combustible IN ('gasolina', 'diesel', 'hibrido', 'electrico', 'gas', 'flex')),
-  kilometros INTEGER NOT NULL DEFAULT 0,
-  caja VARCHAR(20) NOT NULL CHECK (caja IN ('manual', 'automatica', 'cvt', 'semi-automatica')),
-  transmision VARCHAR(20) CHECK (transmision IN ('manual', 'automatica', 'cvt', 'semi-automatica')),
-  motor VARCHAR(50) NOT NULL,
-  descripcion TEXT NOT NULL,
-  modelo_auto_id UUID REFERENCES modelo_autos(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE
-);
-
--- Índices para mejorar rendimiento
-CREATE INDEX idx_vehiculos_marca ON vehiculos(marca);
-CREATE INDEX idx_vehiculos_estado ON vehiculos(estado);
-CREATE INDEX idx_vehiculos_valor ON vehiculos(valor);
-CREATE INDEX idx_vehiculos_ano ON vehiculos(vehiculo_ano);
-CREATE INDEX idx_vehiculos_created_at ON vehiculos(created_at);
-CREATE INDEX idx_usuarios_email ON usuarios(email);
-```
-
-5. **Analizar estructura de base de datos (opcional)**
+### 3. Configurar Prisma y datos iniciales
 ```bash
-npm run analyze-db
+npx prisma db push
+npm run prisma:seed
 ```
 
-6. **Ejecutar la aplicación**
+### 4. Iniciar servidor
 ```bash
-# Desarrollo (con nodemon para auto-restart)
 npm run dev
-
-# Producción
-npm start
+# Servidor disponible en: http://localhost:3001
+# Swagger UI en: http://localhost:3001/api-docs
+# Producción en: https://api.fratelli.voonda.net
+# Swagger Producción: https://api.fratelli.voonda.net/api-docs
 ```
 
-La API estará disponible en `http://localhost:3001`
+## 🌐 Deploy a Producción (Vercel)
 
-## Estructura del proyecto
+### Deploy Directo desde GitHub:
+1. Conecta tu repo en [vercel.com](https://vercel.com)
+2. Configura las variables de entorno:
+   ```
+   DATABASE_URL=postgresql://...
+   JWT_SECRET=tu-secret-aqui
+   NODE_ENV=production
+   FRONTEND_URL=https://tu-frontend.vercel.app
+   ```
+3. ¡Deploy automático!
 
-```
-voonda-api/
-├── package.json
-├── server.js                    # Servidor Express principal
-├── .env                        # Variables de entorno
-├── analyze-database.js         # Script de análisis de DB
-├── routes/
-│   ├── auth.js                 # Rutas de autenticación
-│   └── vehiculos.js            # Rutas de vehículos
-├── middleware/
-│   ├── auth.js                 # Middleware de autenticación
-│   └── errorHandler.js         # Manejo de errores
-├── utils/
-│   ├── supabase.js            # Cliente y helpers de Supabase
-│   └── validations.js         # Esquemas de validación con Joi
-├── controllers/               # Controladores (para expansión futura)
-├── temp/                     # Archivos temporales de análisis
-├── database-models.json      # Modelos generados automáticamente
-├── database-types.ts         # Tipos TypeScript generados
-├── database-constants.js     # Constantes generadas
-└── README.md
-```
+Ver guía completa: [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md)
 
-## Estructura del proyecto
-
-```
-voonda-api/
-├── package.json
-├── next.config.js
-├── config.js
-├── .env.local.example
-├── lib/
-│   ├── supabase.js          # Cliente y helpers de Supabase
-│   ├── middleware.js        # Middleware de autenticación y CORS
-│   └── validations.js       # Esquemas de validación con Joi
-├── pages/api/
-│   ├── auth/
-│   │   ├── login.js         # POST - Iniciar sesión
-│   │   ├── register.js      # POST - Registrar usuario
-│   │   ├── logout.js        # POST - Cerrar sesión
-│   │   └── me.js           # GET - Información del usuario
-│   └── vehiculos/
-│       ├── index.js         # GET/POST - Listar/crear vehículos
-│       └── [id].js         # GET/PUT/DELETE - Operaciones por ID
-├── .github/
-│   └── copilot-instructions.md
-└── README.md
-```
-
-## Documentación de la API
+## 📚 Endpoints Principales
 
 ### Autenticación
-
-Todos los endpoints (excepto login y register) requieren autenticación JWT mediante header:
-```
-Authorization: Bearer <token>
-```
-
-#### POST /api/auth/register
-Registrar un nuevo usuario.
-
-**Body:**
-```json
-{
-  "email": "usuario@ejemplo.com",
-  "password": "contraseña123",
-  "name": "Nombre Usuario"
-}
-```
-
-**Response (201):**
-```json
-{
-  "success": true,
-  "message": "Usuario registrado exitosamente",
-  "token": "jwt-token",
-  "user": {
-    "id": "uuid",
-    "email": "usuario@ejemplo.com",
-    "name": "Nombre Usuario",
-    "created_at": "2024-01-01T00:00:00Z"
-  }
-}
-```
-
-#### POST /api/auth/login
-Iniciar sesión.
-
-**Body:**
-```json
-{
-  "email": "usuario@ejemplo.com",
-  "password": "contraseña123"
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Inicio de sesión exitoso",
-  "token": "jwt-token",
-  "user": {
-    "id": "uuid",
-    "email": "usuario@ejemplo.com",
-    "name": "Nombre Usuario",
-    "created_at": "2024-01-01T00:00:00Z"
-  }
-}
-```
-
-#### POST /api/auth/logout
-Cerrar sesión (invalida el token).
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Sesión cerrada exitosamente"
-}
-```
-
-#### GET /api/auth/me
-Obtener información del usuario autenticado.
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Información del usuario obtenida exitosamente",
-  "user": {
-    "id": "uuid",
-    "email": "usuario@ejemplo.com",
-    "name": "Nombre Usuario",
-    "created_at": "2024-01-01T00:00:00Z"
-  }
-}
-```
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/register` - Registrar usuario
+- `GET /api/auth/me` - Perfil del usuario
+- `POST /api/auth/logout` - Cerrar sesión
 
 ### Vehículos
+- `GET /api/vehiculos` - Lista con filtros y paginación
+- `GET /api/vehiculos/:id` - Obtener vehículo específico
+- `POST /api/vehiculos` - Crear vehículo
+- `PUT /api/vehiculos/:id` - Actualizar vehículo
+- `DELETE /api/vehiculos/:id` - Eliminar vehículo
 
-#### GET /api/vehiculos
-Obtener lista de vehículos con filtros y paginación.
+### Estados
+- `GET /api/estados` - Obtener estados disponibles
 
-**Headers:** `Authorization: Bearer <token>`
+### Empresas
+- `GET /api/empresas` - Lista de empresas (admin)
 
-**Query Parameters:**
-- `page` (number): Número de página (default: 1)
-- `limit` (number): Elementos por página (default: 12, max: 100)
-- `marca` (string): Filtrar por marca
-- `estado` (string): Filtrar por estado (disponible, vendido, reservado, mantenimiento)
-- `yearFrom` (number): Año mínimo
-- `yearTo` (number): Año máximo
-- `priceFrom` (number): Precio mínimo
-- `priceTo` (number): Precio máximo
-- `search` (string): Búsqueda en marca, modelo o descripción
-- `orderBy` (string): Campo de ordenamiento (created_at, valor, vehiculo_ano, kilometros, marca, modelo)
-- `order` (string): Dirección del ordenamiento (asc, desc)
+## 🎯 Ejemplos de Uso
 
-**Example:** `GET /api/vehiculos?page=1&limit=12&marca=Toyota&estado=disponible&orderBy=valor&order=asc`
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Vehículos obtenidos exitosamente",
-  "vehiculos": [
-    {
-      "id": "uuid",
-      "marca": "Toyota",
-      "modelo": "Corolla",
-      "vehiculo_ano": 2022,
-      "estado": "disponible",
-      "valor": 25000.00,
-      "combustible": "gasolina",
-      "kilometros": 15000,
-      "caja": "automatica",
-      "transmision": "automatica",
-      "motor": "1.8L",
-      "descripcion": "Vehículo en excelente estado...",
-      "created_at": "2024-01-01T00:00:00Z",
-      "modelo_autos": {
-        "marca": "Toyota",
-        "modelo": "Corolla",
-        "año": 2022,
-        "combustible": "gasolina",
-        "caja": "automatica"
-      }
-    }
-  ],
-  "pagination": {
-    "total": 50,
-    "page": 1,
-    "limit": 12,
-    "pages": 5
-  }
-}
-```
-
-#### GET /api/vehiculos/[id]
-Obtener un vehículo específico por ID.
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Vehículo obtenido exitosamente",
-  "vehiculo": {
-    "id": "uuid",
-    "marca": "Toyota",
-    "modelo": "Corolla",
-    "vehiculo_ano": 2022,
-    "estado": "disponible",
-    "valor": 25000.00,
-    "combustible": "gasolina",
-    "kilometros": 15000,
-    "caja": "automatica",
-    "transmision": "automatica",
-    "motor": "1.8L",
-    "descripcion": "Vehículo en excelente estado...",
-    "created_at": "2024-01-01T00:00:00Z",
-    "modelo_autos": {
-      "marca": "Toyota",
-      "modelo": "Corolla",
-      "año": 2022,
-      "combustible": "gasolina",
-      "caja": "automatica"
-    }
-  }
-}
-```
-
-#### POST /api/vehiculos
-Crear un nuevo vehículo.
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Body:**
-```json
-{
-  "marca": "Toyota",
-  "modelo": "Corolla",
-  "vehiculo_ano": 2022,
-  "estado": "disponible",
-  "valor": 25000.00,
-  "combustible": "gasolina",
-  "kilometros": 15000,
-  "caja": "automatica",
-  "motor": "1.8L",
-  "descripcion": "Vehículo en excelente estado con mantenimiento al día"
-}
-```
-
-**Response (201):**
-```json
-{
-  "success": true,
-  "message": "Vehículo creado exitosamente",
-  "vehiculo": {
-    "id": "uuid",
-    "marca": "Toyota",
-    "modelo": "Corolla",
-    "vehiculo_ano": 2022,
-    "estado": "disponible",
-    "valor": 25000.00,
-    "combustible": "gasolina",
-    "kilometros": 15000,
-    "caja": "automatica",
-    "transmision": "automatica",
-    "motor": "1.8L",
-    "descripcion": "Vehículo en excelente estado...",
-    "created_at": "2024-01-01T00:00:00Z"
-  }
-}
-```
-
-#### PUT /api/vehiculos/[id]
-Actualizar un vehículo existente.
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Body (campos opcionales):**
-```json
-{
-  "estado": "vendido",
-  "valor": 24000.00,
-  "kilometros": 16000
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Vehículo actualizado exitosamente",
-  "vehiculo": {
-    "id": "uuid",
-    "marca": "Toyota",
-    "modelo": "Corolla",
-    "vehiculo_ano": 2022,
-    "estado": "vendido",
-    "valor": 24000.00,
-    "combustible": "gasolina",
-    "kilometros": 16000,
-    "caja": "automatica",
-    "transmision": "automatica",
-    "motor": "1.8L",
-    "descripcion": "Vehículo en excelente estado...",
-    "created_at": "2024-01-01T00:00:00Z",
-    "updated_at": "2024-01-02T00:00:00Z"
-  }
-}
-```
-
-#### DELETE /api/vehiculos/[id]
-Eliminar un vehículo.
-
-**Headers:** `Authorization: Bearer <token>`
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Vehículo eliminado exitosamente"
-}
-```
-
-## Códigos de estado HTTP
-
-- **200** - Operación exitosa
-- **201** - Recurso creado exitosamente
-- **400** - Datos inválidos o faltantes
-- **401** - No autenticado
-- **403** - Token inválido o expirado
-- **404** - Recurso no encontrado
-- **405** - Método no permitido
-- **409** - Conflicto (recurso ya existe)
-- **429** - Demasiadas solicitudes (rate limiting)
-- **500** - Error interno del servidor
-
-## Rate Limiting
-
-La API implementa rate limiting para prevenir abuso:
-
-- **General**: 100 requests por 15 minutos
-- **Login**: 5 intentos por 15 minutos
-- **Register**: 3 registros por hora
-- **Crear vehículo**: 10 creaciones por hora
-
-## Validaciones
-
-### Vehículo
-- **marca**: Requerida, 1-50 caracteres
-- **modelo**: Requerido, 1-50 caracteres
-- **vehiculo_ano**: Requerido, entre 1950 y año actual + 1
-- **estado**: Requerido, valores: disponible, vendido, reservado, mantenimiento
-- **valor**: Requerido, número positivo
-- **combustible**: Requerido, valores: gasolina, diesel, hibrido, electrico, gas, flex
-- **kilometros**: Requerido, número entero ≥ 0
-- **caja**: Requerida, valores: manual, automatica, cvt, semi-automatica
-- **motor**: Requerido, 1-50 caracteres
-- **descripcion**: Requerida, 10-1000 caracteres
-
-### Usuario
-- **email**: Requerido, formato de email válido
-- **password**: Requerida, 6-50 caracteres
-- **name**: Requerido, 2-100 caracteres
-
-## Desarrollo
-
-### Comandos disponibles
+### Login y obtener token:
 ```bash
-npm run dev         # Iniciar en modo desarrollo (con nodemon)
-npm start           # Iniciar servidor de producción
-npm run analyze-db  # Analizar estructura de base de datos
-npm run lint        # Ejecutar linter
-npm run format      # Formatear código con Prettier
-npm test            # Ejecutar tests (cuando estén configurados)
+# Desarrollo
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin.empresa@voonda.com","password":"admin123"}'
+
+# Producción
+curl -X POST https://api.fratelli.voonda.net/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin.empresa@voonda.com","password":"admin123"}'
 ```
 
-## Análisis de Base de Datos
-
-La API incluye un script que se conecta automáticamente a tu base de datos Supabase y analiza la estructura existente:
-
+### Crear vehículo:
 ```bash
-npm run analyze-db
+curl -X POST http://localhost:3001/api/vehiculos \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "modelo_id": "81fe616b-efac-4b6c-8102-a790d9340ee2",
+    "vehiculo_ano": 2020,
+    "estado_codigo": "salon",
+    "valor": 2500000,
+    "kilometros": 25000,
+    "patente": "ABC123"
+  }'
 ```
 
-Este script:
-- 🔍 **Analiza las tablas** existentes en tu base de datos
-- 📊 **Genera modelos** automáticamente basados en la estructura real
-- 📝 **Crea tipos TypeScript** para desarrollo type-safe
-- 📊 **Genera constantes** para nombres de tablas y campos
-- 💾 **Guarda archivos** JSON, TS y JS con toda la información
-
-**Archivos generados:**
-- `database-models.json` - Modelos completos con estructura y datos de muestra
-- `database-types.ts` - Interfaces TypeScript para cada tabla
-- `database-constants.js` - Constantes con nombres de tablas y campos
-
-**Ejemplo de salida:**
-```
-📋 Modelo: Vehiculos
-   Tabla: vehiculos
-   Campos:
-     • id: UUID (ej: "81fac822-9bfa-4ef2-8a18-7f4e730cf06a")
-     • marca: Text (ej: "Sin especificar")
-     • valor: Integer (ej: 7500000)
-     • estado: Text (ej: "salon")
-     ...
+### Obtener vehículos con filtros:
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://localhost:3001/api/vehiculos?page=1&limit=10&estado_codigo=salon&yearFrom=2020"
 ```
 
-### Variables de entorno requeridas
+## 🗄️ Estructura de Base de Datos
+
+```sql
+-- Empresas (multi-tenant)
+CREATE TABLE empresas (
+  id UUID PRIMARY KEY,
+  nombre VARCHAR NOT NULL,
+  activa BOOLEAN DEFAULT true
+);
+
+-- Usuarios con roles
+CREATE TABLE usuarios (
+  id UUID PRIMARY KEY,
+  email VARCHAR UNIQUE NOT NULL,
+  password_hash VARCHAR NOT NULL,
+  empresa_id UUID REFERENCES empresas(id),
+  rol_id UUID REFERENCES roles(id)
+);
+
+-- Estados de vehículos
+CREATE TABLE estado_vehiculos (
+  id UUID PRIMARY KEY,
+  codigo VARCHAR UNIQUE, -- salon, consignacion, pyc, etc.
+  nombre VARCHAR NOT NULL,
+  descripcion TEXT
+);
+
+-- Modelos de autos (catálogo compartido)
+CREATE TABLE modelo_autos (
+  id UUID PRIMARY KEY,
+  marca VARCHAR NOT NULL,
+  modelo VARCHAR NOT NULL,
+  modelo_ano INTEGER
+  -- más campos técnicos...
+);
+
+-- Vehículos principales
+CREATE TABLE vehiculos (
+  id UUID PRIMARY KEY,
+  empresa_id UUID REFERENCES empresas(id),
+  modelo_id UUID REFERENCES modelo_autos(id),
+  estado_id UUID REFERENCES estado_vehiculos(id),
+  vehiculo_ano INTEGER,
+  kilometros INTEGER,
+  valor DECIMAL,
+  patente VARCHAR,
+  -- más campos...
+);
+```
+
+## 🔒 Sistema de Permisos
+
+### Roles disponibles:
+- **Colaborador:** CRUD vehículos de su empresa
+- **Admin Empresa:** Gestión completa de su empresa
+- **Admin General:** Acceso a todas las empresas
+
+### Middleware de autorización:
+```javascript
+// Verificar autenticación
+authenticateToken
+
+// Verificar permisos específicos
+requirePermission('vehiculos', 'crear')
+
+// Filtrar por empresa automáticamente
+filterByEmpresa
+```
+
+## 📊 Estados de Vehículos
+
+| Código | Nombre | Descripción |
+|--------|--------|-------------|
+| `salon` | En Salón | Disponible para venta |
+| `consignacion` | En Consignación | Vehículo en consignación |
+| `pyc` | Preparación y Chapa | En taller |
+| `preparacion` | En Preparación | Siendo preparado |
+| `vendido` | Vendido | Venta concretada |
+| `entregado` | Entregado | Entregado al cliente |
+
+## 🧪 Testing
+
+### Health checks:
+```bash
+curl http://localhost:3001/health        # Estado del servidor
+curl http://localhost:3001/db-health     # Estado de la BD
+```
+
+### Datos de prueba:
+El comando `npm run prisma:seed` crea:
+- 2 empresas de ejemplo
+- Usuarios admin y colaboradores
+- 6 estados de vehículos
+- 3 modelos de autos base
+- Roles y permisos
+
+Credenciales de prueba:
+- **Admin:** `admin.empresa@voonda.com` / `admin123`
+- **Colaborador:** `colaborador@voonda.com` / `colaborador123`
+
+## 📁 Estructura del Proyecto
+
+```
+voonda-api/
+├── controllers/         # Lógica de negocio
+├── middleware/         # Auth, CORS, errores
+├── prisma/            # Schema y migraciones
+├── routes/            # Definición de rutas
+├── utils/             # Utilidades y validaciones
+├── server.js          # Servidor principal
+├── swagger.config.js  # Configuración Swagger
+├── vercel.json       # Configuración Vercel
+└── package.json      # Dependencias y scripts
+```
+
+## 🚨 Variables de Entorno
+
 ```env
-SUPABASE_URL=                    # URL de tu proyecto Supabase
-SUPABASE_SERVICE_ROLE_KEY=       # Service role key de Supabase
-JWT_SECRET=                      # Secreto para firmar tokens JWT (min 32 chars)
-PORT=3001                        # Puerto del servidor (opcional)
+DATABASE_URL="postgresql://user:password@host:port/database"
+JWT_SECRET="your-super-secret-jwt-key"
+PORT=3001
+NODE_ENV="development"
+FRONTEND_URL="http://localhost:3000"
 ```
 
-### Variables de entorno opcionales
-```env
-NODE_ENV=development             # Entorno de ejecución
-CORS_ORIGIN=http://localhost:3000 # Origen permitido para CORS
-LOG_LEVEL=info                   # Nivel de logging
-API_BASE_URL=http://localhost:3001 # URL base de la API
-```
+## 🤝 Contribuir
 
-## Seguridad
+1. Fork el proyecto
+2. Crea una rama: `git checkout -b feature/nueva-feature`
+3. Commit: `git commit -am 'Agregar nueva feature'`
+4. Push: `git push origin feature/nueva-feature`
+5. Pull Request
 
-- ✅ Autenticación JWT con expiración de tokens
-- ✅ Hashing de contraseñas con bcrypt
-- ✅ Rate limiting por IP
-- ✅ Validación exhaustiva de datos de entrada
-- ✅ Headers de seguridad (CORS, XSS, etc.)
-- ✅ Sanitización de datos
-- ✅ Lista negra de tokens (logout)
+## 📄 Licencia
 
-## Producción
+MIT License - ver [`LICENSE`](LICENSE) para detalles.
 
-Para desplegar en producción:
+---
 
-1. **Configurar variables de entorno de producción**
-2. **Configurar dominio CORS apropiado**
-3. **Usar HTTPS**
-4. **Configurar logging apropiado**
-5. **Configurar Redis para rate limiting y blacklist de tokens**
-6. **Configurar monitoring y alertas**
+## 🔗 Enlaces Útiles
 
-## Soporte
+- **Documentación Swagger:** `/api-docs`
+- **Prisma Studio:** `npx prisma studio`
+- **Logs de desarrollo:** `npm run dev`
+- **Deploy Vercel:** [Guía completa](./VERCEL_DEPLOYMENT.md)
 
-Para reportar bugs o solicitar características, crear un issue en el repositorio del proyecto.
-
-## Licencia
-
-[MIT License](LICENSE)
+¡Tu API Voonda está lista para escalar! 🎉

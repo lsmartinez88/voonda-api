@@ -84,6 +84,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Swagger Documentation
 try {
+  console.log('🔧 Inicializando Swagger UI...');
+  console.log('📦 Swagger dependencies:', {
+    swaggerUi: !!require('swagger-ui-express'),
+    swaggerJsdoc: !!require('swagger-jsdoc')
+  });
+  
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
     explorer: true,
     swaggerOptions: {
@@ -101,15 +107,17 @@ try {
       .swagger-ui .scheme-container { background: #f8f9fa; border-left: 4px solid #007bff; }
     `
   }));
-  console.log('📖 Swagger UI disponible en /api-docs');
+  console.log('📖 Swagger UI configurado correctamente en /api-docs');
 } catch (error) {
   console.error('❌ Error configurando Swagger UI:', error.message);
+  console.error('Stack trace:', error.stack);
   
   // Fallback: endpoint simple de documentación
   app.get('/api-docs', (req, res) => {
     res.json({
       error: 'Swagger UI no disponible',
-      message: 'Documentación disponible en el README',
+      message: 'Error al cargar Swagger UI',
+      details: error.message,
       documentation: {
         github: 'https://github.com/lsmartinez88/voonda-api',
         frontend_docs: '/frontend-api-docs.md'

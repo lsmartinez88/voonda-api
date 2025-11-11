@@ -1,6 +1,6 @@
 ﻿# Voonda API - Documentación de Endpoints para Frontend
 
-## Base URL: http://localhost:3001
+## Base URL: https://api.fratelli.voonda.net
 
 ## Autenticación
 Todos los endpoints (excepto login) requieren header:

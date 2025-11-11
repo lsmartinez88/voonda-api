@@ -46,33 +46,10 @@ const corsOptions = {
 };
 
 // Middleware de seguridad
-app.use((req, res, next) => {
-  // Configuración especial para Swagger UI
-  if (req.path.startsWith('/api-docs')) {
-    helmet({
-      crossOriginEmbedderPolicy: false,
-      contentSecurityPolicy: false, // Deshabilitar CSP para Swagger UI
-    })(req, res, next);
-  } else {
-    // Configuración normal para el resto de endpoints
-    helmet({
-      crossOriginEmbedderPolicy: false,
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-          styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-          imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'", "https:", "data:"],
-          objectSrc: ["'none'"],
-          mediaSrc: ["'self'"],
-          frameSrc: ["'none'"],
-        }
-      }
-    })(req, res, next);
-  }
-});
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false, // Deshabilitar CSP completamente para evitar conflictos con Swagger
+}));
 
 // Rate limiting global
 const globalLimiter = rateLimit({
@@ -93,25 +70,33 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Middleware para corregir MIME types de Swagger UI
+app.use('/api-docs', (req, res, next) => {
+  if (req.path.endsWith('.css')) {
+    res.setHeader('Content-Type', 'text/css');
+  } else if (req.path.endsWith('.js')) {
+    res.setHeader('Content-Type', 'application/javascript');
+  }
+  next();
+});
+
 // Swagger Documentation
 try {
   console.log('🔧 Inicializando Swagger UI...');
-  console.log('📦 Swagger dependencies:', {
-    swaggerUi: !!require('swagger-ui-express'),
-    swaggerJsdoc: !!require('swagger-jsdoc')
-  });
   
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
-    explorer: true,
+  // Configuración mínima de Swagger
+  const swaggerOptions = {
+    explorer: false,
     swaggerOptions: {
-      persistAuthorization: true,
-      displayRequestDuration: true,
-      docExpansion: 'none',
+      docExpansion: 'list',
       filter: true,
-      showRequestHeaders: true,
-    },
-    customSiteTitle: 'Voonda API Documentation'
-  }));
+      persistAuthorization: true
+    }
+  };
+  
+  app.use('/api-docs', swaggerUi.serve);
+  app.get('/api-docs', swaggerUi.setup(swaggerSpecs, swaggerOptions));
+  
   console.log('📖 Swagger UI configurado correctamente en /api-docs');
 } catch (error) {
   console.error('❌ Error configurando Swagger UI:', error.message);

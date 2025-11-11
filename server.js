@@ -46,22 +46,33 @@ const corsOptions = {
 };
 
 // Middleware de seguridad
-app.use(helmet({
-  crossOriginEmbedderPolicy: false,
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", "https:", "data:"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    }
+app.use((req, res, next) => {
+  // Configuración especial para Swagger UI
+  if (req.path.startsWith('/api-docs')) {
+    helmet({
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: false, // Deshabilitar CSP para Swagger UI
+    })(req, res, next);
+  } else {
+    // Configuración normal para el resto de endpoints
+    helmet({
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'", "https:", "data:"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+        }
+      }
+    })(req, res, next);
   }
-}));
+});
 
 // Rate limiting global
 const globalLimiter = rateLimit({
@@ -99,13 +110,7 @@ try {
       filter: true,
       showRequestHeaders: true,
     },
-    customSiteTitle: 'Voonda API Documentation',
-    customfavIcon: '/assets/favicon.ico',
-    customCss: `
-      .swagger-ui .topbar { display: none }
-      .swagger-ui .info .title { color: #2c3e50; }
-      .swagger-ui .scheme-container { background: #f8f9fa; border-left: 4px solid #007bff; }
-    `
+    customSiteTitle: 'Voonda API Documentation'
   }));
   console.log('📖 Swagger UI configurado correctamente en /api-docs');
 } catch (error) {

@@ -2,12 +2,13 @@
 // Basado en la estructura de Supabase PostgreSQL
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_PRISMA_URL") // Cambiado para usar pooling
 }
 
 // ====================================

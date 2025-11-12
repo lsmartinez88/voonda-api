@@ -5,10 +5,12 @@
 
 const { PrismaClient } = require('@prisma/client');
 
-// Configurar el cliente de Prisma con opciones optimizadas
+// Configurar el cliente de Prisma con opciones optimizadas para serverless
 const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn'] : ['error'],
   errorFormat: 'pretty',
+  // Usar la URL de pooling en producción si está disponible
+  datasourceUrl: process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL,
 });
 
 // Manejar la desconexión graceful

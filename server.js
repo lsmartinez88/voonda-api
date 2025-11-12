@@ -173,6 +173,17 @@ app.get('/health', (req, res) => {
 });
 
 // Endpoint de prueba de conexión Prisma
+app.get('/debug-env', (req, res) => {
+  res.json({
+    DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
+    DATABASE_URL_LENGTH: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0,
+    DATABASE_URL_PREFIX: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + '...' : 'NOT_SET',
+    JWT_SECRET_EXISTS: !!process.env.JWT_SECRET,
+    NODE_ENV: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/db-health', async (req, res) => {
   try {
     // Probar conexión con Prisma

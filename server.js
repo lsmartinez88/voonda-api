@@ -70,34 +70,70 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Middleware para corregir MIME types de Swagger UI
-app.use('/api-docs', (req, res, next) => {
-  if (req.path.endsWith('.css')) {
-    res.setHeader('Content-Type', 'text/css');
-  } else if (req.path.endsWith('.js')) {
-    res.setHeader('Content-Type', 'application/javascript');
-  }
-  next();
-});
-
 // Swagger Documentation
 try {
   console.log('🔧 Inicializando Swagger UI...');
   
-  // Configuración mínima de Swagger
-  const swaggerOptions = {
-    explorer: false,
-    swaggerOptions: {
-      docExpansion: 'list',
-      filter: true,
-      persistAuthorization: true
-    }
-  };
+  // Servir Swagger UI usando CDN para evitar problemas con archivos estáticos en Vercel
+  app.get('/api-docs/', (req, res) => {
+    const swaggerDocument = JSON.stringify(swaggerSpecs);
+    
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Voonda API Documentation</title>
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+        <style>
+          html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+          *, *:before, *:after { box-sizing: inherit; }
+          body { margin:0; background: #fafafa; }
+          .swagger-ui .topbar { display: none; }
+        </style>
+      </head>
+      <body>
+        <div id="swagger-ui"></div>
+        <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+        <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+        <script>
+          window.onload = function() {
+            const ui = SwaggerUIBundle({
+              url: '/api/swagger.json',
+              dom_id: '#swagger-ui',
+              deepLinking: true,
+              presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+              ],
+              plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+              ],
+              layout: "StandaloneLayout",
+              persistAuthorization: true,
+              filter: true,
+              tryItOutEnabled: true
+            });
+          };
+        </script>
+      </body>
+      </html>
+    `);
+  });
   
-  app.use('/api-docs', swaggerUi.serve);
-  app.get('/api-docs', swaggerUi.setup(swaggerSpecs, swaggerOptions));
+  // Redireccionar /api-docs a /api-docs/
+  app.get('/api-docs', (req, res) => {
+    res.redirect('/api-docs/');
+  });
   
-  console.log('📖 Swagger UI configurado correctamente en /api-docs');
+  // Endpoint para servir el JSON de Swagger
+  app.get('/api/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpecs);
+  });
+  
+  console.log('📖 Swagger UI configurado correctamente en /api-docs (CDN version)');
 } catch (error) {
   console.error('❌ Error configurando Swagger UI:', error.message);
   console.error('Stack trace:', error.stack);

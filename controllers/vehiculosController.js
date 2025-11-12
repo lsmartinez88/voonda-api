@@ -69,13 +69,14 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
  * Obtener lista de vehículos con filtros y paginación
  */
 exports.getAll = async function (req, res) {
+  const query = req.query || {};
   const {
     page = 1,
     limit = 12,
     orderBy = 'created_at',
     order = 'desc',
     ...filters
-  } = req.query;
+  } = query;
 
   // Aplicar filtro de empresa desde middleware
   const where = await buildPrismaFilters(filters, req.empresaFilter);

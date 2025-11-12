@@ -285,4 +285,4 @@ app.listen(PORT, () => {
   console.log('🔗 ORM: Prisma');
 });
 
-module.exports = app;
+module.exports = app;// Force redeploy to apply env vars - Wed Nov 12 00:29:05 -03 2025

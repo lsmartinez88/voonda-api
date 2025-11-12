@@ -1,5 +1,5 @@
 ﻿/**
- * Controller de Vendedores usando Prisma ORM - VERSION DEPURADA
+ * Controller de Vendedores usando Prisma ORM - VERSION COMPLETA
  * Maneja las personas que venden vehículos a la empresa
  */
 
@@ -188,6 +188,151 @@ exports.getById = async function (req, res) {
     }
 
     return successResponse(res, { vendedor }, 'Vendedor obtenido exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Crear un nuevo vendedor
+ */
+exports.create = async function (req, res) {
+  try {
+    // Aplicar empresa del usuario autenticado
+    const datosVendedor = {
+      ...req.body,
+      empresa_id: req.user.empresa_id || req.body.empresa_id
+    };
+
+    const nuevoVendedor = await prisma.vendedor.create({
+      data: datosVendedor,
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        telefono: true,
+        email: true,
+        dni: true,
+        ciudad: true,
+        provincia: true,
+        origen: true,
+        activo: true,
+        created_at: true
+      }
+    });
+
+    return successResponse(res, { vendedor: nuevoVendedor }, 'Vendedor creado exitosamente', 201);
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Actualizar un vendedor
+ */
+exports.update = async function (req, res) {
+  const { id } = req.params;
+  
+  // Validar formato UUID
+  if (!validateId(id)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ValidationError',
+      message: 'ID de vendedor inválido'
+    });
+  }
+
+  try {
+    // Verificar que el vendedor existe y pertenece a la empresa
+    const vendedorExiste = await prisma.vendedor.findFirst({
+      where: {
+        id,
+        ...req.empresaFilter
+      },
+      select: { id: true }
+    });
+
+    if (!vendedorExiste) {
+      return res.status(404).json({
+        success: false,
+        error: 'NotFound',
+        message: 'Vendedor no encontrado'
+      });
+    }
+
+    const vendedorActualizado = await prisma.vendedor.update({
+      where: { id },
+      data: req.body,
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        telefono: true,
+        email: true,
+        dni: true,
+        direccion: true,
+        ciudad: true,
+        provincia: true,
+        codigo_postal: true,
+        origen: true,
+        comentarios: true,
+        activo: true,
+        updated_at: true
+      }
+    });
+
+    return successResponse(res, { vendedor: vendedorActualizado }, 'Vendedor actualizado exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Eliminar un vendedor (soft delete)
+ */
+exports.delete = async function (req, res) {
+  const { id } = req.params;
+  
+  // Validar formato UUID
+  if (!validateId(id)) {
+    return res.status(400).json({
+      success: false,
+      error: 'ValidationError',
+      message: 'ID de vendedor inválido'
+    });
+  }
+
+  try {
+    // Verificar que el vendedor existe y pertenece a la empresa
+    const vendedorExiste = await prisma.vendedor.findFirst({
+      where: {
+        id,
+        ...req.empresaFilter
+      },
+      select: { id: true, nombre: true, apellido: true }
+    });
+
+    if (!vendedorExiste) {
+      return res.status(404).json({
+        success: false,
+        error: 'NotFound',
+        message: 'Vendedor no encontrado'
+      });
+    }
+
+    // Soft delete - marcar como inactivo
+    const vendedorEliminado = await prisma.vendedor.update({
+      where: { id },
+      data: { activo: false },
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        activo: true
+      }
+    });
+
+    return successResponse(res, { vendedor: vendedorEliminado }, 'Vendedor eliminado exitosamente');
   } catch (error) {
     throw error;
   }

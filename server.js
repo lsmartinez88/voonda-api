@@ -233,6 +233,7 @@ app.use('/api/estados', require('./routes/estados'));
 app.use('/api/vendedores', require('./routes/vendedores'));
 app.use('/api/compradores', require('./routes/compradores'));
 app.use('/api/imagenes', require('./routes/imagenes'));
+app.use('/api/operaciones', require('./routes/operaciones'));
 
 // Ruta raíz
 app.get('/', (req, res) => {

@@ -2035,3 +2035,376 @@ id: string (UUID, required)
 - Los vehículos incluyen datos del `modelo_auto` y `estado`
 - `modelo_auto` contiene marca, modelo, año, etc.
 - `estado` contiene código, nombre y descripción legible
+
+---
+
+## 📊 OPERACIONES (SISTEMA UNIFICADO)
+
+### GET /api/operaciones
+**Descripción:** Obtener lista de operaciones con filtros y paginación
+**Autenticación:** Requerida
+
+**Query Parameters:**
+```
+tipo?: "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion"
+estado?: "pendiente" | "en_proceso" | "completada" | "cancelada" | "suspendida"
+fecha_desde?: "YYYY-MM-DD"
+fecha_hasta?: "YYYY-MM-DD"
+vehiculo_id?: "string (UUID)"
+vendedor_id?: "string (UUID)"
+comprador_id?: "string (UUID)"
+search?: "string" // Busca en observaciones
+page?: "number (default: 1)"
+limit?: "number (default: 12, max: 100)"
+orderBy?: "fecha" | "monto" | "tipo" | "estado" | "created_at" (default: "fecha")
+order?: "asc" | "desc" (default: "desc")
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operaciones obtenidas exitosamente",
+  "data": {
+    "operaciones": [
+      {
+        "id": "string (UUID)",
+        "tipo": "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion",
+        "fecha": "string (ISO date)",
+        "monto": "number",
+        "moneda": "ARS" | "USD" | "EUR" | "BRL",
+        "estado": "pendiente" | "en_proceso" | "completada" | "cancelada" | "suspendida",
+        "observaciones": "string|null",
+        "created_at": "string (ISO date)",
+        "updated_at": "string (ISO date)",
+        "vehiculo": {
+          "id": "string (UUID)",
+          "patente": "string",
+          "modelo_auto": {
+            "marca": "string",
+            "modelo": "string",
+            "version": "string",
+            "modelo_ano": "number"
+          }
+        },
+        "vendedor": {
+          "id": "string (UUID)",
+          "nombre": "string",
+          "apellido": "string",
+          "telefono": "string|null",
+          "email": "string|null"
+        } | null,
+        "comprador": {
+          "id": "string (UUID)", 
+          "nombre": "string",
+          "apellido": "string",
+          "telefono": "string|null",
+          "email": "string|null"
+        } | null,
+        "datos_especificos": "object|null" // JSON flexible según tipo
+      }
+    ],
+    "pagination": {
+      "total": "number",
+      "page": "number",
+      "limit": "number", 
+      "pages": "number"
+    }
+  }
+}
+```
+
+### GET /api/operaciones/:id
+**Descripción:** Obtener operación específica por ID
+**Autenticación:** Requerida
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operación obtenida exitosamente",
+  "data": {
+    "operacion": {
+      "id": "string (UUID)",
+      "tipo": "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion",
+      "fecha": "string (ISO date)",
+      "monto": "number",
+      "moneda": "ARS" | "USD" | "EUR" | "BRL",
+      "estado": "pendiente" | "en_proceso" | "completada" | "cancelada" | "suspendida", 
+      "observaciones": "string|null",
+      "datos_especificos": "object|null",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)",
+      "empresa": {
+        "id": "string (UUID)",
+        "nombre": "string"
+      },
+      "vehiculo": {
+        "id": "string (UUID)",
+        "patente": "string",
+        "vehiculo_ano": "number",
+        "kilometros": "number|null",
+        "valor": "number|null",
+        "modelo_auto": {
+          "marca": "string",
+          "modelo": "string",
+          "version": "string",
+          "modelo_ano": "number",
+          "combustible": "string",
+          "caja": "string"
+        },
+        "estado": {
+          "codigo": "string",
+          "nombre": "string"
+        }
+      },
+      "vendedor": {
+        "id": "string (UUID)",
+        "nombre": "string",
+        "apellido": "string",
+        "telefono": "string|null",
+        "email": "string|null",
+        "dni": "string|null",
+        "ciudad": "string|null",
+        "provincia": "string|null"
+      } | null,
+      "comprador": {
+        "id": "string (UUID)",
+        "nombre": "string", 
+        "apellido": "string",
+        "telefono": "string|null",
+        "email": "string|null",
+        "dni": "string|null",
+        "ciudad": "string|null", 
+        "provincia": "string|null"
+      } | null
+    }
+  }
+}
+```
+
+### POST /api/operaciones
+**Descripción:** Crear nueva operación
+**Autenticación:** Requerida
+
+**Request Body (JSON):**
+```json
+{
+  "tipo": "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion",
+  "fecha": "string (ISO date)", 
+  "monto": "number (positive)",
+  "moneda": "ARS" | "USD" | "EUR" | "BRL" (default: "ARS"),
+  "estado": "pendiente" | "en_proceso" | "completada" | "cancelada" | "suspendida" (default: "pendiente"),
+  "vehiculo_id": "string (UUID, required)",
+  "vendedor_id": "string (UUID, optional)",
+  "comprador_id": "string (UUID, optional)",
+  "observaciones": "string (max 1000 chars, optional)",
+  "datos_especificos": "object (optional)" // JSON específico del tipo
+}
+```
+
+**Ejemplos de `datos_especificos` por tipo:**
+
+**Compra:**
+```json
+{
+  "forma_pago": "efectivo" | "transferencia" | "cheque" | "financiado",
+  "descuento_aplicado": "number (0-100%)",
+  "garantia_meses": "number",
+  "documentacion_completa": "boolean",
+  "precio_final": "number"
+}
+```
+
+**Venta:**
+```json
+{
+  "comision_vendedor": "number",
+  "precio_lista": "number", 
+  "descuento_otorgado": "number",
+  "forma_entrega": "inmediata" | "programada" | "envio",
+  "fecha_entrega": "string (ISO date)",
+  "documentos_transferidos": "boolean"
+}
+```
+
+**Seña:**
+```json
+{
+  "monto_total_acordado": "number",
+  "saldo_pendiente": "number",
+  "fecha_vencimiento": "string (ISO date)",
+  "condiciones_especiales": "string"
+}
+```
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Operación creada exitosamente",
+  "data": {
+    "operacion": {
+      "id": "string (UUID)",
+      "tipo": "string",
+      "fecha": "string (ISO date)",
+      "monto": "number",
+      "moneda": "string",
+      "estado": "string",
+      "observaciones": "string|null",
+      "datos_especificos": "object|null",
+      "created_at": "string (ISO date)",
+      "vehiculo": {
+        "id": "string (UUID)",
+        "patente": "string",
+        "modelo_auto": {
+          "marca": "string",
+          "modelo": "string",
+          "modelo_ano": "number"
+        }
+      },
+      "vendedor": {
+        "id": "string (UUID)",
+        "nombre": "string",
+        "apellido": "string"
+      } | null,
+      "comprador": {
+        "id": "string (UUID)",
+        "nombre": "string", 
+        "apellido": "string"
+      } | null
+    }
+  }
+}
+```
+
+### PUT /api/operaciones/:id
+**Descripción:** Actualizar operación existente
+**Autenticación:** Requerida
+
+**Request Body (JSON):** (todos los campos opcionales)
+```json
+{
+  "tipo": "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion",
+  "fecha": "string (ISO date)",
+  "monto": "number (positive)",
+  "moneda": "ARS" | "USD" | "EUR" | "BRL",
+  "estado": "pendiente" | "en_proceso" | "completada" | "cancelada" | "suspendida",
+  "vehiculo_id": "string (UUID)",
+  "vendedor_id": "string (UUID)",
+  "comprador_id": "string (UUID)",
+  "observaciones": "string (max 1000 chars)",
+  "datos_especificos": "object"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operación actualizada exitosamente",
+  "data": {
+    "operacion": {
+      "id": "string (UUID)",
+      "tipo": "string",
+      "fecha": "string (ISO date)",
+      "monto": "number",
+      "moneda": "string", 
+      "estado": "string",
+      "observaciones": "string|null",
+      "datos_especificos": "object|null",
+      "updated_at": "string (ISO date)"
+    }
+  }
+}
+```
+
+### DELETE /api/operaciones/:id
+**Descripción:** Eliminar operación
+**Autenticación:** Requerida
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operación eliminada exitosamente",
+  "data": {
+    "operacion": {
+      "id": "string (UUID)",
+      "tipo": "string",
+      "fecha": "string (ISO date)"
+    }
+  }
+}
+```
+
+### GET /api/operaciones/resumen
+**Descripción:** Obtener resumen de operaciones por tipo
+**Autenticación:** Requerida
+
+**Query Parameters:**
+```
+fecha_desde?: "YYYY-MM-DD"
+fecha_hasta?: "YYYY-MM-DD"
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Resumen obtenido exitosamente",
+  "data": {
+    "resumen": [
+      {
+        "tipo": "compra" | "venta" | "seña" | "transferencia" | "ingreso" | "entrega" | "devolucion",
+        "cantidad": "number",
+        "monto_total": "number", 
+        "monto_promedio": "number"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 💡 NOTAS PARA OPERACIONES
+
+### Tipos de Operaciones:
+- **compra**: Adquisición de vehículos
+- **venta**: Venta de vehículos a clientes
+- **seña**: Reserva con anticipo
+- **transferencia**: Transferencia de propiedad
+- **ingreso**: Entrada de vehículo al inventario
+- **entrega**: Entrega física del vehículo
+- **devolucion**: Devolución de vehículo
+
+### Estados de Operaciones:
+- **pendiente**: Operación registrada pero sin iniciar
+- **en_proceso**: Operación en curso
+- **completada**: Operación finalizada exitosamente
+- **cancelada**: Operación cancelada
+- **suspendida**: Operación suspendida temporalmente
+
+### Datos Específicos (datos_especificos):
+- Campo JSON flexible que permite almacenar información específica según el tipo de operación
+- Cada tipo de operación tiene su propio schema de validación
+- Permite extensibilidad sin cambios en la estructura de base de datos
+- Ver ejemplos por tipo de operación en la documentación de creación
+
+### Monedas Soportadas:
+- **ARS**: Peso Argentino (default)
+- **USD**: Dólar Estadounidense
+- **EUR**: Euro
+- **BRL**: Real Brasileño
+
+### Filtros Avanzados:
+- Combinar múltiples filtros para búsquedas específicas
+- `search` busca texto libre en observaciones
+- Usar rangos de fechas para períodos específicos
+- Filtrar por entidades relacionadas (vehículo, vendedor, comprador)
+
+### Multi-empresa:
+- Todas las operaciones están filtradas automáticamente por la empresa del usuario
+- Usuarios no pueden ver operaciones de otras empresas
+- Administradores generales pueden ver todas las operaciones

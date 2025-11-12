@@ -282,4 +282,4 @@ MIT License - ver [`LICENSE`](LICENSE) para detalles.
 - **Logs de desarrollo:** `npm run dev`
 - **Deploy Vercel:** [Guía completa](./VERCEL_DEPLOYMENT.md)
 
-¡Tu API Voonda está lista para escalar! 🎉
+¡Tu API Voonda está lista para escalar! 🎉# Force redeploy after env vars Wed Nov 12 00:22:43 -03 2025

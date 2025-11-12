@@ -4,9 +4,644 @@
 
 ## Autenticación
 Todos los endpoints (excepto login) requieren header:
+# Voonda API - Documentación de Endpoints para Frontend
+
+## Base URL: https://api.fratelli.voonda.net
+
+## Autenticación
+Todos los endpoints (excepto login y health checks) requieren header:
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
+
+---
+
+## 🔐 AUTENTICACIÓN
+
+### POST /api/auth/login
+**Descripción:** Iniciar sesión y obtener token JWT
+**Autenticación:** No requerida
+
+**Request Body (JSON):**
+```json
+{
+  "email": "string (required, email format)", 
+  "password": "string (required, min 6 chars)"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Inicio de sesión exitoso",
+  "token": "string (JWT token)",
+  "user": {
+    "id": "string (UUID)",
+    "email": "string",
+    "nombre": "string", 
+    "apellido": "string",
+    "telefono": "string|null",
+    "empresa": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "descripcion": "string|null",
+      "logo_url": "string|null",
+      "activa": "boolean"
+    } | null,
+    "rol": {
+      "id": "string (UUID)",
+      "nombre": "string", // "colaborador" | "administrador_empresa" | "administrador_general"
+      "descripcion": "string",
+      "permisos": "object",
+      "activo": "boolean"
+    },
+    "ultimo_login": "string (ISO date)|null",
+    "created_at": "string (ISO date)"
+  }
+}
+```
+
+### GET /api/auth/me
+**Descripción:** Obtener información del usuario autenticado
+**Autenticación:** Requerida
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Información del usuario obtenida exitosamente",
+  "user": {
+    // Mismo formato que POST /api/auth/login
+  }
+}
+```
+
+### POST /api/auth/logout
+**Descripción:** Cerrar sesión del usuario
+**Autenticación:** Requerida
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Sesión cerrada exitosamente"
+}
+```
+
+---
+
+## 🚗 VEHÍCULOS
+
+### GET /api/vehiculos
+**Descripción:** Obtener lista de vehículos con filtros y paginación
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters (todos opcionales):**
+```
+page: number (default: 1, min: 1)
+limit: number (default: 12, min: 1, max: 100)  
+orderBy: string (default: "created_at") // "created_at" | "valor" | "vehiculo_ano" | "kilometros"
+order: string (default: "desc") // "asc" | "desc"
+estado_codigo: string // "salon" | "consignacion" | "pyc" | "preparacion" | "vendido" | "entregado"
+yearFrom: number (min: 1950, max: current year + 1)
+yearTo: number (min: 1950, max: current year + 1)
+priceFrom: number (positive)
+priceTo: number (positive) 
+search: string (max: 100 chars, busca en marca/modelo)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Vehículos obtenidos exitosamente",
+  "vehiculos": [
+    {
+      "id": "string (UUID)",
+      "empresa_id": "string (UUID)",
+      "modelo_id": "string (UUID)", 
+      "patente": "string|null",
+      "vehiculo_ano": "number",
+      "kilometros": "number",
+      "valor": "string (decimal)|null",
+      "moneda": "string",
+      "estado_id": "string (UUID)|null",
+      "tipo_operacion": "string|null",
+      "fecha_ingreso": "string (ISO date)|null",
+      "observaciones": "string|null",
+      "activo": "boolean",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)",
+      "modelo_auto": {
+        "marca": "string",
+        "modelo": "string", 
+        "modelo_ano": "number",
+        "combustible": "string",
+        "caja": "string"
+      },
+      "estado": {
+        "id": "string (UUID)",
+        "codigo": "string",
+        "nombre": "string",
+        "descripcion": "string"
+      } | null
+    }
+  ],
+  "pagination": {
+    "total": "number",
+    "page": "number", 
+    "limit": "number",
+    "pages": "number"
+  }
+}
+```
+
+### GET /api/vehiculos/{id}
+**Descripción:** Obtener un vehículo por ID con información detallada
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Path Parameters:**
+```
+id: string (UUID, required)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Vehículo obtenido exitosamente", 
+  "vehiculo": {
+    "id": "string (UUID)",
+    "empresa_id": "string (UUID)",
+    "modelo_id": "string (UUID)",
+    "patente": "string|null",
+    "vehiculo_ano": "number",
+    "kilometros": "number", 
+    "valor": "string (decimal)|null",
+    "moneda": "string",
+    "estado_id": "string (UUID)|null",
+    "tipo_operacion": "string|null",
+    "fecha_ingreso": "string (ISO date)|null",
+    "observaciones": "string|null",
+    "activo": "boolean",
+    "created_at": "string (ISO date)",
+    "updated_at": "string (ISO date)",
+    "empresa": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "descripcion": "string|null"
+    },
+    "modelo_auto": {
+      "id": "string (UUID)",
+      "marca": "string",
+      "modelo": "string",
+      "version": "string|null",
+      "modelo_ano": "number", 
+      "combustible": "string",
+      "caja": "string",
+      "motorizacion": "string|null",
+      "traccion": "string|null",
+      "puertas": "number|null",
+      "segmento_modelo": "string|null",
+      "cilindrada": "number|null",
+      "potencia_hp": "number|null",
+      "torque_nm": "number|null"
+    },
+    "estado": {
+      "id": "string (UUID)",
+      "codigo": "string", 
+      "nombre": "string",
+      "descripcion": "string"
+    } | null,
+    "publicaciones": [
+      {
+        "id": "string (UUID)",
+        "vehiculo_id": "string (UUID)",
+        "plataforma": "string", // "facebook" | "web" | "mercadolibre" | "instagram" | "whatsapp" | "olx" | "autocosmos" | "otro"
+        "url_publicacion": "string|null",
+        "id_publicacion": "string|null",
+        "titulo": "string",
+        "ficha_breve": "string|null",
+        "activo": "boolean",
+        "created_at": "string (ISO date)",
+        "updated_at": "string (ISO date)"
+      }
+    ]
+  }
+}
+```
+
+### POST /api/vehiculos
+**Descripción:** Crear nuevo vehículo
+**Autenticación:** Requerida
+**Permisos:** vehiculos.crear
+
+**Request Body (JSON):**
+```json
+{
+  "modelo_id": "string (UUID, required)",
+  "vehiculo_ano": "number (required, min: 1950, max: current year + 1)",
+  "estado_codigo": "string (optional)", // "salon" | "consignacion" | "pyc" | "preparacion" | "vendido" | "entregado"
+  "estado_id": "string (UUID, optional)", // Alternativa a estado_codigo
+  "patente": "string (optional, max: 15 chars)",
+  "kilometros": "number (optional, min: 0, default: 0)",
+  "valor": "number (optional, positive)",
+  "moneda": "string (optional, max: 10 chars, default: 'ARS')",
+  "tipo_operacion": "string (optional)",
+  "fecha_ingreso": "string (ISO date, optional)",
+  "observaciones": "string (optional, max: 1000 chars)"
+}
+```
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Vehículo creado exitosamente",
+  "vehiculo": {
+    // Mismo formato que GET /api/vehiculos/{id}
+  }
+}
+```
+
+### PUT /api/vehiculos/{id}
+**Descripción:** Actualizar un vehículo existente
+**Autenticación:** Requerida
+**Permisos:** vehiculos.editar
+
+**Path Parameters:**
+```
+id: string (UUID, required)
+```
+
+**Request Body (JSON, todos los campos opcionales):**
+```json
+{
+  "modelo_id": "string (UUID, optional)",
+  "vehiculo_ano": "number (optional, min: 1950, max: current year + 1)",
+  "estado_codigo": "string (optional)", 
+  "estado_id": "string (UUID, optional)",
+  "patente": "string (optional, max: 15 chars)",
+  "kilometros": "number (optional, min: 0)",
+  "valor": "number (optional, positive)",
+  "moneda": "string (optional, max: 10 chars)",
+  "tipo_operacion": "string (optional)",
+  "fecha_ingreso": "string (ISO date, optional)",
+  "observaciones": "string (optional, max: 1000 chars)"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Vehículo actualizado exitosamente",
+  "vehiculo": {
+    // Mismo formato que GET /api/vehiculos/{id}
+  }
+}
+```
+
+### DELETE /api/vehiculos/{id}
+**Descripción:** Eliminar un vehículo (soft delete - marca como inactivo)
+**Autenticación:** Requerida
+**Permisos:** vehiculos.eliminar
+
+**Path Parameters:**
+```
+id: string (UUID, required)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Vehículo eliminado exitosamente"
+}
+```
+
+---
+
+## 📢 PUBLICACIONES
+
+### GET /api/vehiculos/{vehiculo_id}/publicaciones
+**Descripción:** Obtener todas las publicaciones de un vehículo
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Path Parameters:**
+```
+vehiculo_id: string (UUID, required)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Publicaciones obtenidas exitosamente",
+  "publicaciones": [
+    {
+      "id": "string (UUID)",
+      "vehiculo_id": "string (UUID)",
+      "plataforma": "string", // "facebook" | "web" | "mercadolibre" | "instagram" | "whatsapp" | "olx" | "autocosmos" | "otro"
+      "url_publicacion": "string|null",
+      "id_publicacion": "string|null",
+      "titulo": "string",
+      "ficha_breve": "string|null",
+      "activo": "boolean",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)"
+    }
+  ]
+}
+```
+
+### POST /api/vehiculos/{vehiculo_id}/publicaciones
+**Descripción:** Crear nueva publicación para un vehículo
+**Autenticación:** Requerida
+**Permisos:** vehiculos.crear
+
+**Path Parameters:**
+```
+vehiculo_id: string (UUID, required)
+```
+
+**Request Body (JSON):**
+```json
+{
+  "plataforma": "string (required)", // "facebook" | "web" | "mercadolibre" | "instagram" | "whatsapp" | "olx" | "autocosmos" | "otro"
+  "titulo": "string (required, max: 200 chars)",
+  "url_publicacion": "string (optional, URL format)",
+  "id_publicacion": "string (optional, max: 100 chars)",
+  "ficha_breve": "string (optional, max: 1000 chars)",
+  "activo": "boolean (optional, default: true)"
+}
+```
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Publicación creada exitosamente",
+  "publicacion": {
+    "id": "string (UUID)",
+    "vehiculo_id": "string (UUID)",
+    "plataforma": "string",
+    "url_publicacion": "string|null",
+    "id_publicacion": "string|null",
+    "titulo": "string",
+    "ficha_breve": "string|null",
+    "activo": "boolean",
+    "created_at": "string (ISO date)",
+    "updated_at": "string (ISO date)"
+  }
+}
+```
+
+### PUT /api/publicaciones/{id}
+**Descripción:** Actualizar una publicación existente
+**Autenticación:** Requerida
+**Permisos:** vehiculos.editar
+
+**Path Parameters:**
+```
+id: string (UUID, required)
+```
+
+**Request Body (JSON, todos los campos opcionales):**
+```json
+{
+  "plataforma": "string (optional)",
+  "titulo": "string (optional, max: 200 chars)",
+  "url_publicacion": "string (optional, URL format)",
+  "id_publicacion": "string (optional, max: 100 chars)",
+  "ficha_breve": "string (optional, max: 1000 chars)",
+  "activo": "boolean (optional)"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Publicación actualizada exitosamente",
+  "publicacion": {
+    // Mismo formato que POST
+  }
+}
+```
+
+### DELETE /api/publicaciones/{id}
+**Descripción:** Eliminar una publicación (soft delete)
+**Autenticación:** Requerida
+**Permisos:** vehiculos.eliminar
+
+**Path Parameters:**
+```
+id: string (UUID, required)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Publicación eliminada exitosamente"
+}
+```
+
+---
+
+## 📊 ESTADOS DE VEHÍCULOS
+
+### GET /api/estados
+**Descripción:** Obtener todos los estados de vehículos disponibles
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Estados obtenidos exitosamente",
+  "estados": [
+    {
+      "id": "string (UUID)",
+      "codigo": "string", // "salon", "consignacion", "pyc", "preparacion", "vendido", "entregado"
+      "nombre": "string", // "En Salón", "En Consignación", etc.
+      "descripcion": "string"
+    }
+  ]
+}
+```
+
+---
+
+## 🏢 EMPRESAS
+
+### GET /api/empresas
+**Descripción:** Obtener lista de empresas (solo admin general)
+**Autenticación:** Requerida
+**Permisos:** empresas.leer
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Empresas obtenidas exitosamente", 
+  "empresas": [
+    {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "descripcion": "string|null", 
+      "logo_url": "string|null",
+      "activa": "boolean",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)"
+    }
+  ]
+}
+```
+
+---
+
+## 🔍 HEALTH CHECKS
+
+### GET /health
+**Descripción:** Verificar estado del servidor
+**Autenticación:** No requerida
+
+**Response 200:**
+```json
+{
+  "status": "OK",
+  "message": "Voonda API with Prisma ORM is running",
+  "timestamp": "string (ISO date)",
+  "version": "1.0.0",
+  "environment": "string",
+  "orm": "Prisma"
+}
+```
+
+### GET /db-health
+**Descripción:** Verificar conectividad con base de datos
+**Autenticación:** No requerida
+
+**Response 200:**
+```json
+{
+  "status": "OK", 
+  "message": "Database connection is healthy",
+  "timestamp": "string (ISO date)",
+  "database": "PostgreSQL"
+}
+```
+
+---
+
+## ⚠️ RESPUESTAS DE ERROR COMUNES
+
+### 400 - Bad Request
+```json
+{
+  "success": false,
+  "error": "Datos inválidos",
+  "message": "string",
+  "details": [
+    {
+      "field": "string", 
+      "message": "string"
+    }
+  ]
+}
+```
+
+### 401 - Unauthorized
+```json
+{
+  "success": false,
+  "message": "Token de acceso requerido" | "Token inválido" | "Token expirado"
+}
+```
+
+### 403 - Forbidden
+```json
+{
+  "success": false,
+  "message": "No tienes permisos para realizar esta acción"
+}
+```
+
+### 404 - Not Found
+```json
+{
+  "success": false,
+  "error": "Recurso no encontrado",
+  "message": "string"
+}
+```
+
+### 500 - Internal Server Error
+```json
+{
+  "success": false,
+  "error": "Error interno del servidor",
+  "message": "string"
+}
+```
+
+---
+
+## 💡 NOTAS PARA FRONTEND
+
+### Credenciales de prueba:
+```
+Admin General: admin@voonda.com / admin123
+Admin Empresa: admin.empresa@voonda.com / admin123
+Colaborador: colaborador@voonda.com / admin123
+```
+
+### Plataformas de publicación disponibles:
+- `"facebook"` - Facebook Marketplace o páginas
+- `"web"` - Sitio web de la empresa
+- `"mercadolibre"` - MercadoLibre
+- `"instagram"` - Instagram posts/stories
+- `"whatsapp"` - WhatsApp Business
+- `"olx"` - OLX
+- `"autocosmos"` - AutoCosmos
+- `"otro"` - Otras plataformas
+
+### Estados de vehículos:
+- `"salon"` - En Salón (disponible para venta)
+- `"consignacion"` - En Consignación  
+- `"pyc"` - Permuta y Compra
+- `"preparacion"` - En Preparación
+- `"vendido"` - Vendido (pendiente entrega)
+- `"entregado"` - Entregado al cliente
+
+### Autenticación:
+- El token JWT expira en 24 horas
+- Almacenar token en localStorage/sessionStorage
+- Incluir token en header `Authorization: Bearer {token}`
+- Manejar respuestas 401 para renovar token
+
+### Paginación:
+- Usar `page` y `limit` para paginación
+- Response incluye objeto `pagination` con información completa
+- `limit` máximo es 100
+
+### Filtros de Búsqueda:
+- `search` busca en marca y modelo del vehículo
+- Usar `yearFrom`/`yearTo` para rango de años
+- Usar `priceFrom`/`priceTo` para rango de precios
+- `estado_codigo` para filtrar por estado específico
+
+### Soft Delete:
+- Los vehículos eliminados se marcan como `activo: false`
+- Las publicaciones eliminadas se marcan como `activo: false`
+- Solo se muestran por defecto los registros activos
 
 ---
 

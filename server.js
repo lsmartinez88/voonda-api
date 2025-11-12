@@ -235,6 +235,9 @@ app.use('/api/compradores', require('./routes/compradores'));
 app.use('/api/imagenes', require('./routes/imagenes'));
 app.use('/api/operaciones', require('./routes/operaciones'));
 
+// Ruta admin temporal para sincronización
+app.use('/api/admin', require('./routes/admin'));
+
 // Ruta raíz
 app.get('/', (req, res) => {
   res.json({

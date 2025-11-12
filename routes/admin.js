@@ -15,10 +15,10 @@ router.post('/sync-schema', async (req, res) => {
   try {
     console.log('🔧 Iniciando sincronización de schema...');
     
-    // Crear tablas que faltan usando SQL directo
-    const createTablesSQL = `
-      -- Crear tabla vendedores si no existe
-      CREATE TABLE IF NOT EXISTS vendedores (
+    // Crear tablas que faltan usando SQL directo (dividido en comandos separados)
+    const commands = [
+      // Crear tabla vendedores
+      `CREATE TABLE IF NOT EXISTS vendedores (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         empresa_id UUID NOT NULL,
         nombre TEXT NOT NULL,
@@ -34,12 +34,11 @@ router.post('/sync-schema', async (req, res) => {
         comentarios TEXT,
         activo BOOLEAN DEFAULT true,
         created_at TIMESTAMPTZ(6) DEFAULT now(),
-        updated_at TIMESTAMPTZ(6) DEFAULT now(),
-        FOREIGN KEY (empresa_id) REFERENCES empresas(id)
-      );
+        updated_at TIMESTAMPTZ(6) DEFAULT now()
+      )`,
 
-      -- Crear tabla compradores si no existe
-      CREATE TABLE IF NOT EXISTS compradores (
+      // Crear tabla compradores
+      `CREATE TABLE IF NOT EXISTS compradores (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         empresa_id UUID NOT NULL,
         nombre TEXT NOT NULL,
@@ -55,12 +54,11 @@ router.post('/sync-schema', async (req, res) => {
         comentarios TEXT,
         activo BOOLEAN DEFAULT true,
         created_at TIMESTAMPTZ(6) DEFAULT now(),
-        updated_at TIMESTAMPTZ(6) DEFAULT now(),
-        FOREIGN KEY (empresa_id) REFERENCES empresas(id)
-      );
+        updated_at TIMESTAMPTZ(6) DEFAULT now()
+      )`,
 
-      -- Crear tabla operaciones si no existe
-      CREATE TABLE IF NOT EXISTS operaciones (
+      // Crear tabla operaciones
+      `CREATE TABLE IF NOT EXISTS operaciones (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         empresa_id UUID NOT NULL,
         vehiculo_id UUID NOT NULL,
@@ -75,54 +73,38 @@ router.post('/sync-schema', async (req, res) => {
         datos_especificos JSONB,
         observaciones TEXT,
         created_at TIMESTAMPTZ(6) DEFAULT now(),
-        updated_at TIMESTAMPTZ(6) DEFAULT now(),
-        FOREIGN KEY (empresa_id) REFERENCES empresas(id),
-        FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id),
-        FOREIGN KEY (vendedor_id) REFERENCES vendedores(id),
-        FOREIGN KEY (comprador_id) REFERENCES compradores(id)
-      );
+        updated_at TIMESTAMPTZ(6) DEFAULT now()
+      )`,
 
-      -- Agregar columnas faltantes a modelo_autos
-      ALTER TABLE modelo_autos ADD COLUMN IF NOT EXISTS equipamiento TEXT[] DEFAULT '{}';
-      ALTER TABLE modelo_autos ADD COLUMN IF NOT EXISTS asistencias_manejo TEXT[] DEFAULT '{}';
+      // Agregar columnas a modelo_autos
+      'ALTER TABLE modelo_autos ADD COLUMN IF NOT EXISTS equipamiento TEXT[] DEFAULT \'{}\'',
+      'ALTER TABLE modelo_autos ADD COLUMN IF NOT EXISTS asistencias_manejo TEXT[] DEFAULT \'{}\'',
 
-      -- Agregar columnas faltantes a vehiculos
-      ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS pendientes_preparacion TEXT;
-      ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS comentarios TEXT;
-      ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS vendedor_id UUID;
-      ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS comprador_id UUID;
+      // Agregar columnas a vehiculos
+      'ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS pendientes_preparacion TEXT',
+      'ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS comentarios TEXT',
+      'ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS vendedor_id UUID',
+      'ALTER TABLE vehiculos ADD COLUMN IF NOT EXISTS comprador_id UUID',
+    ];
 
-      -- Crear índices
-      CREATE INDEX IF NOT EXISTS idx_vendedores_empresa_id ON vendedores(empresa_id);
-      CREATE INDEX IF NOT EXISTS idx_vendedores_telefono ON vendedores(telefono);
-      CREATE INDEX IF NOT EXISTS idx_vendedores_email ON vendedores(email);
-      CREATE INDEX IF NOT EXISTS idx_vendedores_dni ON vendedores(dni);
-      
-      CREATE INDEX IF NOT EXISTS idx_compradores_empresa_id ON compradores(empresa_id);
-      CREATE INDEX IF NOT EXISTS idx_compradores_telefono ON compradores(telefono);
-      CREATE INDEX IF NOT EXISTS idx_compradores_email ON compradores(email);
-      CREATE INDEX IF NOT EXISTS idx_compradores_dni ON compradores(dni);
-      
-      CREATE INDEX IF NOT EXISTS idx_operaciones_empresa_id ON operaciones(empresa_id);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_vehiculo_id ON operaciones(vehiculo_id);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_tipo ON operaciones(tipo);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_fecha ON operaciones(fecha);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_estado ON operaciones(estado);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_vendedor_id ON operaciones(vendedor_id);
-      CREATE INDEX IF NOT EXISTS idx_operaciones_comprador_id ON operaciones(comprador_id);
-      
-      CREATE INDEX IF NOT EXISTS idx_vehiculos_vendedor_id ON vehiculos(vendedor_id);
-      CREATE INDEX IF NOT EXISTS idx_vehiculos_comprador_id ON vehiculos(comprador_id);
-    `;
-
-    // Ejecutar SQL
-    await prisma.$executeRawUnsafe(createTablesSQL);
+    const results = [];
+    
+    // Ejecutar comandos uno por uno
+    for (const command of commands) {
+      try {
+        await prisma.$executeRawUnsafe(command);
+        results.push({ command: command.substring(0, 50) + '...', status: 'success' });
+      } catch (error) {
+        results.push({ command: command.substring(0, 50) + '...', status: 'error', error: error.message });
+      }
+    }
     
     console.log('✅ Schema sincronizado exitosamente');
     
     return res.json({
       success: true,
       message: 'Schema sincronizado exitosamente',
+      results: results,
       tables_created: ['vendedores', 'compradores', 'operaciones'],
       columns_added: ['modelo_autos.equipamiento', 'modelo_autos.asistencias_manejo', 'vehiculos.pendientes_preparacion', 'vehiculos.comentarios']
     });

@@ -271,32 +271,24 @@ exports.getById = async function (req, res) {
           where: { activo: true },
           orderBy: [{ es_principal: 'desc' }, { orden: 'asc' }]
         },
-        operaciones_venta: {
+        operaciones: { // CAMBIO: usar operaciones unificada
           select: {
             id: true,
-            precio_venta: true,
-            fecha_venta: true,
-            fecha_entrega: true,
+            tipo: true,
+            monto: true,
+            fecha: true,
             estado: true,
-            comprador: {
+            vendedor: {
               select: {
+                id: true,
                 nombre: true,
                 apellido: true,
                 telefono: true
               }
-            }
-          },
-          orderBy: { created_at: 'desc' }
-        },
-        operaciones_compra: {
-          select: {
-            id: true,
-            precio_compra: true,
-            fecha_compra: true,
-            fecha_recepcion: true,
-            estado: true,
-            vendedor: {
+            },
+            comprador: {
               select: {
+                id: true,
                 nombre: true,
                 apellido: true,
                 telefono: true

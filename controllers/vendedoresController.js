@@ -74,7 +74,7 @@ exports.getAll = async function (req, res) {
           _count: {
             select: {
               vehiculos: true,
-              operaciones_compra: true
+              operaciones: true // CAMBIO: usar operaciones genérica
             }
           }
         }
@@ -154,11 +154,12 @@ exports.getById = async function (req, res) {
           take: 5,
           orderBy: { created_at: 'desc' }
         },
-        operaciones_compra: {
+        operaciones: { // CAMBIO: usar operaciones genérica
           select: {
             id: true,
-            precio_compra: true,
-            fecha_compra: true,
+            monto: true, // CAMBIO: usar monto en lugar de precio_compra
+            tipo: true,  // CAMBIO: agregar tipo
+            fecha: true, // CAMBIO: usar fecha en lugar de fecha_compra
             estado: true,
             vehiculo: {
               select: {

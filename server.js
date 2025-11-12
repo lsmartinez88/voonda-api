@@ -229,6 +229,11 @@ app.use('/api/vehiculos', require('./routes/vehiculos'));
 app.use('/api/empresas', require('./routes/empresas'));
 app.use('/api/estados', require('./routes/estados'));
 
+// Nuevas rutas
+app.use('/api/vendedores', require('./routes/vendedores'));
+app.use('/api/compradores', require('./routes/compradores'));
+app.use('/api/imagenes', require('./routes/imagenes'));
+
 // Ruta raíz
 app.get('/', (req, res) => {
   res.json({

@@ -150,6 +150,34 @@ const vehiculoValidation = {
       .allow('')
       .messages({
         'string.max': 'Las observaciones no pueden tener más de 1000 caracteres'
+      }),
+    
+    // Nuevos campos agregados
+    pendientes_preparacion: Joi.string()
+      .max(2000)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'Los pendientes de preparación no pueden tener más de 2000 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(2000)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 2000 caracteres'
+      }),
+    vendedor_id: Joi.string()
+      .uuid()
+      .optional()
+      .messages({
+        'string.guid': 'El vendedor_id debe ser un UUID válido'
+      }),
+    comprador_id: Joi.string()
+      .uuid()
+      .optional()
+      .messages({
+        'string.guid': 'El comprador_id debe ser un UUID válido'
       })
   }),
 
@@ -247,6 +275,36 @@ const vehiculoValidation = {
       .allow('')
       .messages({
         'string.max': 'Las observaciones no pueden tener más de 1000 caracteres'
+      }),
+    
+    // Nuevos campos agregados
+    pendientes_preparacion: Joi.string()
+      .max(2000)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'Los pendientes de preparación no pueden tener más de 2000 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(2000)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 2000 caracteres'
+      }),
+    vendedor_id: Joi.string()
+      .uuid()
+      .optional()
+      .allow(null)
+      .messages({
+        'string.guid': 'El vendedor_id debe ser un UUID válido'
+      }),
+    comprador_id: Joi.string()
+      .uuid()
+      .optional()
+      .allow(null)
+      .messages({
+        'string.guid': 'El comprador_id debe ser un UUID válido'
       })
   }).min(1).messages({
     'object.min': 'Debes proporcionar al menos un campo para actualizar'
@@ -317,8 +375,439 @@ const filterValidation = {
     if (value.priceFrom && value.priceTo && value.priceFrom > value.priceTo) {
       return helpers.error('any.invalid', { message: 'El precio inicial no puede ser mayor al precio final' });
     }
-    
-    return value;
+  })
+};
+
+// Esquemas de validación para vendedores
+const vendedorValidation = {
+  // Validación para crear vendedor
+  create: Joi.object({
+    nombre: Joi.string()
+      .min(2)
+      .max(200)
+      .required()
+      .messages({
+        'string.min': 'El nombre debe tener al menos 2 caracteres',
+        'string.max': 'El nombre no puede tener más de 200 caracteres',
+        'any.required': 'El nombre es requerido'
+      }),
+    apellido: Joi.string()
+      .min(2)
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.min': 'El apellido debe tener al menos 2 caracteres',
+        'string.max': 'El apellido no puede tener más de 200 caracteres'
+      }),
+    telefono: Joi.string()
+      .pattern(/^[+0-9\s\-()]+$/)
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.pattern.base': 'El teléfono debe contener solo números y caracteres válidos',
+        'string.max': 'El teléfono no puede tener más de 20 caracteres'
+      }),
+    email: Joi.string()
+      .email()
+      .allow('')
+      .optional()
+      .messages({
+        'string.email': 'El email debe tener un formato válido'
+      }),
+    dni: Joi.string()
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El DNI no puede tener más de 20 caracteres'
+      }),
+    direccion: Joi.string()
+      .max(500)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La dirección no puede tener más de 500 caracteres'
+      }),
+    ciudad: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La ciudad no puede tener más de 100 caracteres'
+      }),
+    provincia: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La provincia no puede tener más de 100 caracteres'
+      }),
+    codigo_postal: Joi.string()
+      .max(10)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El código postal no puede tener más de 10 caracteres'
+      }),
+    origen: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El origen no puede tener más de 200 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(1000)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 1000 caracteres'
+      }),
+    empresa_id: Joi.string().uuid().optional() // Solo para admin general
+  }),
+
+  // Validación para actualizar vendedor
+  update: Joi.object({
+    nombre: Joi.string()
+      .min(2)
+      .max(200)
+      .optional()
+      .messages({
+        'string.min': 'El nombre debe tener al menos 2 caracteres',
+        'string.max': 'El nombre no puede tener más de 200 caracteres'
+      }),
+    apellido: Joi.string()
+      .min(2)
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.min': 'El apellido debe tener al menos 2 caracteres',
+        'string.max': 'El apellido no puede tener más de 200 caracteres'
+      }),
+    telefono: Joi.string()
+      .pattern(/^[+0-9\s\-()]+$/)
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.pattern.base': 'El teléfono debe contener solo números y caracteres válidos',
+        'string.max': 'El teléfono no puede tener más de 20 caracteres'
+      }),
+    email: Joi.string()
+      .email()
+      .allow('')
+      .optional()
+      .messages({
+        'string.email': 'El email debe tener un formato válido'
+      }),
+    dni: Joi.string()
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El DNI no puede tener más de 20 caracteres'
+      }),
+    direccion: Joi.string()
+      .max(500)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La dirección no puede tener más de 500 caracteres'
+      }),
+    ciudad: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La ciudad no puede tener más de 100 caracteres'
+      }),
+    provincia: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La provincia no puede tener más de 100 caracteres'
+      }),
+    codigo_postal: Joi.string()
+      .max(10)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El código postal no puede tener más de 10 caracteres'
+      }),
+    origen: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El origen no puede tener más de 200 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(1000)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 1000 caracteres'
+      }),
+    activo: Joi.boolean().optional()
+  })
+};
+
+// Esquemas de validación para compradores (igual que vendedores)
+const compradorValidation = {
+  // Validación para crear comprador
+  create: Joi.object({
+    nombre: Joi.string()
+      .min(2)
+      .max(200)
+      .required()
+      .messages({
+        'string.min': 'El nombre debe tener al menos 2 caracteres',
+        'string.max': 'El nombre no puede tener más de 200 caracteres',
+        'any.required': 'El nombre es requerido'
+      }),
+    apellido: Joi.string()
+      .min(2)
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.min': 'El apellido debe tener al menos 2 caracteres',
+        'string.max': 'El apellido no puede tener más de 200 caracteres'
+      }),
+    telefono: Joi.string()
+      .pattern(/^[+0-9\s\-()]+$/)
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.pattern.base': 'El teléfono debe contener solo números y caracteres válidos',
+        'string.max': 'El teléfono no puede tener más de 20 caracteres'
+      }),
+    email: Joi.string()
+      .email()
+      .allow('')
+      .optional()
+      .messages({
+        'string.email': 'El email debe tener un formato válido'
+      }),
+    dni: Joi.string()
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El DNI no puede tener más de 20 caracteres'
+      }),
+    direccion: Joi.string()
+      .max(500)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La dirección no puede tener más de 500 caracteres'
+      }),
+    ciudad: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La ciudad no puede tener más de 100 caracteres'
+      }),
+    provincia: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La provincia no puede tener más de 100 caracteres'
+      }),
+    codigo_postal: Joi.string()
+      .max(10)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El código postal no puede tener más de 10 caracteres'
+      }),
+    origen: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El origen no puede tener más de 200 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(1000)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 1000 caracteres'
+      }),
+    empresa_id: Joi.string().uuid().optional() // Solo para admin general
+  }),
+
+  // Validación para actualizar comprador
+  update: Joi.object({
+    nombre: Joi.string()
+      .min(2)
+      .max(200)
+      .optional()
+      .messages({
+        'string.min': 'El nombre debe tener al menos 2 caracteres',
+        'string.max': 'El nombre no puede tener más de 200 caracteres'
+      }),
+    apellido: Joi.string()
+      .min(2)
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.min': 'El apellido debe tener al menos 2 caracteres',
+        'string.max': 'El apellido no puede tener más de 200 caracteres'
+      }),
+    telefono: Joi.string()
+      .pattern(/^[+0-9\s\-()]+$/)
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.pattern.base': 'El teléfono debe contener solo números y caracteres válidos',
+        'string.max': 'El teléfono no puede tener más de 20 caracteres'
+      }),
+    email: Joi.string()
+      .email()
+      .allow('')
+      .optional()
+      .messages({
+        'string.email': 'El email debe tener un formato válido'
+      }),
+    dni: Joi.string()
+      .max(20)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El DNI no puede tener más de 20 caracteres'
+      }),
+    direccion: Joi.string()
+      .max(500)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La dirección no puede tener más de 500 caracteres'
+      }),
+    ciudad: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La ciudad no puede tener más de 100 caracteres'
+      }),
+    provincia: Joi.string()
+      .max(100)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'La provincia no puede tener más de 100 caracteres'
+      }),
+    codigo_postal: Joi.string()
+      .max(10)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El código postal no puede tener más de 10 caracteres'
+      }),
+    origen: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El origen no puede tener más de 200 caracteres'
+      }),
+    comentarios: Joi.string()
+      .max(1000)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'Los comentarios no pueden tener más de 1000 caracteres'
+      }),
+    activo: Joi.boolean().optional()
+  })
+};
+
+// Esquemas de validación para imágenes de vehículos
+const imagenVehiculoValidation = {
+  // Validación para crear imagen
+  create: Joi.object({
+    url_imagen: Joi.string()
+      .uri()
+      .required()
+      .messages({
+        'string.uri': 'La URL de la imagen debe ser válida',
+        'any.required': 'La URL de la imagen es requerida'
+      }),
+    titulo: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El título no puede tener más de 200 caracteres'
+      }),
+    orden: Joi.number()
+      .integer()
+      .min(0)
+      .max(1000)
+      .default(0)
+      .optional()
+      .messages({
+        'number.base': 'El orden debe ser un número',
+        'number.integer': 'El orden debe ser un número entero',
+        'number.min': 'El orden debe ser mayor o igual a 0',
+        'number.max': 'El orden no puede ser mayor a 1000'
+      }),
+    es_principal: Joi.boolean()
+      .default(false)
+      .optional()
+  }),
+
+  // Validación para actualizar imagen
+  update: Joi.object({
+    url_imagen: Joi.string()
+      .uri()
+      .optional()
+      .messages({
+        'string.uri': 'La URL de la imagen debe ser válida'
+      }),
+    titulo: Joi.string()
+      .max(200)
+      .allow('')
+      .optional()
+      .messages({
+        'string.max': 'El título no puede tener más de 200 caracteres'
+      }),
+    orden: Joi.number()
+      .integer()
+      .min(0)
+      .max(1000)
+      .optional()
+      .messages({
+        'number.base': 'El orden debe ser un número',
+        'number.integer': 'El orden debe ser un número entero',
+        'number.min': 'El orden debe ser mayor o igual a 0',
+        'number.max': 'El orden no puede ser mayor a 1000'
+      }),
+    es_principal: Joi.boolean().optional(),
+    activo: Joi.boolean().optional()
+  })
+};
+
+// Filtros generales para búsquedas
+const filterValidationGeneral = {
+  general: Joi.object({
+    page: Joi.number().integer().min(1).default(1).optional(),
+    limit: Joi.number().integer().min(1).max(100).default(12).optional(),
+    orderBy: Joi.string().valid('created_at', 'updated_at', 'nombre').default('created_at').optional(),
+    order: Joi.string().valid('asc', 'desc').default('desc').optional(),
+    search: Joi.string().max(100).allow('').optional()
   })
 };
 
@@ -364,7 +853,11 @@ const validate = (schema, property = 'body') => {
 module.exports = {
   authValidation,
   vehiculoValidation,
+  vendedorValidation,
+  compradorValidation,
+  imagenVehiculoValidation,
   filterValidation,
+  filterValidationGeneral,
   validateData,
   validateId,
   validate

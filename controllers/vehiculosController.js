@@ -96,7 +96,9 @@ exports.getAll = async function (req, res) {
               modelo: true,
               modelo_ano: true,
               combustible: true,
-              caja: true
+              caja: true,
+              equipamiento: true,
+              asistencias_manejo: true
             }
           },
           estado: {
@@ -106,6 +108,35 @@ exports.getAll = async function (req, res) {
               nombre: true,
               descripcion: true
             }
+          },
+          vendedor: {
+            select: {
+              id: true,
+              nombre: true,
+              apellido: true,
+              telefono: true,
+              email: true
+            }
+          },
+          comprador: {
+            select: {
+              id: true,
+              nombre: true,
+              apellido: true,
+              telefono: true,
+              email: true
+            }
+          },
+          imagenes: {
+            select: {
+              id: true,
+              url_imagen: true,
+              titulo: true,
+              orden: true,
+              es_principal: true
+            },
+            where: { activo: true },
+            orderBy: [{ es_principal: 'desc' }, { orden: 'asc' }]
           }
         }
       }),
@@ -160,19 +191,22 @@ exports.getById = async function (req, res) {
         },
         modelo_auto: {
           select: {
+            id: true,
             marca: true,
             modelo: true,
+            version: true,
             modelo_ano: true,
             combustible: true,
             caja: true,
-            version: true,
             motorizacion: true,
             traccion: true,
             puertas: true,
             segmento_modelo: true,
             cilindrada: true,
             potencia_hp: true,
-            torque_nm: true
+            torque_nm: true,
+            equipamiento: true,
+            asistencias_manejo: true
           }
         },
         estado: {
@@ -182,6 +216,93 @@ exports.getById = async function (req, res) {
             nombre: true,
             descripcion: true
           }
+        },
+        vendedor: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            telefono: true,
+            email: true,
+            dni: true,
+            direccion: true,
+            ciudad: true,
+            provincia: true
+          }
+        },
+        comprador: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            telefono: true,
+            email: true,
+            dni: true,
+            direccion: true,
+            ciudad: true,
+            provincia: true
+          }
+        },
+        publicaciones: {
+          select: {
+            id: true,
+            vehiculo_id: true,
+            plataforma: true,
+            url_publicacion: true,
+            id_publicacion_externa: true,
+            titulo: true,
+            ficha_breve: true,
+            activo: true,
+            created_at: true,
+            updated_at: true
+          },
+          where: { activo: true }
+        },
+        imagenes: {
+          select: {
+            id: true,
+            url_imagen: true,
+            titulo: true,
+            orden: true,
+            es_principal: true,
+            created_at: true
+          },
+          where: { activo: true },
+          orderBy: [{ es_principal: 'desc' }, { orden: 'asc' }]
+        },
+        operaciones_venta: {
+          select: {
+            id: true,
+            precio_venta: true,
+            fecha_venta: true,
+            fecha_entrega: true,
+            estado: true,
+            comprador: {
+              select: {
+                nombre: true,
+                apellido: true,
+                telefono: true
+              }
+            }
+          },
+          orderBy: { created_at: 'desc' }
+        },
+        operaciones_compra: {
+          select: {
+            id: true,
+            precio_compra: true,
+            fecha_compra: true,
+            fecha_recepcion: true,
+            estado: true,
+            vendedor: {
+              select: {
+                nombre: true,
+                apellido: true,
+                telefono: true
+              }
+            }
+          },
+          orderBy: { created_at: 'desc' }
         }
       }
     });
@@ -244,16 +365,15 @@ exports.create = async function (req, res) {
       ...req.body,
       empresa_id, // Agregar empresa_id
       estado_id,  // Usar el estado_id resuelto
-      marca: req.body.marca?.trim(),
-      modelo: req.body.modelo?.trim(),
-      version: req.body.version?.trim(),
-      motorizacion: req.body.motorizacion?.trim(),
+      // Limpiar campos de texto
+      observaciones: req.body.observaciones?.trim(),
+      pendientes_preparacion: req.body.pendientes_preparacion?.trim(),
+      comentarios: req.body.comentarios?.trim(),
       // Prisma maneja created_at y updated_at automáticamente
     };
 
     // Limpiar campos de estado originales del body
     delete vehiculoData.estado_codigo;
-    delete vehiculoData.estado_id;
 
     // Limpiar campos undefined para evitar problemas con Prisma
     Object.keys(vehiculoData).forEach(key => {
@@ -274,7 +394,9 @@ exports.create = async function (req, res) {
             modelo: true,
             modelo_ano: true,
             combustible: true,
-            caja: true
+            caja: true,
+            equipamiento: true,
+            asistencias_manejo: true
           }
         },
         estado: {
@@ -283,6 +405,24 @@ exports.create = async function (req, res) {
             codigo: true,
             nombre: true,
             descripcion: true
+          }
+        },
+        vendedor: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            telefono: true,
+            email: true
+          }
+        },
+        comprador: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            telefono: true,
+            email: true
           }
         }
       }

@@ -91,7 +91,7 @@ exports.getAll = async function (req, res) {
         take: parseInt(limit),
         orderBy: { [orderBy]: order },
         include: {
-          modelo_auto: {
+          modelo: {
             select: {
               marca: true,
               modelo: true,
@@ -131,13 +131,22 @@ exports.getAll = async function (req, res) {
           imagenes: {
             select: {
               id: true,
-              url_imagen: true,
-              titulo: true,
+              url: true,
+              descripcion: true,
               orden: true,
               es_principal: true
             },
             where: { activo: true },
             orderBy: [{ es_principal: 'desc' }, { orden: 'asc' }]
+          },
+          publicaciones: {
+            select: {
+              id: true,
+              plataforma: true,
+              titulo: true,
+              activo: true
+            },
+            where: { activo: true }
           }
         }
       }),
@@ -190,7 +199,7 @@ exports.getById = async function (req, res) {
             nombre: true
           }
         },
-        modelo_auto: {
+        modelo: {
           select: {
             id: true,
             marca: true,
@@ -250,7 +259,7 @@ exports.getById = async function (req, res) {
             vehiculo_id: true,
             plataforma: true,
             url_publicacion: true,
-            id_publicacion_externa: true,
+            id_publicacion: true,
             titulo: true,
             ficha_breve: true,
             activo: true,
@@ -262,8 +271,8 @@ exports.getById = async function (req, res) {
         imagenes: {
           select: {
             id: true,
-            url_imagen: true,
-            titulo: true,
+            url: true,
+            descripcion: true,
             orden: true,
             es_principal: true,
             created_at: true
@@ -381,7 +390,7 @@ exports.create = async function (req, res) {
     const newVehiculo = await prisma.vehiculo.create({
       data: vehiculoData,
       include: {
-        modelo_auto: {
+        modelo: {
           select: {
             marca: true,
             modelo: true,
@@ -522,7 +531,7 @@ exports.update = async function (req, res) {
             nombre: true
           }
         },
-        modelo_auto: {
+        modelo: {
           select: {
             marca: true,
             modelo: true,

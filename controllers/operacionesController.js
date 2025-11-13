@@ -104,7 +104,7 @@ exports.getAll = async function (req, res) {
             select: {
               id: true,
               patente: true,
-              modelo_auto: {
+              modelo: {
                 select: {
                   marca: true,
                   modelo: true,
@@ -196,7 +196,7 @@ exports.getById = async function (req, res) {
             vehiculo_ano: true,
             kilometros: true,
             valor: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,
@@ -283,7 +283,7 @@ exports.create = async function (req, res) {
           select: {
             id: true,
             patente: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,

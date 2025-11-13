@@ -52,8 +52,8 @@ exports.getByVehiculo = async function (req, res) {
       },
       select: {
         id: true,
-        url_imagen: true,
-        titulo: true,
+        url: true,
+        descripcion: true,
         orden: true,
         es_principal: true,
         created_at: true,
@@ -100,7 +100,7 @@ exports.getById = async function (req, res) {
         vehiculo: {
           select: {
             id: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,
@@ -180,8 +180,8 @@ exports.create = async function (req, res) {
     // Normalizar datos
     const imagenData = {
       vehiculo_id,
-      url_imagen: req.body.url_imagen?.trim(),
-      titulo: req.body.titulo?.trim(),
+      url: req.body.url_imagen?.trim(),
+      descripcion: req.body.titulo?.trim(),
       orden: req.body.orden || 0,
       es_principal: req.body.es_principal || false
     };
@@ -199,7 +199,7 @@ exports.create = async function (req, res) {
         vehiculo: {
           select: {
             id: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,
@@ -274,8 +274,8 @@ exports.update = async function (req, res) {
 
     // Normalizar datos de actualización
     const updateData = {
-      url_imagen: req.body.url_imagen?.trim(),
-      titulo: req.body.titulo?.trim(),
+      url: req.body.url_imagen?.trim(),
+      descripcion: req.body.titulo?.trim(),
       orden: req.body.orden,
       es_principal: req.body.es_principal
     };
@@ -294,7 +294,7 @@ exports.update = async function (req, res) {
         vehiculo: {
           select: {
             id: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,

@@ -131,7 +131,7 @@ exports.getById = async function (req, res) {
         vehiculos: {
           select: {
             id: true,
-            modelo_auto: {
+            modelo: {
               select: {
                 marca: true,
                 modelo: true,
@@ -162,7 +162,7 @@ exports.getById = async function (req, res) {
             estado: true,
             vehiculo: {
               select: {
-                modelo_auto: {
+                modelo: {
                   select: {
                     marca: true,
                     modelo: true,

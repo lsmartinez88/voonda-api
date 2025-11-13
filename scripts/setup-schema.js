@@ -1,4 +1,13 @@
-generator client {
+﻿/**
+ * Script para crear el esquema completo usando Prisma DB Push
+ * Esto es más rápido para desarrollo y evita problemas de migración
+ */
+
+require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+const fullSchema = `generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
@@ -212,4 +221,11 @@ model Operacion {
   @@index([vendedor_id])
   @@index([comprador_id])
   @@map("operaciones")
-}
+}`;
+
+console.log('📝 Escribiendo schema completo...');
+fs.writeFileSync(path.join(__dirname, '../prisma/schema.prisma'), fullSchema);
+console.log('✅ Schema escrito correctamente');
+
+console.log('🎯 Ahora ejecuta: npx prisma db push');
+console.log('🎯 Después ejecuta: npm run db:setup-data para poblar datos');

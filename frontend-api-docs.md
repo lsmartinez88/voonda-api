@@ -125,10 +125,10 @@ search: string (max: 100 chars, busca en marca/modelo)
       "tipo_operacion": "string|null",
       "fecha_ingreso": "string (ISO date)|null",
       "observaciones": "string|null",
-      "pendientes_preparacion": "array[string]|null", // NUEVO CAMPO
-      "comentarios": "string|null", // NUEVO CAMPO
-      "vendedor_id": "string (UUID)|null", // NUEVO CAMPO
-      "comprador_id": "string (UUID)|null", // NUEVO CAMPO
+      "pendientes_preparacion": "array[string]|null",
+      "comentarios": "string|null",
+      "vendedor_id": "string (UUID)|null",
+      "comprador_id": "string (UUID)|null",
       "activo": "boolean",
       "created_at": "string (ISO date)",
       "updated_at": "string (ISO date)",
@@ -138,8 +138,8 @@ search: string (max: 100 chars, busca en marca/modelo)
         "modelo_ano": "number",
         "combustible": "string",
         "caja": "string",
-        "equipamiento": "array[string]", // NUEVO CAMPO
-        "asistencias_manejo": "array[string]" // NUEVO CAMPO
+        "equipamiento": "array[string]",
+        "asistencias_manejo": "array[string]"
       },
       "estado": {
         "id": "string (UUID)",
@@ -147,21 +147,21 @@ search: string (max: 100 chars, busca en marca/modelo)
         "nombre": "string",
         "descripcion": "string"
       } | null,
-      "vendedor": { // NUEVA RELACIÓN
+      "vendedor": {
         "id": "string (UUID)",
         "nombre": "string",
         "apellido": "string|null",
         "telefono": "string|null",
         "email": "string|null"
       } | null,
-      "comprador": { // NUEVA RELACIÓN
+      "comprador": {
         "id": "string (UUID)",
         "nombre": "string",
         "apellido": "string|null",
         "telefono": "string|null",
         "email": "string|null"
       } | null,
-      "imagenes": [ // NUEVA RELACIÓN
+      "imagenes": [
         {
           "id": "string (UUID)",
           "url": "string",
@@ -209,10 +209,10 @@ id: string (UUID, required)
     "tipo_operacion": "string|null",
     "fecha_ingreso": "string (ISO date)|null",
     "observaciones": "string|null",
-    "pendientes_preparacion": "array[string]|null", // NUEVO CAMPO
-    "comentarios": "string|null", // NUEVO CAMPO
-    "vendedor_id": "string (UUID)|null", // NUEVO CAMPO
-    "comprador_id": "string (UUID)|null", // NUEVO CAMPO
+    "pendientes_preparacion": "array[string]|null",
+    "comentarios": "string|null",
+    "vendedor_id": "string (UUID)|null",
+    "comprador_id": "string (UUID)|null",
     "activo": "boolean",
     "created_at": "string (ISO date)",
     "updated_at": "string (ISO date)",
@@ -229,8 +229,8 @@ id: string (UUID, required)
       "modelo_ano": "number", 
       "combustible": "string",
       "caja": "string",
-      "equipamiento": "array[string]", // NUEVO CAMPO
-      "asistencias_manejo": "array[string]", // NUEVO CAMPO
+      "equipamiento": "array[string]",
+      "asistencias_manejo": "array[string]",
       "motorizacion": "string|null",
       "traccion": "string|null",
       "puertas": "number|null",
@@ -245,7 +245,7 @@ id: string (UUID, required)
       "nombre": "string",
       "descripcion": "string"
     } | null,
-    "vendedor": { // NUEVA RELACIÓN
+    "vendedor": {
       "id": "string (UUID)",
       "nombre": "string",
       "apellido": "string|null",
@@ -255,7 +255,7 @@ id: string (UUID, required)
       "ciudad": "string|null",
       "provincia": "string|null"
     } | null,
-    "comprador": { // NUEVA RELACIÓN
+    "comprador": {
       "id": "string (UUID)",
       "nombre": "string",
       "apellido": "string|null",
@@ -265,7 +265,7 @@ id: string (UUID, required)
       "ciudad": "string|null",
       "provincia": "string|null"
     } | null,
-    "imagenes": [ // NUEVA RELACIÓN
+    "imagenes": [
       {
         "id": "string (UUID)",
         "url": "string",
@@ -312,10 +312,10 @@ id: string (UUID, required)
   "tipo_operacion": "string (optional)",
   "fecha_ingreso": "string (ISO date, optional)",
   "observaciones": "string (optional, max: 1000 chars)",
-  "pendientes_preparacion": "array[string] (optional)", // NUEVO CAMPO
-  "comentarios": "string (optional, max: 2000 chars)", // NUEVO CAMPO
-  "vendedor_id": "string (UUID, optional)", // NUEVO CAMPO
-  "comprador_id": "string (UUID, optional)" // NUEVO CAMPO
+  "pendientes_preparacion": "array[string] (optional)",
+  "comentarios": "string (optional, max: 2000 chars)",
+  "vendedor_id": "string (UUID, optional)",
+  "comprador_id": "string (UUID, optional)"
 }
 ```
 
@@ -354,10 +354,10 @@ id: string (UUID, required)
   "tipo_operacion": "string (optional)",
   "fecha_ingreso": "string (ISO date, optional)",
   "observaciones": "string (optional, max: 1000 chars)",
-  "pendientes_preparacion": "array[string] (optional)", // NUEVO CAMPO
-  "comentarios": "string (optional, max: 2000 chars)", // NUEVO CAMPO
-  "vendedor_id": "string (UUID, optional)", // NUEVO CAMPO
-  "comprador_id": "string (UUID, optional)" // NUEVO CAMPO
+  "pendientes_preparacion": "array[string] (optional)",
+  "comentarios": "string (optional, max: 2000 chars)",
+  "vendedor_id": "string (UUID, optional)",
+  "comprador_id": "string (UUID, optional)"
 }
 ```
 
@@ -368,7 +368,7 @@ id: string (UUID, required)
 
 ---
 
-## 👤 VENDEDORES (NUEVO)
+## 👤 VENDEDORES
 
 ### GET /api/vendedores
 **Descripción:** Obtener lista de vendedores (personas que venden vehículos a la empresa)
@@ -405,7 +405,7 @@ search: string (busca en nombre, apellido, teléfono, email, DNI)
       "updated_at": "string (ISO date)",
       "_count": {
         "vehiculos": "number",
-        "operaciones_compra": "number"
+        "operaciones": "number"
       }
     }
   ],
@@ -460,12 +460,13 @@ search: string (busca en nombre, apellido, teléfono, email, DNI)
         }
       }
     ],
-    "operaciones_compra": [
+    "operaciones": [
       {
         "id": "string (UUID)",
-        "precio_compra": "string (decimal)",
-        "fecha_compra": "string (ISO date)",
-        "estado": "string",
+        "tipo_operacion": "string", // "compra" | "venta"
+        "precio": "string (decimal)",
+        "fecha_operacion": "string (ISO date)",
+        "estado": "string", // "pendiente" | "completada" | "cancelada"
         "vehiculo": {
           "modelo_auto": {
             "marca": "string",
@@ -536,7 +537,7 @@ search: string (busca en nombre, apellido, teléfono, email, DNI)
 
 ---
 
-## 🛒 COMPRADORES (NUEVO)
+## 🛒 COMPRADORES
 
 ### GET /api/compradores
 **Descripción:** Obtener lista de compradores (personas que compran vehículos de la empresa)
@@ -571,7 +572,7 @@ search: string (busca en nombre, apellido, teléfono, email, DNI)
       },
       "_count": {
         "vehiculos": "number",
-        "operaciones_venta": "number"
+        "operaciones": "number"
       }
     }
   ],
@@ -595,7 +596,190 @@ search: string (busca en nombre, apellido, teléfono, email, DNI)
 
 ---
 
-## 📷 IMÁGENES DE VEHÍCULOS (NUEVO)
+## 💼 OPERACIONES
+
+### GET /api/operaciones
+**Descripción:** Obtener lista de operaciones (compras y ventas) con filtros y paginación
+**Autenticación:** Requerida
+**Permisos:** operaciones.leer
+
+**Query Parameters (todos opcionales):**
+```
+page: number (default: 1, min: 1)
+limit: number (default: 12, min: 1, max: 100)
+orderBy: string (default: "created_at") // "created_at" | "fecha_operacion" | "precio"
+order: string (default: "desc") // "asc" | "desc"
+tipo_operacion: string // "compra" | "venta"
+estado: string // "pendiente" | "completada" | "cancelada"
+fechaFrom: string (ISO date, opcional)
+fechaTo: string (ISO date, opcional)
+vendedor_id: string (UUID, opcional)
+comprador_id: string (UUID, opcional)
+vehiculo_id: string (UUID, opcional)
+search: string (busca en observaciones, método de pago)
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operaciones obtenidas exitosamente",
+  "operaciones": [
+    {
+      "id": "string (UUID)",
+      "empresa_id": "string (UUID)",
+      "vehiculo_id": "string (UUID)",
+      "vendedor_id": "string (UUID)|null",
+      "comprador_id": "string (UUID)|null",
+      "tipo_operacion": "string", // "compra" | "venta"
+      "precio": "string (decimal)",
+      "moneda": "string",
+      "fecha_operacion": "string (ISO date)",
+      "estado": "string", // "pendiente" | "completada" | "cancelada"
+      "metodo_pago": "string|null",
+      "observaciones": "string|null",
+      "documentos_pendientes": "array[string]|null",
+      "activo": "boolean",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)",
+      "vehiculo": {
+        "id": "string (UUID)",
+        "patente": "string|null",
+        "modelo_auto": {
+          "marca": "string",
+          "modelo": "string",
+          "modelo_ano": "number"
+        }
+      },
+      "vendedor": {
+        "id": "string (UUID)",
+        "nombre": "string",
+        "apellido": "string|null",
+        "telefono": "string|null"
+      } | null,
+      "comprador": {
+        "id": "string (UUID)",
+        "nombre": "string",
+        "apellido": "string|null",
+        "telefono": "string|null"
+      } | null
+    }
+  ],
+  "pagination": {
+    "total": "number",
+    "page": "number",
+    "limit": "number",
+    "pages": "number"
+  }
+}
+```
+
+### GET /api/operaciones/{id}
+**Descripción:** Obtener una operación por ID con información detallada
+**Autenticación:** Requerida
+**Permisos:** operaciones.leer
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Operación obtenida exitosamente",
+  "operacion": {
+    "id": "string (UUID)",
+    "empresa_id": "string (UUID)",
+    "vehiculo_id": "string (UUID)",
+    "vendedor_id": "string (UUID)|null",
+    "comprador_id": "string (UUID)|null",
+    "tipo_operacion": "string",
+    "precio": "string (decimal)",
+    "moneda": "string",
+    "fecha_operacion": "string (ISO date)",
+    "estado": "string",
+    "metodo_pago": "string|null",
+    "observaciones": "string|null",
+    "documentos_pendientes": "array[string]|null",
+    "activo": "boolean",
+    "created_at": "string (ISO date)",
+    "updated_at": "string (ISO date)",
+    "vehiculo": {
+      "id": "string (UUID)",
+      "patente": "string|null",
+      "vehiculo_ano": "number",
+      "kilometros": "number",
+      "modelo_auto": {
+        "marca": "string",
+        "modelo": "string",
+        "modelo_ano": "number",
+        "combustible": "string",
+        "caja": "string"
+      }
+    },
+    "vendedor": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "apellido": "string|null",
+      "telefono": "string|null",
+      "email": "string|null",
+      "dni": "string|null"
+    } | null,
+    "comprador": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "apellido": "string|null",
+      "telefono": "string|null",
+      "email": "string|null",
+      "dni": "string|null"
+    } | null
+  }
+}
+```
+
+### POST /api/operaciones
+**Descripción:** Crear nueva operación (compra o venta)
+**Autenticación:** Requerida
+**Permisos:** operaciones.crear
+
+**Request Body (JSON):**
+```json
+{
+  "vehiculo_id": "string (UUID, required)",
+  "tipo_operacion": "string (required)", // "compra" | "venta"
+  "vendedor_id": "string (UUID, optional)", // Requerido si tipo_operacion = "compra"
+  "comprador_id": "string (UUID, optional)", // Requerido si tipo_operacion = "venta"
+  "precio": "number (required, positive)",
+  "moneda": "string (optional, default: 'ARS')",
+  "fecha_operacion": "string (ISO date, required)",
+  "estado": "string (optional, default: 'pendiente')", // "pendiente" | "completada" | "cancelada"
+  "metodo_pago": "string (optional)",
+  "observaciones": "string (optional, max: 2000 chars)",
+  "documentos_pendientes": "array[string] (optional)"
+}
+```
+
+**Response 201:**
+```json
+{
+  "success": true,
+  "message": "Operación creada exitosamente",
+  "operacion": {
+    // Mismo formato que GET /api/operaciones/{id}
+  }
+}
+```
+
+### PUT /api/operaciones/{id}
+**Descripción:** Actualizar una operación existente
+**Autenticación:** Requerida
+**Permisos:** operaciones.editar
+
+### DELETE /api/operaciones/{id}
+**Descripción:** Eliminar una operación (soft delete)
+**Autenticación:** Requerida
+**Permisos:** operaciones.eliminar
+
+---
+
+## 📷 IMÁGENES DE VEHÍCULOS
 
 ### GET /api/imagenes
 **Descripción:** Obtener todas las imágenes (con filtros por vehículo)
@@ -833,23 +1017,40 @@ limit: number (default: 12)
 
 ## 💡 NOTAS PARA FRONTEND
 
-### 🆕 NUEVAS CARACTERÍSTICAS
+### 🆕 CARACTERÍSTICAS ACTUALES
 
-#### **Campos Nuevos en Vehículos:**
+#### **Nuevos Campos en Vehículos:**
 - `pendientes_preparacion`: Array de strings con tareas pendientes
 - `comentarios`: Comentarios adicionales del vehículo
 - `vendedor_id`/`comprador_id`: Referencias a vendedores y compradores
 - `equipamiento`: Array de elementos de equipamiento en modelo_auto
 - `asistencias_manejo`: Array de asistencias de manejo en modelo_auto
 
-#### **Nuevas Entidades:**
+#### **Entidades Principales:**
 - **Vendedores**: Personas que venden vehículos a la empresa
 - **Compradores**: Personas que compran vehículos de la empresa  
+- **Operaciones**: Sistema unificado de compras y ventas (reemplaza tablas separadas)
 - **Imágenes**: Sistema de gestión de imágenes por vehículo
+- **Publicaciones**: Gestión de publicaciones en diferentes plataformas
 
 #### **Relaciones Expandidas:**
-- Vehículos ahora incluyen `vendedor`, `comprador` e `imagenes`
+- Vehículos incluyen `vendedor`, `comprador`, `imagenes` y `publicaciones`
+- Operaciones unifican compras y ventas con referencias a vendedores/compradores
 - Cada entidad mantiene contadores de relaciones (`_count`)
+
+### 📊 ESTRUCTURA DE OPERACIONES UNIFICADA
+
+**Operaciones de Compra:**
+- `tipo_operacion`: "compra"
+- `vendedor_id`: ID del vendedor (requerido)
+- `comprador_id`: null
+- La empresa compra el vehículo del vendedor
+
+**Operaciones de Venta:**
+- `tipo_operacion`: "venta"
+- `vendedor_id`: null
+- `comprador_id`: ID del comprador (requerido)
+- La empresa vende el vehículo al comprador
 
 ### Credenciales de prueba:
 ```
@@ -875,6 +1076,11 @@ Colaborador: colaborador@voonda.com / admin123
 - `"preparacion"` - En Preparación
 - `"vendido"` - Vendido (pendiente entrega)
 - `"entregado"` - Entregado al cliente
+
+### Estados de operaciones:
+- `"pendiente"` - Operación pendiente de completar
+- `"completada"` - Operación finalizada exitosamente
+- `"cancelada"` - Operación cancelada
 
 ### Autenticación:
 - El token JWT expira en 24 horas
@@ -910,6 +1116,34 @@ Colaborador: colaborador@voonda.com / admin123
     "Documentos al día"
   ],
   "comentarios": "Vehículo en excelente estado, único dueño"
+}
+```
+
+#### Crear operación de compra:
+```json
+{
+  "vehiculo_id": "uuid-del-vehiculo",
+  "tipo_operacion": "compra",
+  "vendedor_id": "uuid-del-vendedor",
+  "precio": 25000000,
+  "moneda": "ARS",
+  "fecha_operacion": "2024-11-13",
+  "metodo_pago": "Transferencia bancaria",
+  "observaciones": "Compra directa, documentación al día"
+}
+```
+
+#### Crear operación de venta:
+```json
+{
+  "vehiculo_id": "uuid-del-vehiculo",
+  "tipo_operacion": "venta",
+  "comprador_id": "uuid-del-comprador",
+  "precio": 28000000,
+  "moneda": "ARS",
+  "fecha_operacion": "2024-11-13",
+  "metodo_pago": "Financiado 50%",
+  "documentos_pendientes": ["Transferencia", "Seguro"]
 }
 ```
 

@@ -8,6 +8,72 @@ const { prisma } = require('../utils/prisma');
 const router = express.Router();
 
 /**
+ * POST /api/admin/reset-database
+ * RESETEAR COMPLETAMENTE LA BASE DE DATOS - USAR CON CUIDADO
+ */
+router.post('/reset-database', async (req, res) => {
+  try {
+    console.log('🧨 RESETEO COMPLETO DE BASE DE DATOS INICIADO...');
+    
+    // Verificar confirmación
+    const { confirm } = req.body;
+    if (confirm !== 'RESET_ALL_DATA') {
+      return res.status(400).json({
+        success: false,
+        message: 'Confirmación requerida. Envía { "confirm": "RESET_ALL_DATA" }'
+      });
+    }
+
+    // Obtener todas las tablas del esquema público
+    const tables = await prisma.$queryRaw`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_type = 'BASE TABLE'
+      AND table_name != '_prisma_migrations'
+      ORDER BY table_name
+    `;
+    
+    console.log(`📋 Encontradas ${tables.length} tablas para eliminar`);
+    
+    if (tables.length > 0) {
+      // Desactivar foreign key checks temporalmente
+      await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
+      
+      // Eliminar todas las tablas
+      for (const table of tables) {
+        const tableName = table.table_name;
+        console.log(`🗑️  Eliminando tabla: ${tableName}`);
+        await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS "${tableName}" CASCADE`);
+      }
+      
+      // Reactivar foreign key checks
+      await prisma.$executeRawUnsafe('SET session_replication_role = DEFAULT;');
+    }
+    
+    // También eliminar la tabla de migraciones de prisma
+    console.log('🗑️  Eliminando tabla _prisma_migrations');
+    await prisma.$executeRawUnsafe('DROP TABLE IF EXISTS "_prisma_migrations" CASCADE');
+    
+    console.log('✅ Base de datos reseteada exitosamente');
+    
+    res.json({
+      success: true,
+      message: 'Base de datos reseteada exitosamente',
+      tablesDropped: tables.map(t => t.table_name)
+    });
+    
+  } catch (error) {
+    console.error('❌ Error en reset:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error reseteando base de datos',
+      error: error.message
+    });
+  }
+});
+
+/**
  * POST /api/admin/sync-schema
  * Sincronizar schema usando SQL directo
  */

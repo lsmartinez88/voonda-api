@@ -72,11 +72,20 @@ const options = {
             kilometros: { type: 'number', minimum: 0 },
             valor: { type: 'string', nullable: true },
             moneda: { type: 'string', maxLength: 10 },
+            estado_id: { type: 'string', format: 'uuid', nullable: true },
             tipo_operacion: { type: 'string', nullable: true },
-            publicacion_web: { type: 'string', enum: ['true', 'false'] },
-            publicacion_api_call: { type: 'string', enum: ['true', 'false'] },
             fecha_ingreso: { type: 'string', format: 'date-time', nullable: true },
             observaciones: { type: 'string', nullable: true, maxLength: 1000 },
+            pendientes_preparacion: { 
+              type: 'array', 
+              items: { type: 'string' }, 
+              nullable: true,
+              description: 'Lista de tareas pendientes de preparación'
+            },
+            comentarios: { type: 'string', nullable: true, maxLength: 2000 },
+            vendedor_id: { type: 'string', format: 'uuid', nullable: true },
+            comprador_id: { type: 'string', format: 'uuid', nullable: true },
+            activo: { type: 'boolean', default: true },
             created_at: { type: 'string', format: 'date-time' },
             updated_at: { type: 'string', format: 'date-time' },
             modelo_auto: {
@@ -88,6 +97,18 @@ const options = {
                 combustible: { type: 'string' },
                 caja: { type: 'string' },
                 version: { type: 'string', nullable: true },
+                equipamiento: { 
+                  type: 'array', 
+                  items: { type: 'string' }, 
+                  nullable: true,
+                  description: 'Lista de equipamiento del modelo'
+                },
+                asistencias_manejo: { 
+                  type: 'array', 
+                  items: { type: 'string' }, 
+                  nullable: true,
+                  description: 'Lista de asistencias de manejo'
+                },
                 motorizacion: { type: 'string', nullable: true },
                 traccion: { type: 'string', nullable: true },
                 puertas: { type: 'number', nullable: true },
@@ -99,12 +120,40 @@ const options = {
             },
             estado: {
               type: 'object',
+              nullable: true,
               properties: {
                 id: { type: 'string', format: 'uuid' },
                 codigo: { type: 'string', enum: ['salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado'] },
                 nombre: { type: 'string' },
                 descripcion: { type: 'string' }
               }
+            },
+            vendedor: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                nombre: { type: 'string' },
+                apellido: { type: 'string', nullable: true },
+                telefono: { type: 'string', nullable: true },
+                email: { type: 'string', nullable: true }
+              }
+            },
+            comprador: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                nombre: { type: 'string' },
+                apellido: { type: 'string', nullable: true },
+                telefono: { type: 'string', nullable: true },
+                email: { type: 'string', nullable: true }
+              }
+            },
+            imagenes: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/ImagenVehiculo' },
+              description: 'Lista de imágenes del vehículo'
             }
           }
         },
@@ -115,6 +164,123 @@ const options = {
             codigo: { type: 'string', enum: ['salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado'] },
             nombre: { type: 'string' },
             descripcion: { type: 'string' },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Vendedor: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            empresa_id: { type: 'string', format: 'uuid' },
+            nombre: { type: 'string' },
+            apellido: { type: 'string', nullable: true },
+            telefono: { type: 'string', nullable: true },
+            email: { type: 'string', nullable: true },
+            dni: { type: 'string', nullable: true },
+            direccion: { type: 'string', nullable: true },
+            ciudad: { type: 'string', nullable: true },
+            provincia: { type: 'string', nullable: true },
+            codigo_postal: { type: 'string', nullable: true },
+            origen: { type: 'string', nullable: true },
+            comentarios: { type: 'string', nullable: true },
+            activo: { type: 'boolean', default: true },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Comprador: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            empresa_id: { type: 'string', format: 'uuid' },
+            nombre: { type: 'string' },
+            apellido: { type: 'string', nullable: true },
+            telefono: { type: 'string', nullable: true },
+            email: { type: 'string', nullable: true },
+            dni: { type: 'string', nullable: true },
+            direccion: { type: 'string', nullable: true },
+            ciudad: { type: 'string', nullable: true },
+            provincia: { type: 'string', nullable: true },
+            codigo_postal: { type: 'string', nullable: true },
+            origen: { type: 'string', nullable: true },
+            comentarios: { type: 'string', nullable: true },
+            activo: { type: 'boolean', default: true },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Operacion: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            empresa_id: { type: 'string', format: 'uuid' },
+            vehiculo_id: { type: 'string', format: 'uuid' },
+            vendedor_id: { 
+              type: 'string', 
+              format: 'uuid', 
+              nullable: true,
+              description: 'ID del vendedor (solo para operaciones de compra)'
+            },
+            comprador_id: { 
+              type: 'string', 
+              format: 'uuid', 
+              nullable: true,
+              description: 'ID del comprador (solo para operaciones de venta)'
+            },
+            tipo_operacion: { 
+              type: 'string', 
+              enum: ['compra', 'venta'],
+              description: 'Tipo de operación'
+            },
+            precio: { type: 'string', description: 'Precio de la operación' },
+            moneda: { type: 'string', default: 'ARS' },
+            fecha_operacion: { type: 'string', format: 'date' },
+            estado: { 
+              type: 'string', 
+              enum: ['pendiente', 'completada', 'cancelada'],
+              default: 'pendiente'
+            },
+            metodo_pago: { type: 'string', nullable: true },
+            observaciones: { type: 'string', nullable: true },
+            documentos_pendientes: { 
+              type: 'array', 
+              items: { type: 'string' }, 
+              nullable: true,
+              description: 'Lista de documentos pendientes'
+            },
+            activo: { type: 'boolean', default: true },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        ImagenVehiculo: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            vehiculo_id: { type: 'string', format: 'uuid' },
+            url: { type: 'string', description: 'URL de la imagen' },
+            descripcion: { type: 'string', nullable: true },
+            orden: { type: 'integer', minimum: 1 },
+            es_principal: { type: 'boolean', default: false },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        PublicacionVehiculo: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            vehiculo_id: { type: 'string', format: 'uuid' },
+            plataforma: { 
+              type: 'string', 
+              enum: ['facebook', 'web', 'mercadolibre', 'instagram', 'whatsapp', 'olx', 'autocosmos', 'otro']
+            },
+            url_publicacion: { type: 'string', nullable: true },
+            id_publicacion: { type: 'string', nullable: true },
+            titulo: { type: 'string', maxLength: 200 },
+            ficha_breve: { type: 'string', nullable: true, maxLength: 1000 },
+            activo: { type: 'boolean', default: true },
             created_at: { type: 'string', format: 'date-time' },
             updated_at: { type: 'string', format: 'date-time' }
           }
@@ -186,10 +352,16 @@ const options = {
             valor: { type: 'number', minimum: 0 },
             moneda: { type: 'string', maxLength: 10 },
             tipo_operacion: { type: 'string' },
-            publicacion_web: { type: 'string', enum: ['true', 'false'] },
-            publicacion_api_call: { type: 'string', enum: ['true', 'false'] },
             fecha_ingreso: { type: 'string', format: 'date-time' },
-            observaciones: { type: 'string', maxLength: 1000 }
+            observaciones: { type: 'string', maxLength: 1000 },
+            pendientes_preparacion: { 
+              type: 'array', 
+              items: { type: 'string' },
+              description: 'Lista de tareas pendientes de preparación'
+            },
+            comentarios: { type: 'string', maxLength: 2000 },
+            vendedor_id: { type: 'string', format: 'uuid' },
+            comprador_id: { type: 'string', format: 'uuid' }
           }
         },
         PaginatedVehiculos: {
@@ -200,6 +372,66 @@ const options = {
             vehiculos: {
               type: 'array',
               items: { $ref: '#/components/schemas/Vehiculo' }
+            },
+            pagination: {
+              type: 'object',
+              properties: {
+                total: { type: 'number' },
+                page: { type: 'number' },
+                limit: { type: 'number' },
+                pages: { type: 'number' }
+              }
+            }
+          }
+        },
+        PaginatedVendedores: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            message: { type: 'string' },
+            vendedores: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Vendedor' }
+            },
+            pagination: {
+              type: 'object',
+              properties: {
+                total: { type: 'number' },
+                page: { type: 'number' },
+                limit: { type: 'number' },
+                pages: { type: 'number' }
+              }
+            }
+          }
+        },
+        PaginatedCompradores: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            message: { type: 'string' },
+            compradores: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Comprador' }
+            },
+            pagination: {
+              type: 'object',
+              properties: {
+                total: { type: 'number' },
+                page: { type: 'number' },
+                limit: { type: 'number' },
+                pages: { type: 'number' }
+              }
+            }
+          }
+        },
+        PaginatedOperaciones: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            message: { type: 'string' },
+            operaciones: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Operacion' }
             },
             pagination: {
               type: 'object',

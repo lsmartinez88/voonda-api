@@ -93,11 +93,20 @@ exports.getAll = async function (req, res) {
         include: {
           modelo: {
             select: {
+              id: true,
               marca: true,
               modelo: true,
+              version: true,
               modelo_ano: true,
+              segmento_modelo: true,
+              motorizacion: true,
               combustible: true,
               caja: true,
+              traccion: true,
+              cilindrada: true,
+              potencia_hp: true,
+              torque_nm: true,
+              rendimiento_mixto: true,
               equipamiento: true,
               asistencias_manejo: true
             }
@@ -392,11 +401,20 @@ exports.create = async function (req, res) {
       include: {
         modelo: {
           select: {
+            id: true,
             marca: true,
             modelo: true,
+            version: true,
             modelo_ano: true,
+            segmento_modelo: true,
+            motorizacion: true,
             combustible: true,
             caja: true,
+            traccion: true,
+            cilindrada: true,
+            potencia_hp: true,
+            torque_nm: true,
+            rendimiento_mixto: true,
             equipamiento: true,
             asistencias_manejo: true
           }
@@ -533,11 +551,22 @@ exports.update = async function (req, res) {
         },
         modelo: {
           select: {
+            id: true,
             marca: true,
             modelo: true,
+            version: true,
             modelo_ano: true,
+            segmento_modelo: true,
+            motorizacion: true,
             combustible: true,
-            caja: true
+            caja: true,
+            traccion: true,
+            cilindrada: true,
+            potencia_hp: true,
+            torque_nm: true,
+            rendimiento_mixto: true,
+            equipamiento: true,
+            asistencias_manejo: true
           }
         },
         estado: {

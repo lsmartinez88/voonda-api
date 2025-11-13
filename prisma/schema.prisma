@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 model Empresa {
@@ -100,17 +101,21 @@ model ModeloAuto {
 }
 
 model Vehiculo {
-  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  empresa_id   String  @db.Uuid
-  modelo_id    String  @db.Uuid
-  patente      String? @db.Text
-  vehiculo_ano Int
-  kilometros   Int     @default(0)
-  valor        Decimal? @db.Decimal(12, 2)
-  moneda       String   @default("ARS") @db.Text
-  estado       String   @default("disponible") @db.Text
-  observaciones String? @db.Text
-  activo       Boolean  @default(true)
+  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  empresa_id              String   @db.Uuid
+  modelo_id               String   @db.Uuid
+  patente                 String?  @db.Text
+  vehiculo_ano            Int
+  kilometros              Int      @default(0)
+  valor                   Decimal? @db.Decimal(12, 2)
+  moneda                  String   @default("ARS") @db.Text
+  estado_id               String?  @db.Uuid
+  tipo_operacion          String?  @db.Text
+  fecha_ingreso           DateTime? @db.Timestamptz(6)
+  observaciones           String?  @db.Text
+  pendientes_preparacion  String[] @default([])
+  comentarios             String?  @db.Text
+  activo                  Boolean  @default(true)
 
   vendedor_id  String? @db.Uuid
   comprador_id String? @db.Uuid
@@ -118,15 +123,18 @@ model Vehiculo {
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  empresa    Empresa     @relation(fields: [empresa_id], references: [id])
-  modelo     ModeloAuto  @relation(fields: [modelo_id], references: [id])
-  vendedor   Vendedor?   @relation(fields: [vendedor_id], references: [id])
-  comprador  Comprador?  @relation(fields: [comprador_id], references: [id])
-  operaciones Operacion[]
+  empresa       Empresa                @relation(fields: [empresa_id], references: [id])
+  modelo        ModeloAuto             @relation(fields: [modelo_id], references: [id])
+  estado        EstadoVehiculo?        @relation(fields: [estado_id], references: [id])
+  vendedor      Vendedor?              @relation(fields: [vendedor_id], references: [id])
+  comprador     Comprador?             @relation(fields: [comprador_id], references: [id])
+  operaciones   Operacion[]
+  imagenes      ImagenVehiculo[]
+  publicaciones PublicacionVehiculo[]
 
   @@index([empresa_id])
   @@index([modelo_id])
-  @@index([estado])
+  @@index([estado_id])
   @@index([vendedor_id])
   @@index([comprador_id])
   @@map("vehiculos")
@@ -212,4 +220,76 @@ model Operacion {
   @@index([vendedor_id])
   @@index([comprador_id])
   @@map("operaciones")
+}
+
+model EstadoVehiculo {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo      String   @unique @db.VarChar(50)
+  nombre      String   @db.VarChar(100)
+  descripcion String?  @db.Text
+  activo      Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  vehiculos Vehiculo[]
+
+  @@index([codigo])
+  @@index([activo])
+  @@map("estados_vehiculo")
+}
+
+model ImagenVehiculo {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehiculo_id  String   @db.Uuid
+  url          String   @db.Text
+  descripcion  String?  @db.Text
+  orden        Int      @default(1)
+  es_principal Boolean  @default(false)
+  activo       Boolean  @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  vehiculo Vehiculo @relation(fields: [vehiculo_id], references: [id], onDelete: Cascade)
+
+  @@index([vehiculo_id])
+  @@index([es_principal])
+  @@index([activo])
+  @@map("imagenes_vehiculo")
+}
+
+model PublicacionVehiculo {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehiculo_id      String   @db.Uuid
+  plataforma       String   @db.VarChar(50) // facebook, web, mercadolibre, instagram, whatsapp, olx, autocosmos, otro
+  url_publicacion  String?  @db.Text
+  id_publicacion   String?  @db.VarChar(100)
+  titulo           String   @db.VarChar(200)
+  ficha_breve      String?  @db.Text
+  activo           Boolean  @default(true)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  vehiculo Vehiculo @relation(fields: [vehiculo_id], references: [id], onDelete: Cascade)
+
+  @@index([vehiculo_id])
+  @@index([plataforma])
+  @@index([activo])
+  @@map("publicaciones_vehiculo")
+}
+
+model Imagen {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre      String   @db.VarChar(200)
+  url         String   @db.Text
+  tipo        String   @db.VarChar(50) // vehiculo, perfil, documento, etc
+  descripcion String?  @db.Text
+  tamaño      Int?     // tamaño en bytes
+  formato     String?  @db.VarChar(10) // jpg, png, pdf, etc
+  activo      Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([tipo])
+  @@index([activo])
+  @@map("imagenes")
 }

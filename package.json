@@ -23,9 +23,6 @@
     "lint": "eslint .",
     "format": "prettier --write ."
   },
-  "prisma": {
-    "seed": "node prisma/seed-unified.js"
-  },
   "dependencies": {
     "@prisma/client": "^6.18.0",
     "@supabase/supabase-js": "^2.38.5",

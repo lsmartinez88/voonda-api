@@ -288,6 +288,30 @@ const options = {
             updated_at: { type: 'string', format: 'date-time' }
           }
         },
+        Imagen: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            nombre: { type: 'string', maxLength: 200 },
+            url: { type: 'string', description: 'URL de la imagen' },
+            tipo: { 
+              type: 'string',
+              enum: ['vehiculo', 'perfil', 'documento', 'logo', 'banner', 'otro'],
+              description: 'Tipo de imagen'
+            },
+            descripcion: { type: 'string', nullable: true },
+            tamaño: { type: 'integer', nullable: true, description: 'Tamaño en bytes' },
+            formato: { 
+              type: 'string', 
+              nullable: true, 
+              enum: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'webp'],
+              description: 'Formato de la imagen'
+            },
+            activo: { type: 'boolean', default: true },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
         ImagenVehiculo: {
           type: 'object',
           properties: {

@@ -20,6 +20,40 @@ const options = {
         description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
       },
     ],
+    tags: [
+      {
+        name: 'Autenticación',
+        description: 'Endpoints de autenticación y gestión de sesiones'
+      },
+      {
+        name: 'Vehículos',
+        description: 'Gestión completa de vehículos del inventario'
+      },
+      {
+        name: 'Vendedores',
+        description: 'Gestión de vendedores (personas que venden vehículos a la empresa)'
+      },
+      {
+        name: 'Compradores',
+        description: 'Gestión de compradores (personas que compran vehículos de la empresa)'
+      },
+      {
+        name: 'Operaciones',
+        description: 'Sistema unificado de operaciones de compra y venta'
+      },
+      {
+        name: 'Imágenes',
+        description: 'Gestión de imágenes de vehículos'
+      },
+      {
+        name: 'Estados',
+        description: 'Estados disponibles para vehículos'
+      },
+      {
+        name: 'Empresas',
+        description: 'Gestión de empresas (solo admin general)'
+      }
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {

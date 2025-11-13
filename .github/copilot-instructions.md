@@ -15,3 +15,7 @@ Este es un proyecto API completo usando Next.js con autenticación JWT y CRUD de
 - SUPABASE_SERVICE_ROLE_KEY  
 - JWT_SECRET
 - PORT=3001
+
+## Importante
+- cada vez que se realiza un cambio en routes hay que actualizar la informacion del swagger correspondiente. 
+- cuando se cambia alguna definicion de la api hay que actualizar el archivo frontend-api-docs.md

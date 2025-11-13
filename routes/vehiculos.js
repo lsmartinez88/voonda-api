@@ -242,6 +242,98 @@ router.post('/',
 );
 
 // PUT /api/vehiculos/:id - Actualizar un vehículo
+/**
+ * @swagger
+ * /api/vehiculos/{id}:
+ *   put:
+ *     summary: Actualizar vehículo
+ *     description: Actualiza los datos de un vehículo existente
+ *     tags: [Vehículos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID único del vehículo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               modelo_id:
+ *                 type: string
+ *                 format: uuid
+ *               vehiculo_ano:
+ *                 type: integer
+ *                 minimum: 1950
+ *               estado_codigo:
+ *                 type: string
+ *                 enum: [salon, consignacion, pyc, preparacion, vendido, entregado]
+ *               estado_id:
+ *                 type: string
+ *                 format: uuid
+ *               patente:
+ *                 type: string
+ *                 maxLength: 15
+ *               kilometros:
+ *                 type: number
+ *                 minimum: 0
+ *               valor:
+ *                 type: number
+ *                 minimum: 0
+ *               moneda:
+ *                 type: string
+ *                 maxLength: 10
+ *               tipo_operacion:
+ *                 type: string
+ *               fecha_ingreso:
+ *                 type: string
+ *                 format: date-time
+ *               observaciones:
+ *                 type: string
+ *                 maxLength: 1000
+ *               pendientes_preparacion:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               comentarios:
+ *                 type: string
+ *                 maxLength: 2000
+ *               vendedor_id:
+ *                 type: string
+ *                 format: uuid
+ *               comprador_id:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Vehículo actualizado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Vehículo actualizado exitosamente"
+ *                 vehiculo:
+ *                   $ref: '#/components/schemas/Vehiculo'
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: Vehículo no encontrado
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
 router.put('/:id',
   authenticateToken,
   requirePermission('vehiculos', 'editar'),
@@ -251,6 +343,39 @@ router.put('/:id',
 );
 
 // DELETE /api/vehiculos/:id - Eliminar un vehículo (soft delete)
+/**
+ * @swagger
+ * /api/vehiculos/{id}:
+ *   delete:
+ *     summary: Eliminar vehículo
+ *     description: Elimina un vehículo del sistema (soft delete)
+ *     tags: [Vehículos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID único del vehículo
+ *     responses:
+ *       200:
+ *         description: Vehículo eliminado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       404:
+ *         description: Vehículo no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
 router.delete('/:id',
   authenticateToken,
   requirePermission('vehiculos', 'eliminar'),

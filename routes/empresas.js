@@ -25,8 +25,34 @@ const requireAdminGeneral = (req, res, next) => {
 // ============================================================
 
 /**
- * GET /api/empresas
- * Obtener todas las empresas con paginación y filtros
+ * @swagger
+ * /api/empresas:
+ *   get:
+ *     summary: Obtener lista de empresas
+ *     description: Devuelve una lista de todas las empresas (solo para admin general)
+ *     tags: [Empresas]
+ *     responses:
+ *       200:
+ *         description: Empresas obtenidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Empresas obtenidas exitosamente"
+ *                 empresas:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Empresa'
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Solo administradores generales pueden gestionar empresas
  */
 router.get('/', 
   authenticateToken,
@@ -35,8 +61,46 @@ router.get('/',
 );
 
 /**
- * GET /api/empresas/:id
- * Obtener una empresa específica por ID
+ * @swagger
+ * /api/empresas/{id}:
+ *   get:
+ *     summary: Obtener empresa por ID
+ *     description: Devuelve una empresa específica por ID (solo para admin general)
+ *     tags: [Empresas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID único de la empresa
+ *     responses:
+ *       200:
+ *         description: Empresa obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Empresa obtenida exitosamente"
+ *                 empresa:
+ *                   $ref: '#/components/schemas/Empresa'
+ *       404:
+ *         description: Empresa no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Solo administradores generales pueden gestionar empresas
  */
 router.get('/:id', 
   authenticateToken,

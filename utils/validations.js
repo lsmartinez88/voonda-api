@@ -317,13 +317,11 @@ const filterValidation = {
     page: Joi.number()
       .integer()
       .min(1)
-      .default(1)
       .optional(),
     limit: Joi.number()
       .integer()
       .min(1)
       .max(100)
-      .default(12)
       .optional(),
     marca: Joi.string()
       .max(50)
@@ -359,11 +357,9 @@ const filterValidation = {
       .allow(''),
     orderBy: Joi.string()
       .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros', 'marca', 'modelo')
-      .default('created_at')
       .optional(),
     order: Joi.string()
       .valid('asc', 'desc')
-      .default('desc')
       .optional()
   }).custom((value, helpers) => {
     // Validar que yearFrom no sea mayor que yearTo

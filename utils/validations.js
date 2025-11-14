@@ -836,8 +836,28 @@ function validateId(id) {
 const validate = (schema, property = 'body') => {
   return (req, res, next) => {
     try {
-      const dataToValidate = req[property];
+      let dataToValidate = req[property];
+      
+      console.log(`🔍 VALIDATION - Input ${property}:`, JSON.stringify(dataToValidate));
+      
+      // Si estamos validando query parameters, convertir strings a los tipos correctos
+      if (property === 'query' && dataToValidate) {
+        dataToValidate = { ...dataToValidate };
+        
+        // Convertir parámetros numéricos
+        if (dataToValidate.page) dataToValidate.page = Number(dataToValidate.page);
+        if (dataToValidate.limit) dataToValidate.limit = Number(dataToValidate.limit);
+        if (dataToValidate.yearFrom) dataToValidate.yearFrom = Number(dataToValidate.yearFrom);
+        if (dataToValidate.yearTo) dataToValidate.yearTo = Number(dataToValidate.yearTo);
+        if (dataToValidate.priceFrom) dataToValidate.priceFrom = Number(dataToValidate.priceFrom);
+        if (dataToValidate.priceTo) dataToValidate.priceTo = Number(dataToValidate.priceTo);
+        
+        console.log(`🔍 VALIDATION - After conversion:`, JSON.stringify(dataToValidate));
+      }
+      
       const validatedData = validateData(schema, dataToValidate);
+      console.log(`🔍 VALIDATION - Output ${property}:`, JSON.stringify(validatedData));
+      
       req[property] = validatedData;
       next();
     } catch (error) {

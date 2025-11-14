@@ -811,8 +811,9 @@ const filterValidationGeneral = {
 function validateData(schema, data) {
   const { error, value } = schema.validate(data, { 
     abortEarly: false,
-    allowUnknown: false,
-    stripUnknown: true
+    allowUnknown: true,  // Permitir parámetros adicionales
+    stripUnknown: false, // No eliminar parámetros desconocidos
+    convert: true        // Asegurar conversión de tipos
   });
   
   if (error) {

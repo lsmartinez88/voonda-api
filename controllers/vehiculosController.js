@@ -69,15 +69,15 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
  * Obtener lista de vehículos con filtros y paginación
  */
 exports.getAll = async function (req, res) {
-  console.log('🚀 CONTROLLER - Original req.query:', JSON.stringify(req.query));
-  
   const query = req.query || {};
   
   // Convertir parámetros numéricos de string a number antes de la destructuración
   if (query.page) query.page = parseInt(query.page);
   if (query.limit) query.limit = parseInt(query.limit);
-  
-  console.log('🚀 CONTROLLER - After conversion:', JSON.stringify(query));
+  if (query.yearFrom) query.yearFrom = parseInt(query.yearFrom);
+  if (query.yearTo) query.yearTo = parseInt(query.yearTo);
+  if (query.priceFrom) query.priceFrom = parseFloat(query.priceFrom);
+  if (query.priceTo) query.priceTo = parseFloat(query.priceTo);
   
   const {
     page = 1,
@@ -86,8 +86,6 @@ exports.getAll = async function (req, res) {
     order = 'desc',
     ...filters
   } = query;
-
-  console.log('🚀 CONTROLLER - Destructured values:', { page, limit, orderBy, order });
 
   // Aplicar filtro de empresa desde middleware
   const where = await buildPrismaFilters(filters, req.empresaFilter);

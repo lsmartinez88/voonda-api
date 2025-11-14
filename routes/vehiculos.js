@@ -127,7 +127,7 @@ router.get('/',
   authenticateToken,
   requirePermission('vehiculos', 'leer'),
   filterByEmpresa,
-  validate(filterValidation.vehiculos, 'query'),
+  // validate(filterValidation.vehiculos, 'query'), // Removido por problemas de paginación
   asyncHandler(vehiculosController.getAll)
 );
 

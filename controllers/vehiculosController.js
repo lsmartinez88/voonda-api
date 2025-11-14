@@ -70,6 +70,11 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
  */
 exports.getAll = async function (req, res) {
   const query = req.query || {};
+  
+  // Convertir parámetros numéricos de string a number
+  if (query.page) query.page = parseInt(query.page);
+  if (query.limit) query.limit = parseInt(query.limit);
+  
   const {
     page = 1,
     limit = 12,
@@ -80,7 +85,7 @@ exports.getAll = async function (req, res) {
 
   // Aplicar filtro de empresa desde middleware
   const where = await buildPrismaFilters(filters, req.empresaFilter);
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const skip = (page - 1) * limit;
 
   try {
     // Ejecutar consultas en paralelo para mejor performance
@@ -88,7 +93,7 @@ exports.getAll = async function (req, res) {
       prisma.vehiculo.findMany({
         where,
         skip,
-        take: parseInt(limit),
+        take: limit,
         orderBy: { [orderBy]: order },
         include: {
           modelo: {
@@ -164,9 +169,9 @@ exports.getAll = async function (req, res) {
 
     const pagination = {
       total,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total / parseInt(limit))
+      page: page,
+      limit: limit,
+      pages: Math.ceil(total / limit)
     };
 
     return successResponse(res, { vehiculos, pagination }, 'Vehículos obtenidos exitosamente');

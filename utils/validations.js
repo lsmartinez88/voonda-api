@@ -325,13 +325,16 @@ const filterValidation = {
       .max(100)
       .optional(),
     orderBy: Joi.string()
-      .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros')
+      .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros', 'fecha_ingreso')
+      .optional(),
+    sortBy: Joi.string()
+      .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros', 'fecha_ingreso', 'ano')
       .optional(),
     order: Joi.string()
       .valid('asc', 'desc')
       .optional(),
       
-    // FILTROS JERÁRQUICOS (NUEVOS)
+    // FILTROS JERÁRQUICOS (COMPATIBILIDAD FRONTEND)
     marca: Joi.string()
       .max(100)
       .optional()
@@ -339,13 +342,21 @@ const filterValidation = {
       .messages({
         'string.max': 'La marca no puede tener más de 100 caracteres'
       }),
-    modelo: Joi.string()
-      .uuid()
+    marcaId: Joi.string()
+      .max(100)
       .optional()
       .allow('')
       .messages({
-        'string.guid': 'El modelo debe ser un UUID válido'
+        'string.max': 'La marcaId no puede tener más de 100 caracteres'
       }),
+    modelo: Joi.string()
+      .optional()
+      .allow('')
+      .messages({}),
+    modeloId: Joi.string()
+      .optional()
+      .allow('')
+      .messages({}),
     search: Joi.string()
       .max(100)
       .trim()

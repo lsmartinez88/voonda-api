@@ -76,19 +76,24 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
     Object.assign(where, empresaFilter);
   }
   
-  // Filtro por marca (a través de relación modelo -> marca)
-  if (filters.marca) {
+  // Filtro por marca (soportar ambos formatos: marca y marcaId)
+  const marcaValue = filters.marca || filters.marcaId;
+  if (marcaValue) {
     where.modelo = {
-      marca: {
-        id: filters.marca
-      }
+      marca: marcaValue // Buscar por nombre de marca directamente
     };
   }
   
-  // Filtro por modelo (combinar con marca si existe)
-  if (filters.modelo) {
+  // Filtro por modelo (soportar ambos formatos: modelo y modeloId) 
+  const modeloValue = filters.modelo || filters.modeloId;
+  if (modeloValue) {
     if (!where.modelo) where.modelo = {};
-    where.modelo.id = filters.modelo;
+    // Si es UUID, buscar por ID; si no, buscar por nombre
+    if (modeloValue.length === 36 && modeloValue.includes('-')) {
+      where.modelo.id = modeloValue;
+    } else {
+      where.modelo.modelo = modeloValue; // Buscar por nombre del modelo
+    }
   }
   
   // Filtro por año
@@ -172,10 +177,14 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
 exports.getAll = async function (req, res) {
   const query = req.query || {};
   
+  // Log para debug - mostrar parámetros recibidos
+  console.log('🔍 GET /api/vehiculos - Parámetros recibidos:', JSON.stringify(query, null, 2));
+  
   // Validar y transformar filtros
   const { errors, transformed } = validateAndTransformFilters(query);
   
   if (errors.length > 0) {
+    console.log('❌ Errores de validación:', errors);
     return res.status(400).json({
       success: false,
       error: 'Parámetros inválidos',
@@ -187,12 +196,32 @@ exports.getAll = async function (req, res) {
     page = 1,
     limit = 12,
     orderBy = 'created_at',
+    sortBy, // Compatibilidad con frontend
     order = 'desc',
     ...filters
   } = transformed;
 
+  // Usar sortBy si está presente, sino orderBy
+  const finalOrderBy = sortBy || orderBy;
+  
+  // Mapear nombres de campos del frontend a la base de datos
+  const orderByMapping = {
+    'fecha_ingreso': 'created_at',
+    'created_at': 'created_at',
+    'valor': 'valor',
+    'vehiculo_ano': 'vehiculo_ano',
+    'ano': 'vehiculo_ano',
+    'kilometros': 'kilometros'
+  };
+  
+  const mappedOrderBy = orderByMapping[finalOrderBy] || 'created_at';
+
   // Aplicar filtro de empresa desde middleware
   const where = await buildPrismaFilters(filters, req.empresaFilter);
+  
+  // Log para debug - mostrar filtros construidos
+  console.log('🔍 Filtros WHERE construidos:', JSON.stringify(where, null, 2));
+  
   const skip = (page - 1) * limit;
 
   try {
@@ -202,7 +231,7 @@ exports.getAll = async function (req, res) {
         where,
         skip,
         take: limit,
-        orderBy: { [orderBy]: order },
+        orderBy: { [mappedOrderBy]: order },
         include: {
           modelo: {
             select: {

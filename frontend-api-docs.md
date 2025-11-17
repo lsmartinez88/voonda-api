@@ -2974,6 +2974,119 @@ id: string (UUID, required)
 }
 ```
 
+### 🔍 ENDPOINTS DE FILTROS PARA VEHÍCULOS
+
+### GET /api/vehiculos/filtros/marcas-modelos
+**Descripción:** Obtener marcas con modelos y versiones para filtros de vehículos
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters:** Ninguno
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Marcas y modelos obtenidos exitosamente",
+  "marcas": [
+    {
+      "marca": "Toyota",
+      "modelos": [
+        {
+          "modelo": "Corolla",
+          "versiones": ["XEI", "XLI", "SEG"]
+        },
+        {
+          "modelo": "Camry", 
+          "versiones": ["LE", "SE", "XSE"]
+        }
+      ]
+    },
+    {
+      "marca": "Honda",
+      "modelos": [
+        {
+          "modelo": "Civic",
+          "versiones": ["LX", "EX", "Sport"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### GET /api/vehiculos/filtros/años
+**Descripción:** Obtener años únicos de vehículos disponibles para filtros
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters:** Ninguno
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Años disponibles obtenidos exitosamente",
+  "años": [2024, 2023, 2022, 2021, 2020, 2019, 2018]
+}
+```
+
+### GET /api/vehiculos/filtros/estados
+**Descripción:** Obtener todos los estados de vehículos disponibles para filtros
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters:** Ninguno
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Estados disponibles obtenidos exitosamente",
+  "estados": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "codigo": "salon",
+      "nombre": "En Salón",
+      "descripcion": "Vehículo disponible para la venta en salón"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "codigo": "vendido",
+      "nombre": "Vendido",
+      "descripcion": "Vehículo vendido a cliente final"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "codigo": "reservado",
+      "nombre": "Reservado",
+      "descripcion": "Vehículo reservado por cliente"
+    }
+  ]
+}
+```
+
+**Ejemplo de uso en Frontend:**
+```javascript
+// Obtener marcas y modelos para combo jerárquico
+const response1 = await fetch('/api/vehiculos/filtros/marcas-modelos', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const { marcas } = await response1.json();
+
+// Obtener años para combo de años
+const response2 = await fetch('/api/vehiculos/filtros/años', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const { años } = await response2.json();
+
+// Obtener estados para combo de estados
+const response3 = await fetch('/api/vehiculos/filtros/estados', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const { estados } = await response3.json();
+```
+
 ---
 
 ## 📊 ESTADOS DE VEHÍCULOS

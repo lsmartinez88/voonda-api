@@ -653,3 +653,125 @@ exports.delete = async function (req, res) {
     throw error;
   }
 };
+
+/**
+ * Obtener marcas con modelos y versiones para filtros
+ */
+exports.getMarcasModelos = async function (req, res) {
+  try {
+    // Aplicar filtro de empresa si corresponde
+    let empresaFilter = {};
+    if (req.empresaFilter) {
+      empresaFilter = req.empresaFilter;
+    }
+
+    // Obtener modelos únicos con sus marcas, agrupados por marca
+    const modelosData = await prisma.vehiculo.findMany({
+      where: {
+        activo: true,
+        ...empresaFilter
+      },
+      select: {
+        modelo: {
+          select: {
+            marca: true,
+            modelo: true,
+            version: true
+          }
+        }
+      },
+      distinct: ['modelo_id']
+    });
+
+    // Agrupar por marca -> modelo -> versiones
+    const marcasMap = new Map();
+    
+    modelosData.forEach(({ modelo }) => {
+      const { marca, modelo: nombreModelo, version } = modelo;
+      
+      if (!marcasMap.has(marca)) {
+        marcasMap.set(marca, new Map());
+      }
+      
+      const modelosMap = marcasMap.get(marca);
+      if (!modelosMap.has(nombreModelo)) {
+        modelosMap.set(nombreModelo, new Set());
+      }
+      
+      if (version) {
+        modelosMap.get(nombreModelo).add(version);
+      }
+    });
+
+    // Convertir a estructura de respuesta
+    const marcas = Array.from(marcasMap.entries()).map(([marca, modelosMap]) => ({
+      marca,
+      modelos: Array.from(modelosMap.entries()).map(([modelo, versionesSet]) => ({
+        modelo,
+        versiones: Array.from(versionesSet).sort()
+      })).sort((a, b) => a.modelo.localeCompare(b.modelo))
+    })).sort((a, b) => a.marca.localeCompare(b.marca));
+
+    return successResponse(res, { marcas }, 'Marcas y modelos obtenidos exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Obtener años únicos de vehículos para filtros
+ */
+exports.getAños = async function (req, res) {
+  try {
+    // Aplicar filtro de empresa si corresponde
+    let empresaFilter = {};
+    if (req.empresaFilter) {
+      empresaFilter = req.empresaFilter;
+    }
+
+    // Obtener años únicos de vehículos activos
+    const añosData = await prisma.vehiculo.findMany({
+      where: {
+        activo: true,
+        ...empresaFilter
+      },
+      select: {
+        vehiculo_ano: true
+      },
+      distinct: ['vehiculo_ano'],
+      orderBy: {
+        vehiculo_ano: 'desc'
+      }
+    });
+
+    const años = añosData.map(v => v.vehiculo_ano);
+
+    return successResponse(res, { años }, 'Años disponibles obtenidos exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Obtener estados de vehículos para filtros
+ */
+exports.getEstados = async function (req, res) {
+  try {
+    // Obtener todos los estados activos
+    const estados = await prisma.estadoVehiculo.findMany({
+      select: {
+        id: true,
+        codigo: true,
+        nombre: true,
+        descripcion: true
+      },
+      orderBy: {
+        nombre: 'asc'
+      }
+    });
+
+    return successResponse(res, { estados }, 'Estados disponibles obtenidos exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};

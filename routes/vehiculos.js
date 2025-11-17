@@ -383,4 +383,152 @@ router.delete('/:id',
   asyncHandler(vehiculosController.delete)
 );
 
+// ============================================================
+// RUTAS PARA FILTROS Y COMBOS
+// ============================================================
+
+// GET /api/vehiculos/filtros/marcas-modelos - Obtener marcas con modelos y versiones
+/**
+ * @swagger
+ * /api/vehiculos/filtros/marcas-modelos:
+ *   get:
+ *     summary: Obtener marcas con modelos y versiones para filtros
+ *     description: Devuelve una estructura jerárquica de marcas -> modelos -> versiones disponibles en el inventario
+ *     tags: [Vehículos]
+ *     responses:
+ *       200:
+ *         description: Marcas y modelos obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Marcas y modelos obtenidos exitosamente"
+ *                 marcas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       marca:
+ *                         type: string
+ *                         example: "Toyota"
+ *                       modelos:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             modelo:
+ *                               type: string
+ *                               example: "Corolla"
+ *                             versiones:
+ *                               type: array
+ *                               items:
+ *                                 type: string
+ *                               example: ["XEI", "XLI", "SEG"]
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
+router.get('/filtros/marcas-modelos',
+  authenticateToken,
+  requirePermission('vehiculos', 'leer'),
+  filterByEmpresa,
+  asyncHandler(vehiculosController.getMarcasModelos)
+);
+
+// GET /api/vehiculos/filtros/años - Obtener años únicos para filtros
+/**
+ * @swagger
+ * /api/vehiculos/filtros/años:
+ *   get:
+ *     summary: Obtener años únicos de vehículos para filtros
+ *     description: Devuelve una lista de años únicos disponibles en el inventario, ordenados de mayor a menor
+ *     tags: [Vehículos]
+ *     responses:
+ *       200:
+ *         description: Años disponibles obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Años disponibles obtenidos exitosamente"
+ *                 años:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [2024, 2023, 2022, 2021, 2020]
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
+router.get('/filtros/años',
+  authenticateToken,
+  requirePermission('vehiculos', 'leer'),
+  filterByEmpresa,
+  asyncHandler(vehiculosController.getAños)
+);
+
+// GET /api/vehiculos/filtros/estados - Obtener estados para filtros
+/**
+ * @swagger
+ * /api/vehiculos/filtros/estados:
+ *   get:
+ *     summary: Obtener estados de vehículos para filtros
+ *     description: Devuelve una lista de todos los estados disponibles para vehículos
+ *     tags: [Vehículos]
+ *     responses:
+ *       200:
+ *         description: Estados disponibles obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Estados disponibles obtenidos exitosamente"
+ *                 estados:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       codigo:
+ *                         type: string
+ *                         example: "salon"
+ *                       nombre:
+ *                         type: string
+ *                         example: "En Salón"
+ *                       descripcion:
+ *                         type: string
+ *                         example: "Vehículo disponible para la venta en salón"
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
+router.get('/filtros/estados',
+  authenticateToken,
+  requirePermission('vehiculos', 'leer'),
+  asyncHandler(vehiculosController.getEstados)
+);
+
 module.exports = router;

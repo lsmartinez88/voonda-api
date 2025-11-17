@@ -399,27 +399,161 @@ const options = {
         },
         VehiculoRequest: {
           type: 'object',
-          required: ['modelo_id', 'vehiculo_ano'],
+          required: ['marca', 'modelo', 'version', 'vehiculo_ano', 'vendedor_nombre', 'vendedor_apellido', 'vendedor_telefono', 'vendedor_email'],
           properties: {
-            modelo_id: { type: 'string', format: 'uuid' },
-            vehiculo_ano: { type: 'number', minimum: 1950 },
-            estado_codigo: { type: 'string', enum: ['salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado'] },
-            estado_id: { type: 'string', format: 'uuid' },
-            patente: { type: 'string', maxLength: 15 },
-            kilometros: { type: 'number', minimum: 0 },
-            valor: { type: 'number', minimum: 0 },
-            moneda: { type: 'string', maxLength: 10 },
-            tipo_operacion: { type: 'string' },
+            // INFORMACIÓN DEL MODELO (OBLIGATORIO - se verifica/crea en modelo_autos)
+            marca: { 
+              type: 'string', 
+              minLength: 2,
+              maxLength: 50,
+              description: 'Marca del vehículo (se verifica/crea automáticamente en modelo_autos)',
+              example: 'Toyota'
+            },
+            modelo: { 
+              type: 'string', 
+              minLength: 1,
+              maxLength: 50,
+              description: 'Modelo del vehículo (se verifica/crea automáticamente en modelo_autos)',
+              example: 'Corolla'
+            },
+            version: { 
+              type: 'string', 
+              minLength: 1,
+              maxLength: 50,
+              description: 'Versión del modelo (se verifica/crea automáticamente en modelo_autos)',
+              example: 'XEI'
+            },
+            vehiculo_ano: { 
+              type: 'number', 
+              minimum: 1950,
+              description: 'Año del vehículo',
+              example: 2023
+            },
+            // INFORMACIÓN DEL VENDEDOR (OBLIGATORIO - se crea/reutiliza automáticamente)
+            vendedor_nombre: { 
+              type: 'string', 
+              minLength: 2,
+              maxLength: 50,
+              description: 'Nombre del vendedor (se crea/reutiliza vendedor automáticamente)',
+              example: 'Juan'
+            },
+            vendedor_apellido: { 
+              type: 'string', 
+              minLength: 2,
+              maxLength: 50,
+              description: 'Apellido del vendedor',
+              example: 'Pérez'
+            },
+            vendedor_telefono: { 
+              type: 'string', 
+              minLength: 8,
+              maxLength: 20,
+              description: 'Teléfono del vendedor',
+              example: '+54 9 11 1234-5678'
+            },
+            vendedor_email: { 
+              type: 'string', 
+              format: 'email',
+              maxLength: 100,
+              description: 'Email del vendedor (identificador único por empresa)',
+              example: 'juan.perez@email.com'
+            },
+            // INFORMACIÓN ADICIONAL DEL VENDEDOR (OPCIONAL)
+            vendedor_dni: { 
+              type: 'string', 
+              maxLength: 20,
+              description: 'DNI del vendedor',
+              example: '12345678'
+            },
+            vendedor_direccion: { 
+              type: 'string', 
+              maxLength: 200,
+              description: 'Dirección del vendedor',
+              example: 'Av. Corrientes 1234, CABA'
+            },
+            vendedor_observaciones: { 
+              type: 'string', 
+              maxLength: 500,
+              description: 'Observaciones sobre el vendedor',
+              example: 'Vendedor confiable'
+            },
+            // INFORMACIÓN DEL VEHÍCULO (OPCIONAL)
+            estado_codigo: { 
+              type: 'string', 
+              enum: ['disponible', 'salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado'],
+              default: 'disponible',
+              description: 'Estado del vehículo (por defecto DISPONIBLE)'
+            },
+            patente: { type: 'string', maxLength: 15, example: 'ABC123' },
+            kilometros: { type: 'number', minimum: 0, default: 0, example: 15000 },
+            valor: { type: 'number', minimum: 0, example: 2500000 },
+            moneda: { type: 'string', maxLength: 10, default: 'ARS', example: 'ARS' },
+            tipo_operacion: { type: 'string', example: 'Venta' },
             fecha_ingreso: { type: 'string', format: 'date-time' },
             observaciones: { type: 'string', maxLength: 1000 },
             pendientes_preparacion: { 
-              type: 'array', 
-              items: { type: 'string' },
-              description: 'Lista de tareas pendientes de preparación'
+              type: 'string', 
+              maxLength: 2000,
+              description: 'Tareas pendientes de preparación'
             },
             comentarios: { type: 'string', maxLength: 2000 },
-            vendedor_id: { type: 'string', format: 'uuid' },
-            comprador_id: { type: 'string', format: 'uuid' }
+            publicacion_web: { type: 'string', enum: ['true', 'false'], default: 'false' },
+            publicacion_api_call: { type: 'string', enum: ['true', 'false'], default: 'false' },
+            // Array de publicaciones
+            publicaciones: {
+              type: 'array',
+              description: 'Array de publicaciones a crear junto con el vehículo',
+              items: {
+                type: 'object',
+                required: ['plataforma', 'titulo'],
+                properties: {
+                  plataforma: {
+                    type: 'string',
+                    enum: ['facebook', 'web', 'mercadolibre', 'instagram', 'whatsapp', 'olx', 'autocosmos', 'otro'],
+                    description: 'Plataforma donde se publicará'
+                  },
+                  titulo: {
+                    type: 'string',
+                    minLength: 1,
+                    maxLength: 200,
+                    description: 'Título de la publicación'
+                  },
+                  url_publicacion: {
+                    type: 'string',
+                    format: 'uri',
+                    description: 'URL de la publicación (opcional)'
+                  },
+                  id_publicacion: {
+                    type: 'string',
+                    maxLength: 100,
+                    description: 'ID interno de la publicación en la plataforma (opcional)'
+                  },
+                  ficha_breve: {
+                    type: 'string',
+                    maxLength: 1000,
+                    description: 'Descripción breve de la publicación (opcional)'
+                  },
+                  activo: {
+                    type: 'boolean',
+                    default: true,
+                    description: 'Si la publicación está activa'
+                  }
+                }
+              },
+              example: [
+                {
+                  plataforma: 'web',
+                  titulo: 'Toyota Corolla XEI 2023 - Impecable',
+                  ficha_breve: 'Vehículo en excelente estado, único dueño'
+                },
+                {
+                  plataforma: 'facebook',
+                  titulo: 'Toyota Corolla XEI 2023',
+                  url_publicacion: 'https://facebook.com/marketplace/item/123',
+                  id_publicacion: 'fb_123456'
+                }
+              ]
+            }
           }
         },
         PaginatedVehiculos: {

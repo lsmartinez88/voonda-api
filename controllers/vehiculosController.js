@@ -564,48 +564,108 @@ exports.create = async function (req, res) {
       empresa_id = req.user.empresa.id;
     }
 
-    // Resolver estado_id desde estado_codigo o estado_id
-    let estado_id = null;
-    try {
-      estado_id = await resolverEstadoId(req.body.estado_codigo, req.body.estado_id);
-      
-      // Si no se especifica estado, usar el por defecto (salon)
-      if (!estado_id) {
-        const estadoDefecto = await getEstadoDefecto();
-        estado_id = estadoDefecto.id;
+    // 1. CREAR/VERIFICAR VENDEDOR
+    console.log('🧑‍💼 Creando/verificando vendedor...');
+    const vendedorData = {
+      empresa_id: empresa_id,
+      nombre: req.body.vendedor_nombre.trim(),
+      apellido: req.body.vendedor_apellido.trim(),
+      telefono: req.body.vendedor_telefono.trim(),
+      email: req.body.vendedor_email.trim().toLowerCase(),
+      dni: req.body.vendedor_dni?.trim() || null,
+      direccion: req.body.vendedor_direccion?.trim() || null,
+      observaciones: req.body.vendedor_observaciones?.trim() || null,
+      activo: true
+    };
+
+    // Verificar si ya existe el vendedor por email en la empresa
+    let vendedor = await prisma.vendedor.findFirst({
+      where: {
+        email: vendedorData.email,
+        empresa_id: empresa_id
       }
-    } catch (error) {
+    });
+
+    if (!vendedor) {
+      // Crear nuevo vendedor si no existe
+      vendedor = await prisma.vendedor.create({
+        data: vendedorData
+      });
+      console.log('✅ Vendedor creado:', vendedor.id);
+    } else {
+      console.log('✅ Vendedor existente encontrado:', vendedor.id);
+    }
+
+    // 2. CREAR/VERIFICAR MODELO AUTO
+    console.log('🚗 Creando/verificando modelo auto...');
+    const modeloData = {
+      marca: req.body.marca.trim(),
+      modelo: req.body.modelo.trim(),
+      version: req.body.version.trim(),
+      modelo_ano: req.body.vehiculo_ano
+    };
+
+    // Buscar modelo existente
+    let modeloAuto = await prisma.modeloAuto.findFirst({
+      where: {
+        marca: modeloData.marca,
+        modelo: modeloData.modelo,
+        version: modeloData.version,
+        modelo_ano: modeloData.modelo_ano
+      }
+    });
+
+    if (!modeloAuto) {
+      // Crear nuevo modelo si no existe
+      modeloAuto = await prisma.modeloAuto.create({
+        data: modeloData
+      });
+      console.log('✅ Modelo auto creado:', modeloAuto.id);
+    } else {
+      console.log('✅ Modelo auto existente encontrado:', modeloAuto.id);
+    }
+
+    // 3. OBTENER ESTADO DISPONIBLE (por defecto)
+    console.log('🔄 Obteniendo estado DISPONIBLE...');
+    const estadoDefecto = await prisma.estadoVehiculo.findFirst({
+      where: { codigo: 'disponible' }
+    });
+
+    if (!estadoDefecto) {
       return res.status(400).json({
         success: false,
-        error: 'Estado inválido',
-        message: error.message
+        message: 'Estado DISPONIBLE no encontrado en el sistema'
       });
     }
 
-    // Normalizar datos - Prisma maneja los timestamps automáticamente
+    // 4. CREAR VEHICULO
+    console.log('🚙 Creando vehículo...');
     const vehiculoData = {
-      ...req.body,
-      empresa_id, // Agregar empresa_id
-      estado_id,  // Usar el estado_id resuelto
-      // Limpiar campos de texto
-      observaciones: req.body.observaciones?.trim(),
-      pendientes_preparacion: req.body.pendientes_preparacion?.trim(),
-      comentarios: req.body.comentarios?.trim(),
-      // Prisma maneja created_at y updated_at automáticamente
+      empresa_id,
+      modelo_id: modeloAuto.id,
+      vendedor_id: vendedor.id,
+      estado_id: estadoDefecto.id,
+      vehiculo_ano: req.body.vehiculo_ano,
+      patente: req.body.patente?.trim() || null,
+      kilometros: req.body.kilometros || 0,
+      valor: req.body.valor || null,
+      moneda: req.body.moneda || 'ARS',
+      tipo_operacion: req.body.tipo_operacion?.trim() || null,
+      fecha_ingreso: req.body.fecha_ingreso || new Date(),
+      observaciones: req.body.observaciones?.trim() || null,
+      pendientes_preparacion: req.body.pendientes_preparacion?.trim() || null,
+      comentarios: req.body.comentarios?.trim() || null,
+      publicacion_web: req.body.publicacion_web === 'true',
+      publicacion_api_call: req.body.publicacion_api_call === 'true',
+      activo: true
     };
 
-    // Limpiar campos de estado originales del body
-    delete vehiculoData.estado_codigo;
-
-    // Limpiar campos undefined para evitar problemas con Prisma
+    // Limpiar campos undefined
     Object.keys(vehiculoData).forEach(key => {
       if (vehiculoData[key] === undefined || vehiculoData[key] === '') {
         delete vehiculoData[key];
       }
     });
-
-    // Re-agregar el estado_id final al vehiculoData
-    vehiculoData.estado_id = estado_id;
 
     const newVehiculo = await prisma.vehiculo.create({
       data: vehiculoData,
@@ -659,8 +719,67 @@ exports.create = async function (req, res) {
       }
     });
 
-    return successResponse(res, { vehiculo: newVehiculo }, 'Vehículo creado exitosamente', 201);
+    console.log('✅ Vehículo creado exitosamente:', newVehiculo.id);
+
+    // 5. CREAR PUBLICACIONES si se proporcionaron
+    let publicacionesCreadas = [];
+    if (req.body.publicaciones && req.body.publicaciones.length > 0) {
+      console.log('📢 Creando publicaciones del vehículo...');
+      
+      const publicacionesData = req.body.publicaciones.map(pub => ({
+        vehiculo_id: newVehiculo.id,
+        plataforma: pub.plataforma.trim(),
+        titulo: pub.titulo.trim(),
+        url_publicacion: pub.url_publicacion?.trim() || null,
+        id_publicacion: pub.id_publicacion?.trim() || null,
+        ficha_breve: pub.ficha_breve?.trim() || null,
+        activo: pub.activo !== false // Por defecto true
+      }));
+
+      // Crear todas las publicaciones
+      publicacionesCreadas = await prisma.publicacionVehiculo.createMany({
+        data: publicacionesData,
+        skipDuplicates: true
+      });
+
+      // Obtener las publicaciones creadas para la respuesta
+      const publicacionesRespuesta = await prisma.publicacionVehiculo.findMany({
+        where: {
+          vehiculo_id: newVehiculo.id
+        },
+        select: {
+          id: true,
+          vehiculo_id: true,
+          plataforma: true,
+          url_publicacion: true,
+          id_publicacion: true,
+          titulo: true,
+          ficha_breve: true,
+          activo: true,
+          created_at: true,
+          updated_at: true
+        }
+      });
+
+      console.log(`✅ ${publicacionesRespuesta.length} publicaciones creadas`);
+      
+      // Agregar las publicaciones al objeto vehículo para la respuesta
+      newVehiculo.publicaciones = publicacionesRespuesta;
+    }
+
+    console.log('🎉 Vehículo y publicaciones creados exitosamente');
+
+    return successResponse(res, { 
+      vehiculo: newVehiculo,
+      resumen: {
+        vendedor_creado: vendedor ? 'reutilizado' : 'nuevo',
+        modelo_creado: modeloAuto ? 'reutilizado' : 'nuevo',
+        estado: estadoDefecto.codigo,
+        publicaciones_creadas: publicacionesCreadas.count || 0
+      }
+    }, 'Vehículo creado exitosamente', 201);
   } catch (error) {
+    console.error('❌ Error al crear vehículo:', error);
     throw error;
   }
 };

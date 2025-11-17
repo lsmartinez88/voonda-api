@@ -2867,26 +2867,120 @@ id: string (UUID, required)
 ```
 
 ### POST /api/vehiculos
-**Descripción:** Crear nuevo vehículo
+**Descripción:** Crear nuevo vehículo con información del vendedor y modelo
 **Autenticación:** Requerida
 **Permisos:** vehiculos.crear
+**Funcionalidad:** 
+- ✅ Crea/reutiliza vendedor automáticamente por email
+- ✅ Crea/reutiliza modelo automáticamente por marca, modelo, versión y año  
+- ✅ Asigna estado DISPONIBLE por defecto
+- ✅ Asigna empresa del usuario logueado automáticamente
 
 **Request Body (JSON):**
 ```json
 {
-  "modelo_id": "string (UUID, required)",
-  "vehiculo_ano": "number (required, min: 1950, max: current year + 1)",
-  "estado_codigo": "string (optional)", // "salon" | "consignacion" | "pyc" | "preparacion" | "vendido" | "entregado"
-  "estado_id": "string (UUID, optional)", // Alternativa a estado_codigo
-  "patente": "string (optional, max: 15 chars)",
-  "kilometros": "number (optional, min: 0, default: 0)",
-  "valor": "number (optional, positive)",
-  "moneda": "string (optional, max: 10 chars, default: 'ARS')",
-  "tipo_operacion": "string (optional)",
+  // ==================== CAMPOS OBLIGATORIOS ====================
+  
+  // INFORMACIÓN DEL MODELO (se verifica/crea en modelo_autos)
+  "marca": "string (required, 2-50 chars)", // Ej: "Toyota"
+  "modelo": "string (required, 1-50 chars)", // Ej: "Corolla" 
+  "version": "string (required, 1-50 chars)", // Ej: "XEI"
+  "vehiculo_ano": "number (required, min: 1950, max: current year + 1)", // Ej: 2023
+  
+  // INFORMACIÓN DEL VENDEDOR (se crea/reutiliza por email+empresa)
+  "vendedor_nombre": "string (required, 2-50 chars)", // Ej: "Juan"
+  "vendedor_apellido": "string (required, 2-50 chars)", // Ej: "Pérez"
+  "vendedor_telefono": "string (required, 8-20 chars)", // Ej: "+54 9 11 1234-5678"
+  "vendedor_email": "string (required, email format, max: 100 chars)", // Ej: "juan.perez@email.com"
+  
+  // ==================== CAMPOS OPCIONALES ====================
+  
+  // INFORMACIÓN ADICIONAL DEL VENDEDOR
+  "vendedor_dni": "string (optional, max: 20 chars)", // Ej: "12345678"
+  "vendedor_direccion": "string (optional, max: 200 chars)", // Ej: "Av. Corrientes 1234"
+  "vendedor_observaciones": "string (optional, max: 500 chars)", // Ej: "Vendedor confiable"
+  
+  // INFORMACIÓN DEL VEHÍCULO
+  "estado_codigo": "string (optional, default: 'disponible')", // "disponible" | "salon" | "consignacion" | "pyc" | "preparacion" | "vendido" | "entregado"
+  "patente": "string (optional, max: 15 chars)", // Ej: "ABC123"
+  "kilometros": "number (optional, min: 0, default: 0)", // Ej: 15000
+  "valor": "number (optional, positive)", // Ej: 2500000
+  "moneda": "string (optional, max: 10 chars, default: 'ARS')", // Ej: "ARS"
+  "tipo_operacion": "string (optional)", // Ej: "Venta"
   "publicacion_web": "string (optional, 'true'|'false', default: 'false')",
   "publicacion_api_call": "string (optional, 'true'|'false', default: 'false')", 
   "fecha_ingreso": "string (ISO date, optional)",
-  "observaciones": "string (optional, max: 1000 chars)"
+  "observaciones": "string (optional, max: 1000 chars)",
+  "pendientes_preparacion": "string (optional, max: 2000 chars)",
+  "comentarios": "string (optional, max: 2000 chars)",
+  
+  // Array de publicaciones (OPCIONAL)
+  "publicaciones": [
+    {
+      "plataforma": "string (required)", // "facebook" | "web" | "mercadolibre" | "instagram" | "whatsapp" | "olx" | "autocosmos" | "otro"
+      "titulo": "string (required, 1-200 chars)", // Ej: "Toyota Corolla XEI 2023 - Impecable"
+      "url_publicacion": "string (optional, URL format)", // Ej: "https://facebook.com/marketplace/item/123"
+      "id_publicacion": "string (optional, max: 100 chars)", // Ej: "fb_123456"
+      "ficha_breve": "string (optional, max: 1000 chars)", // Ej: "Vehículo en excelente estado"
+      "activo": "boolean (optional, default: true)"
+    }
+  ]
+}
+```
+
+**Ejemplo Mínimo:**
+```json
+{
+  "marca": "Toyota",
+  "modelo": "Corolla", 
+  "version": "XEI",
+  "vehiculo_ano": 2023,
+  "vendedor_nombre": "Juan",
+  "vendedor_apellido": "Pérez", 
+  "vendedor_telefono": "+54 9 11 1234-5678",
+  "vendedor_email": "juan.perez@email.com"
+}
+```
+
+**Ejemplo Completo:**
+```json
+{
+  "marca": "Toyota",
+  "modelo": "Corolla",
+  "version": "XEI", 
+  "vehiculo_ano": 2023,
+  "vendedor_nombre": "Juan",
+  "vendedor_apellido": "Pérez",
+  "vendedor_telefono": "+54 9 11 1234-5678",
+  "vendedor_email": "juan.perez@email.com",
+  "vendedor_dni": "12345678",
+  "vendedor_direccion": "Av. Corrientes 1234, CABA",
+  "patente": "ABC123",
+  "kilometros": 15000,
+  "valor": 2500000,
+  "moneda": "ARS",
+  "estado_codigo": "salon",
+  "observaciones": "Vehículo en excelente estado",
+  "publicaciones": [
+    {
+      "plataforma": "web",
+      "titulo": "Toyota Corolla XEI 2023 - Impecable",
+      "ficha_breve": "Vehículo en excelente estado, único dueño, service completo"
+    },
+    {
+      "plataforma": "facebook",
+      "titulo": "Toyota Corolla XEI 2023",
+      "url_publicacion": "https://facebook.com/marketplace/item/123456",
+      "id_publicacion": "fb_marketplace_123456",
+      "ficha_breve": "¡No te lo pierdas!"
+    },
+    {
+      "plataforma": "mercadolibre",
+      "titulo": "Toyota Corolla XEI 2023 - Financiación Disponible",
+      "url_publicacion": "https://articulo.mercadolibre.com.ar/MLA-123456",
+      "id_publicacion": "MLA123456789"
+    }
+  ]
 }
 ```
 
@@ -2897,6 +2991,12 @@ id: string (UUID, required)
   "message": "Vehículo creado exitosamente",
   "vehiculo": {
     // Mismo formato que GET /api/vehiculos/{id}
+  },
+  "resumen": {
+    "vendedor_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó vendedor
+    "modelo_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó modelo
+    "estado": "disponible", // Estado asignado
+    "publicaciones_creadas": 3 // Número de publicaciones creadas
   }
 }
 ```
@@ -2906,11 +3006,15 @@ id: string (UUID, required)
 {
   "success": false,
   "error": "Datos inválidos",
-  "message": "El modelo_id es requerido", 
+  "message": "La marca es requerida", 
   "details": [
     {
-      "field": "string",
-      "message": "string"
+      "field": "marca",
+      "message": "La marca debe tener al menos 2 caracteres"
+    },
+    {
+      "field": "vendedor_email", 
+      "message": "El email del vendedor debe tener un formato válido"
     }
   ]
 }

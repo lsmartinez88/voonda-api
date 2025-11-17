@@ -134,34 +134,103 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
     }
   }
 
-  // Búsqueda general en marca, modelo y descripción
+  // Búsqueda general mejorada: ID, marca, modelo, patente, observaciones y más
   if (filters.search) {
     const searchTerm = filters.search.trim();
     if (searchTerm) {
-      where.OR = [
-        {
-          modelo: {
+      // Si el término parece ser un UUID, buscar directamente por ID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(searchTerm);
+      
+      if (isUUID) {
+        // Búsqueda directa por ID de vehículo
+        where.id = searchTerm;
+      } else {
+        // Búsqueda general en múltiples campos
+        const searchConditions = [
+          // Búsqueda en marca
+          {
             modelo: {
+              marca: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            }
+          },
+          // Búsqueda en modelo
+          {
+            modelo: {
+              modelo: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            }
+          },
+          // Búsqueda en versión
+          {
+            modelo: {
+              version: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            }
+          },
+          // Búsqueda en patente (dominio del vehículo)
+          {
+            patente: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          },
+          // Búsqueda en observaciones
+          {
+            observaciones: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          },
+          // Búsqueda en comentarios
+          {
+            comentarios: {
               contains: searchTerm,
               mode: 'insensitive'
             }
           }
-        },
-        {
-          modelo: {
-            marca: {
-              contains: searchTerm,
-              mode: 'insensitive'
-            }
+        ];
+
+        // Si es un número, buscar también por año o kilometraje
+        const numericValue = parseInt(searchTerm);
+        if (!isNaN(numericValue)) {
+          // Búsqueda por año si parece un año válido
+          if (numericValue >= 1950 && numericValue <= new Date().getFullYear() + 1) {
+            searchConditions.push({
+              vehiculo_ano: numericValue
+            });
           }
-        },
-        {
-          descripcion: {
-            contains: searchTerm,
-            mode: 'insensitive'
+          
+          // Búsqueda por kilometraje si es un número grande
+          if (numericValue > 0) {
+            searchConditions.push({
+              kilometros: {
+                gte: numericValue - 1000,
+                lte: numericValue + 1000
+              }
+            });
           }
         }
-      ];
+
+        // Si es un decimal, buscar por valor
+        const floatValue = parseFloat(searchTerm);
+        if (!isNaN(floatValue) && searchTerm.includes('.') && floatValue > 1000) {
+          searchConditions.push({
+            valor: {
+              gte: floatValue - 100000,
+              lte: floatValue + 100000
+            }
+          });
+        }
+
+        where.OR = searchConditions;
+      }
     }
   }
 

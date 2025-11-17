@@ -314,6 +314,7 @@ const vehiculoValidation = {
 // Validación para query parameters de filtros
 const filterValidation = {
   vehiculos: Joi.object({
+    // PAGINACIÓN
     page: Joi.number()
       .integer()
       .min(1)
@@ -323,18 +324,65 @@ const filterValidation = {
       .min(1)
       .max(100)
       .optional(),
+    orderBy: Joi.string()
+      .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros')
+      .optional(),
+    order: Joi.string()
+      .valid('asc', 'desc')
+      .optional(),
+      
+    // FILTROS JERÁRQUICOS (NUEVOS)
     marca: Joi.string()
-      .max(50)
+      .max(100)
       .optional()
-      .allow(''),
+      .allow('')
+      .messages({
+        'string.max': 'La marca no puede tener más de 100 caracteres'
+      }),
     modelo: Joi.string()
-      .max(50)
+      .uuid()
       .optional()
-      .allow(''),
+      .allow('')
+      .messages({
+        'string.guid': 'El modelo debe ser un UUID válido'
+      }),
+    search: Joi.string()
+      .max(100)
+      .trim()
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'El término de búsqueda no puede tener más de 100 caracteres'
+      }),
+      
+    // FILTROS ESPECÍFICOS
+    ano: Joi.number()
+      .integer()
+      .min(1950)
+      .max(new Date().getFullYear() + 1)
+      .optional()
+      .messages({
+        'number.base': 'El año debe ser un número',
+        'number.integer': 'El año debe ser un número entero',
+        'number.min': 'El año debe ser mayor a 1950',
+        'number.max': 'El año no puede ser mayor al próximo año'
+      }),
+    estado: Joi.string()
+      .uuid()
+      .optional()
+      .allow('')
+      .messages({
+        'string.guid': 'El estado debe ser un UUID válido'
+      }),
     estado_codigo: Joi.string()
       .valid('salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
       .optional()
-      .allow(''),
+      .allow('')
+      .messages({
+        'any.only': 'El estado debe ser: salon, consignacion, pyc, preparacion, vendido, entregado'
+      }),
+      
+    // FILTROS DE RANGO (LEGACY)
     yearFrom: Joi.number()
       .integer()
       .min(1950)
@@ -350,16 +398,6 @@ const filterValidation = {
       .optional(),
     priceTo: Joi.number()
       .positive()
-      .optional(),
-    search: Joi.string()
-      .max(100)
-      .optional()
-      .allow(''),
-    orderBy: Joi.string()
-      .valid('created_at', 'valor', 'vehiculo_ano', 'kilometros', 'marca', 'modelo')
-      .optional(),
-    order: Joi.string()
-      .valid('asc', 'desc')
       .optional()
   }).custom((value, helpers) => {
     // Validar que yearFrom no sea mayor que yearTo

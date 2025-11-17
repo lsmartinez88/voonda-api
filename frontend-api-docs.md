@@ -2976,6 +2976,52 @@ id: string (UUID, required)
 
 ### 🔍 ENDPOINTS DE FILTROS PARA VEHÍCULOS
 
+### GET /api/vehiculos/filtros/marcas
+**Descripción:** Obtener marcas que tienen vehículos disponibles
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters:** Ninguno
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Marcas disponibles obtenidas exitosamente",
+  "marcas": ["Toyota", "Honda", "Ford", "Chevrolet", "Volkswagen"]
+}
+```
+
+### GET /api/vehiculos/filtros/modelos
+**Descripción:** Obtener modelos disponibles, opcionalmente filtrados por marca
+**Autenticación:** Requerida
+**Permisos:** vehiculos.leer
+
+**Query Parameters (opcionales):**
+```
+marcaId: string // Filtrar modelos por marca específica
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Modelos disponibles obtenidos exitosamente",
+  "modelos": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "nombre": "Corolla",
+      "marca": "Toyota"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001", 
+      "nombre": "Civic",
+      "marca": "Honda"
+    }
+  ]
+}
+```
+
 ### GET /api/vehiculos/filtros/marcas-modelos
 **Descripción:** Obtener marcas con modelos y versiones para filtros de vehículos
 **Autenticación:** Requerida
@@ -3066,25 +3112,76 @@ id: string (UUID, required)
 }
 ```
 
-**Ejemplo de uso en Frontend:**
+**Ejemplo de uso en Frontend - Sistema de filtros jerárquicos:**
 ```javascript
-// Obtener marcas y modelos para combo jerárquico
-const response1 = await fetch('/api/vehiculos/filtros/marcas-modelos', {
+// 1. Obtener marcas disponibles para combo principal
+const response1 = await fetch('/api/vehiculos/filtros/marcas', {
   headers: { 'Authorization': `Bearer ${token}` }
 });
 const { marcas } = await response1.json();
 
-// Obtener años para combo de años
-const response2 = await fetch('/api/vehiculos/filtros/años', {
+// 2. Cuando usuario selecciona marca, obtener modelos de esa marca
+const selectedMarca = "Toyota";
+const response2 = await fetch(`/api/vehiculos/filtros/modelos?marcaId=${selectedMarca}`, {
   headers: { 'Authorization': `Bearer ${token}` }
 });
-const { años } = await response2.json();
+const { modelos } = await response2.json();
 
-// Obtener estados para combo de estados
-const response3 = await fetch('/api/vehiculos/filtros/estados', {
+// 3. Obtener años para combo de años
+const response3 = await fetch('/api/vehiculos/filtros/años', {
   headers: { 'Authorization': `Bearer ${token}` }
 });
-const { estados } = await response3.json();
+const { años } = await response3.json();
+
+// 4. Obtener estados para combo de estados
+const response4 = await fetch('/api/vehiculos/filtros/estados', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const { estados } = await response4.json();
+
+// 5. Filtrar vehículos usando los filtros seleccionados
+const selectedModelo = "550e8400-e29b-41d4-a716-446655440000";
+const selectedAno = 2023;
+const searchTerm = "corolla";
+
+const responseVehiculos = await fetch(
+  `/api/vehiculos?marca=${selectedMarca}&modelo=${selectedModelo}&ano=${selectedAno}&search=${searchTerm}&page=1&limit=10`,
+  {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }
+);
+const { vehiculos, pagination } = await responseVehiculos.json();
+
+// 6. Para combo jerárquico completo (marcas->modelos->versiones)
+const response5 = await fetch('/api/vehiculos/filtros/marcas-modelos', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const { marcas: marcasCompletas } = await response5.json();
+```
+
+**⚠️ IMPORTANTE - Cambios en el endpoint principal GET /api/vehiculos:**
+
+El endpoint principal de vehículos ahora soporta los siguientes **NUEVOS** parámetros de filtro:
+
+- **`marca`**: string - Filtrar por marca específica (ej: "Toyota")
+- **`modelo`**: string - ID del modelo específico (combinar con marca o usar solo)  
+- **`search`**: string - Búsqueda mejorada que incluye marca, modelo y descripción
+- **`ano`**: number - Filtrar por año específico del vehículo
+- **`estado`**: string - ID del estado del vehículo
+
+**Ejemplos de filtrado en endpoint principal:**
+```javascript
+// Filtrar solo por marca
+fetch('/api/vehiculos?marca=Toyota')
+
+// Filtrar por marca y modelo específico  
+fetch('/api/vehiculos?marca=Toyota&modelo=uuid-del-modelo')
+
+// Búsqueda general mejorada
+fetch('/api/vehiculos?search=corolla')
+
+// Filtros múltiples
+fetch('/api/vehiculos?marca=Honda&ano=2023&estado_codigo=salon&page=1')
 ```
 
 ---

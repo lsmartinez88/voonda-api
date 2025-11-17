@@ -9,7 +9,64 @@ const { successResponse } = require('../middleware/errorHandler');
 const { resolverEstadoId, getEstadoDefecto, getEstadoPorCodigo } = require('../utils/estadoVehiculo');
 
 /**
- * Función helper para construir filtros de Prisma con soporte multi-empresa
+ * Sanitizar término de búsqueda para seguridad
+ */
+const sanitizeSearchTerm = (term) => {
+  if (!term || typeof term !== 'string') return '';
+  
+  // Remover caracteres especiales peligrosos y limitar longitud
+  return term
+    .replace(/[<>\"'%;()&+]/g, '')
+    .trim()
+    .substring(0, 100);
+};
+
+/**
+ * Validar parámetros de filtro y convertir tipos
+ */
+const validateAndTransformFilters = (filters) => {
+  const errors = [];
+  const transformed = { ...filters };
+  
+  // Validar año
+  if (filters.ano) {
+    const ano = parseInt(filters.ano);
+    if (isNaN(ano) || ano < 1950 || ano > new Date().getFullYear() + 1) {
+      errors.push('Año inválido');
+    } else {
+      transformed.ano = ano;
+    }
+  }
+  
+  // Validar página y límite
+  if (filters.page) {
+    const page = parseInt(filters.page);
+    if (isNaN(page) || page < 1) {
+      errors.push('Página inválida');
+    } else {
+      transformed.page = page;
+    }
+  }
+  
+  if (filters.limit) {
+    const limit = parseInt(filters.limit);
+    if (isNaN(limit) || limit < 1 || limit > 100) {
+      errors.push('Límite inválido (1-100)');
+    } else {
+      transformed.limit = limit;
+    }
+  }
+  
+  // Sanitizar término de búsqueda
+  if (filters.search) {
+    transformed.search = sanitizeSearchTerm(filters.search);
+  }
+  
+  return { errors, transformed };
+};
+
+/**
+ * Función helper para construir filtros de Prisma con soporte multi-empresa y filtros jerárquicos
  */
 const buildPrismaFilters = async (filters, empresaFilter = null) => {
   const where = {};
@@ -19,18 +76,26 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
     Object.assign(where, empresaFilter);
   }
   
+  // Filtro por marca (a través de relación modelo -> marca)
   if (filters.marca) {
-    where.marca = { equals: filters.marca };
+    where.modelo = {
+      marca: {
+        id: filters.marca
+      }
+    };
   }
   
-  if (filters.estado_codigo) {
-    // Resolver código de estado a ID
-    const estado = await getEstadoPorCodigo(filters.estado_codigo);
-    if (estado) {
-      where.estado_id = { equals: estado.id };
-    }
+  // Filtro por modelo (combinar con marca si existe)
+  if (filters.modelo) {
+    if (!where.modelo) where.modelo = {};
+    where.modelo.id = filters.modelo;
   }
-
+  
+  // Filtro por año
+  if (filters.ano) {
+    where.vehiculo_ano = parseInt(filters.ano);
+  }
+  
   if (filters.yearFrom || filters.yearTo) {
     where.vehiculo_ano = {};
     if (filters.yearFrom) {
@@ -38,6 +103,19 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
     }
     if (filters.yearTo) {
       where.vehiculo_ano.lte = parseInt(filters.yearTo);
+    }
+  }
+
+  // Filtro por estado
+  if (filters.estado) {
+    where.estado_id = filters.estado;
+  }
+  
+  if (filters.estado_codigo) {
+    // Resolver código de estado a ID
+    const estado = await getEstadoPorCodigo(filters.estado_codigo);
+    if (estado) {
+      where.estado_id = { equals: estado.id };
     }
   }
 
@@ -51,12 +129,35 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
     }
   }
 
+  // Búsqueda general en marca, modelo y descripción
   if (filters.search) {
-    where.OR = [
-      { marca: { contains: filters.search, mode: 'insensitive' } },
-      { modelo: { contains: filters.search, mode: 'insensitive' } },
-      { descripcion: { contains: filters.search, mode: 'insensitive' } }
-    ];
+    const searchTerm = filters.search.trim();
+    if (searchTerm) {
+      where.OR = [
+        {
+          modelo: {
+            modelo: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          modelo: {
+            marca: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          descripcion: {
+            contains: searchTerm,
+            mode: 'insensitive'
+          }
+        }
+      ];
+    }
   }
 
   // Solo mostrar vehículos activos por defecto
@@ -71,13 +172,16 @@ const buildPrismaFilters = async (filters, empresaFilter = null) => {
 exports.getAll = async function (req, res) {
   const query = req.query || {};
   
-  // Convertir parámetros numéricos de string a number antes de la destructuración
-  if (query.page) query.page = parseInt(query.page);
-  if (query.limit) query.limit = parseInt(query.limit);
-  if (query.yearFrom) query.yearFrom = parseInt(query.yearFrom);
-  if (query.yearTo) query.yearTo = parseInt(query.yearTo);
-  if (query.priceFrom) query.priceFrom = parseFloat(query.priceFrom);
-  if (query.priceTo) query.priceTo = parseFloat(query.priceTo);
+  // Validar y transformar filtros
+  const { errors, transformed } = validateAndTransformFilters(query);
+  
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Parámetros inválidos',
+      details: errors
+    });
+  }
   
   const {
     page = 1,
@@ -85,7 +189,7 @@ exports.getAll = async function (req, res) {
     orderBy = 'created_at',
     order = 'desc',
     ...filters
-  } = query;
+  } = transformed;
 
   // Aplicar filtro de empresa desde middleware
   const where = await buildPrismaFilters(filters, req.empresaFilter);
@@ -649,6 +753,113 @@ exports.delete = async function (req, res) {
     });
 
     return successResponse(res, {}, 'Vehículo eliminado exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Obtener marcas que tienen vehículos disponibles para filtros
+ */
+exports.getMarcas = async function (req, res) {
+  try {
+    // Aplicar filtro de empresa si corresponde
+    let empresaFilter = {};
+    if (req.empresaFilter) {
+      empresaFilter = req.empresaFilter;
+    }
+
+    // Obtener marcas que tienen vehículos activos
+    const marcasData = await prisma.vehiculo.findMany({
+      where: {
+        activo: true,
+        ...empresaFilter
+      },
+      select: {
+        modelo: {
+          select: {
+            marca: true
+          }
+        }
+      },
+      distinct: ['modelo_id']
+    });
+
+    // Extraer marcas únicas y ordenar
+    const marcasSet = new Set();
+    marcasData.forEach(({ modelo }) => {
+      if (modelo?.marca) {
+        marcasSet.add(modelo.marca);
+      }
+    });
+
+    const marcas = Array.from(marcasSet).sort();
+
+    return successResponse(res, { marcas }, 'Marcas disponibles obtenidas exitosamente');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Obtener modelos por marca para filtros
+ */
+exports.getModelosByMarca = async function (req, res) {
+  try {
+    const { marcaId } = req.query;
+    
+    // Aplicar filtro de empresa si corresponde
+    let empresaFilter = {};
+    if (req.empresaFilter) {
+      empresaFilter = req.empresaFilter;
+    }
+
+    // Construir filtros
+    const where = {
+      activo: true,
+      ...empresaFilter
+    };
+
+    // Filtrar por marca si se especifica
+    if (marcaId) {
+      where.modelo = {
+        marca: marcaId
+      };
+    }
+
+    // Obtener modelos que tienen vehículos activos
+    const modelosData = await prisma.vehiculo.findMany({
+      where,
+      select: {
+        modelo: {
+          select: {
+            id: true,
+            modelo: true,
+            marca: true
+          }
+        }
+      },
+      distinct: ['modelo_id']
+    });
+
+    // Extraer modelos únicos con información de marca
+    const modelosMap = new Map();
+    modelosData.forEach(({ modelo }) => {
+      if (modelo) {
+        if (!modelosMap.has(modelo.id)) {
+          modelosMap.set(modelo.id, {
+            id: modelo.id,
+            nombre: modelo.modelo,
+            marca: modelo.marca
+          });
+        }
+      }
+    });
+
+    const modelos = Array.from(modelosMap.values())
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    return successResponse(res, { modelos }, 'Modelos disponibles obtenidos exitosamente');
   } catch (error) {
     throw error;
   }

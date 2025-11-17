@@ -387,6 +387,100 @@ router.delete('/:id',
 // RUTAS PARA FILTROS Y COMBOS
 // ============================================================
 
+// GET /api/vehiculos/filtros/marcas - Obtener marcas que tienen vehículos
+/**
+ * @swagger
+ * /api/vehiculos/filtros/marcas:
+ *   get:
+ *     summary: Obtener marcas que tienen vehículos disponibles
+ *     description: Devuelve una lista de marcas únicas que tienen al menos un vehículo en el inventario
+ *     tags: [Vehículos]
+ *     responses:
+ *       200:
+ *         description: Marcas disponibles obtenidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Marcas disponibles obtenidas exitosamente"
+ *                 marcas:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Toyota", "Honda", "Ford", "Chevrolet"]
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
+router.get('/filtros/marcas',
+  authenticateToken,
+  requirePermission('vehiculos', 'leer'),
+  filterByEmpresa,
+  asyncHandler(vehiculosController.getMarcas)
+);
+
+// GET /api/vehiculos/filtros/modelos - Obtener modelos filtrados por marca
+/**
+ * @swagger
+ * /api/vehiculos/filtros/modelos:
+ *   get:
+ *     summary: Obtener modelos disponibles, opcionalmente filtrados por marca
+ *     description: Devuelve modelos que tienen vehículos disponibles, con opción de filtrar por marca específica
+ *     tags: [Vehículos]
+ *     parameters:
+ *       - in: query
+ *         name: marcaId
+ *         schema:
+ *           type: string
+ *         description: Filtrar modelos por marca específica
+ *         example: "Toyota"
+ *     responses:
+ *       200:
+ *         description: Modelos disponibles obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Modelos disponibles obtenidos exitosamente"
+ *                 modelos:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       nombre:
+ *                         type: string
+ *                         example: "Corolla"
+ *                       marca:
+ *                         type: string
+ *                         example: "Toyota"
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos suficientes
+ */
+router.get('/filtros/modelos',
+  authenticateToken,
+  requirePermission('vehiculos', 'leer'),
+  filterByEmpresa,
+  asyncHandler(vehiculosController.getModelosByMarca)
+);
+
 // GET /api/vehiculos/filtros/marcas-modelos - Obtener marcas con modelos y versiones
 /**
  * @swagger

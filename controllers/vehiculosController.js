@@ -816,6 +816,21 @@ exports.update = async function (req, res) {
             id: true,
             nombre: true
           }
+        },
+        vendedor: {
+          select: {
+            id: true,
+            email: true
+          }
+        },
+        modelo: {
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            version: true,
+            modelo_ano: true
+          }
         }
       }
     });
@@ -828,57 +843,194 @@ exports.update = async function (req, res) {
       });
     }
 
-    // Preparar datos de actualización
-    const updateData = { ...req.body };
-    
-    // No permitir cambiar empresa_id a menos que sea admin general
-    if (updateData.empresa_id && req.user.rol.nombre !== 'administrador_general') {
-      delete updateData.empresa_id;
-    }
+    console.log('📝 Actualizando vehículo:', id);
 
-    // Resolver estado_id si se proporciona estado_codigo o estado_id
-    if (updateData.estado_codigo || updateData.estado_id) {
-      try {
-        const estado_id = await resolverEstadoId(updateData.estado_codigo, updateData.estado_id);
-        if (estado_id) {
-          updateData.estado_id = estado_id;
-        }
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          error: 'Estado inválido',
-          message: error.message
+    // Variables para rastrear cambios
+    let vendedorId = existingVehiculo.vendedor_id;
+    let modeloId = existingVehiculo.modelo_id;
+    let resumenCambios = {
+      vendedor_actualizado: false,
+      modelo_actualizado: false,
+      publicaciones_gestionadas: 0
+    };
+
+    // 1. ACTUALIZAR/CREAR VENDEDOR si se proporciona información del vendedor
+    if (req.body.vendedor_email) {
+      console.log('🧑‍💼 Verificando/actualizando vendedor...');
+      
+      const vendedorData = {
+        empresa_id: existingVehiculo.empresa_id,
+        nombre: req.body.vendedor_nombre?.trim(),
+        apellido: req.body.vendedor_apellido?.trim(),
+        telefono: req.body.vendedor_telefono?.trim(),
+        email: req.body.vendedor_email?.trim().toLowerCase(),
+        dni: req.body.vendedor_dni?.trim() || null,
+        direccion: req.body.vendedor_direccion?.trim() || null,
+        observaciones: req.body.vendedor_observaciones?.trim() || null,
+        activo: true
+      };
+
+      // Si cambió el email, buscar o crear nuevo vendedor
+      if (existingVehiculo.vendedor?.email !== vendedorData.email) {
+        let vendedor = await prisma.vendedor.findFirst({
+          where: {
+            email: vendedorData.email,
+            empresa_id: existingVehiculo.empresa_id
+          }
         });
+
+        if (!vendedor) {
+          // Crear nuevo vendedor
+          vendedor = await prisma.vendedor.create({
+            data: vendedorData
+          });
+          console.log('✅ Nuevo vendedor creado:', vendedor.id);
+          resumenCambios.vendedor_actualizado = 'nuevo';
+        } else {
+          console.log('✅ Vendedor existente encontrado:', vendedor.id);
+          resumenCambios.vendedor_actualizado = 'reutilizado';
+        }
+        
+        vendedorId = vendedor.id;
+      } else if (existingVehiculo.vendedor) {
+        // Actualizar datos del vendedor actual si solo cambiaron otros campos
+        await prisma.vendedor.update({
+          where: { id: existingVehiculo.vendedor_id },
+          data: {
+            ...vendedorData,
+            email: existingVehiculo.vendedor.email // Mantener email original
+          }
+        });
+        console.log('✅ Datos del vendedor actualizados');
+        resumenCambios.vendedor_actualizado = 'actualizado';
       }
     }
 
-    // Limpiar campo de estado_codigo del updateData
-    delete updateData.estado_codigo;
-    
-    // Normalizar strings si están presentes
-    if (updateData.marca) updateData.marca = updateData.marca.trim();
-    if (updateData.modelo) updateData.modelo = updateData.modelo.trim();
-    if (updateData.version) updateData.version = updateData.version.trim();
-    if (updateData.motorizacion) updateData.motorizacion = updateData.motorizacion.trim();
+    // 2. ACTUALIZAR/CREAR MODELO si se proporciona información del modelo
+    if (req.body.marca && req.body.modelo && req.body.version && req.body.vehiculo_ano) {
+      console.log('🚗 Verificando/actualizando modelo...');
+      
+      const modeloData = {
+        marca: req.body.marca.trim(),
+        modelo: req.body.modelo.trim(),
+        version: req.body.version.trim(),
+        modelo_ano: req.body.vehiculo_ano
+      };
+
+      // Verificar si cambió el modelo
+      const modeloCambiado = (
+        existingVehiculo.modelo.marca !== modeloData.marca ||
+        existingVehiculo.modelo.modelo !== modeloData.modelo ||
+        existingVehiculo.modelo.version !== modeloData.version ||
+        existingVehiculo.modelo.modelo_ano !== modeloData.modelo_ano
+      );
+
+      if (modeloCambiado) {
+        let modeloAuto = await prisma.modeloAuto.findFirst({
+          where: {
+            marca: modeloData.marca,
+            modelo: modeloData.modelo,
+            version: modeloData.version,
+            modelo_ano: modeloData.modelo_ano
+          }
+        });
+
+        if (!modeloAuto) {
+          // Crear nuevo modelo
+          modeloAuto = await prisma.modeloAuto.create({
+            data: modeloData
+          });
+          console.log('✅ Nuevo modelo creado:', modeloAuto.id);
+          resumenCambios.modelo_actualizado = 'nuevo';
+        } else {
+          console.log('✅ Modelo existente encontrado:', modeloAuto.id);
+          resumenCambios.modelo_actualizado = 'reutilizado';
+        }
+        
+        modeloId = modeloAuto.id;
+      }
+    }
+
+    // 3. GESTIONAR PUBLICACIONES
+    if (req.body.publicaciones && Array.isArray(req.body.publicaciones)) {
+      console.log('📢 Gestionando publicaciones...');
+      
+      // Eliminar publicaciones existentes del vehículo
+      await prisma.publicacionVehiculo.deleteMany({
+        where: { vehiculo_id: id }
+      });
+
+      if (req.body.publicaciones.length > 0) {
+        // Crear nuevas publicaciones
+        const publicacionesData = req.body.publicaciones.map(pub => ({
+          vehiculo_id: id,
+          plataforma: pub.plataforma?.trim(),
+          titulo: pub.titulo?.trim(),
+          url_publicacion: pub.url_publicacion?.trim() || null,
+          id_publicacion: pub.id_publicacion?.trim() || null,
+          ficha_breve: pub.ficha_breve?.trim() || null,
+          activo: pub.activo !== false
+        })).filter(pub => pub.plataforma && pub.titulo); // Filtrar publicaciones válidas
+
+        if (publicacionesData.length > 0) {
+          await prisma.publicacionVehiculo.createMany({
+            data: publicacionesData,
+            skipDuplicates: true
+          });
+          
+          console.log(`✅ ${publicacionesData.length} publicaciones actualizadas`);
+          resumenCambios.publicaciones_gestionadas = publicacionesData.length;
+        }
+      }
+    }
+
+    // 4. RESOLVER ESTADO si se proporciona
+    let estadoId = undefined;
+    if (req.body.estado_codigo) {
+      const estado = await prisma.estadoVehiculo.findFirst({
+        where: { codigo: req.body.estado_codigo }
+      });
+      if (estado) {
+        estadoId = estado.id;
+      }
+    }
+
+    // 5. PREPARAR DATOS DE ACTUALIZACIÓN
+    const updateData = {
+      vendedor_id: vendedorId,
+      modelo_id: modeloId,
+      vehiculo_ano: req.body.vehiculo_ano || existingVehiculo.vehiculo_ano,
+      patente: req.body.patente?.trim() || existingVehiculo.patente,
+      kilometros: req.body.kilometros ?? existingVehiculo.kilometros,
+      valor: req.body.valor ?? existingVehiculo.valor,
+      moneda: req.body.moneda?.trim() || existingVehiculo.moneda,
+      tipo_operacion: req.body.tipo_operacion?.trim() || existingVehiculo.tipo_operacion,
+      fecha_ingreso: req.body.fecha_ingreso ? new Date(req.body.fecha_ingreso) : existingVehiculo.fecha_ingreso,
+      observaciones: req.body.observaciones?.trim() ?? existingVehiculo.observaciones,
+      pendientes_preparacion: req.body.pendientes_preparacion?.trim() ?? existingVehiculo.pendientes_preparacion,
+      comentarios: req.body.comentarios?.trim() ?? existingVehiculo.comentarios,
+      publicacion_web: req.body.publicacion_web === 'true' || req.body.publicacion_web === true,
+      publicacion_api_call: req.body.publicacion_api_call === 'true' || req.body.publicacion_api_call === true
+    };
+
+    // Agregar estado si se resolvió
+    if (estadoId) {
+      updateData.estado_id = estadoId;
+    }
 
     // Limpiar campos undefined
     Object.keys(updateData).forEach(key => {
-      if (updateData[key] === undefined || updateData[key] === '') {
+      if (updateData[key] === undefined) {
         delete updateData[key];
       }
     });
 
-    // Prisma maneja updated_at automáticamente
+    // 6. ACTUALIZAR VEHÍCULO
+    console.log('🚙 Actualizando vehículo...');
     const updatedVehiculo = await prisma.vehiculo.update({
       where: { id },
       data: updateData,
       include: {
-        empresa: {
-          select: {
-            id: true,
-            nombre: true
-          }
-        },
         modelo: {
           select: {
             id: true,
@@ -906,12 +1058,41 @@ exports.update = async function (req, res) {
             nombre: true,
             descripcion: true
           }
+        },
+        vendedor: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            telefono: true,
+            email: true
+          }
+        },
+        publicaciones: {
+          select: {
+            id: true,
+            vehiculo_id: true,
+            plataforma: true,
+            url_publicacion: true,
+            id_publicacion: true,
+            titulo: true,
+            ficha_breve: true,
+            activo: true,
+            created_at: true,
+            updated_at: true
+          }
         }
       }
     });
 
-    return successResponse(res, { vehiculo: updatedVehiculo }, 'Vehículo actualizado exitosamente');
+    console.log('🎉 Vehículo actualizado exitosamente');
+
+    return successResponse(res, { 
+      vehiculo: updatedVehiculo,
+      resumen: resumenCambios
+    }, 'Vehículo actualizado exitosamente');
   } catch (error) {
+    console.error('❌ Error al actualizar vehículo:', error);
     throw error;
   }
 };

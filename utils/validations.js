@@ -337,12 +337,38 @@ const vehiculoValidation = {
 
   // Validación para actualizar vehículo (todos los campos opcionales)
   update: Joi.object({
-    // Referencia al modelo
-    modelo_id: Joi.string()
-      .uuid()
+    // Información del modelo del vehículo (OPCIONAL para actualizar/verificar modelo_auto)
+    marca: Joi.string()
+      .trim()
+      .min(2)
+      .max(50)
       .optional()
       .messages({
-        'string.guid': 'El modelo_id debe ser un UUID válido'
+        'string.base': 'La marca debe ser texto',
+        'string.min': 'La marca debe tener al menos 2 caracteres',
+        'string.max': 'La marca no puede tener más de 50 caracteres'
+      }),
+    
+    modelo: Joi.string()
+      .trim()
+      .min(1)
+      .max(50)
+      .optional()
+      .messages({
+        'string.base': 'El modelo debe ser texto',
+        'string.min': 'El modelo debe tener al menos 1 caracter',
+        'string.max': 'El modelo no puede tener más de 50 caracteres'
+      }),
+    
+    version: Joi.string()
+      .trim()
+      .min(1)
+      .max(50)
+      .optional()
+      .messages({
+        'string.base': 'La versión debe ser texto',
+        'string.min': 'La versión debe tener al menos 1 caracter',
+        'string.max': 'La versión no puede tener más de 50 caracteres'
       }),
     
     // Información específica del vehículo
@@ -358,12 +384,138 @@ const vehiculoValidation = {
         'number.max': 'El año del vehículo no puede ser mayor al próximo año'
       }),
     
-    // Estado del vehículo
-    estado_codigo: Joi.string()
-      .valid('salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
+    // Información del vendedor (OPCIONAL para actualizar/crear vendedor)
+    vendedor_nombre: Joi.string()
+      .trim()
+      .min(2)
+      .max(50)
       .optional()
       .messages({
-        'any.only': 'El estado debe ser: salon, consignacion, pyc, preparacion, vendido, entregado'
+        'string.base': 'El nombre del vendedor debe ser texto',
+        'string.min': 'El nombre del vendedor debe tener al menos 2 caracteres',
+        'string.max': 'El nombre del vendedor no puede tener más de 50 caracteres'
+      }),
+    
+    vendedor_apellido: Joi.string()
+      .trim()
+      .min(2)
+      .max(50)
+      .optional()
+      .messages({
+        'string.base': 'El apellido del vendedor debe ser texto',
+        'string.min': 'El apellido del vendedor debe tener al menos 2 caracteres',
+        'string.max': 'El apellido del vendedor no puede tener más de 50 caracteres'
+      }),
+    
+    vendedor_telefono: Joi.string()
+      .trim()
+      .min(8)
+      .max(20)
+      .optional()
+      .messages({
+        'string.base': 'El teléfono del vendedor debe ser texto',
+        'string.min': 'El teléfono del vendedor debe tener al menos 8 caracteres',
+        'string.max': 'El teléfono del vendedor no puede tener más de 20 caracteres'
+      }),
+    
+    vendedor_email: Joi.string()
+      .email()
+      .trim()
+      .max(100)
+      .optional()
+      .messages({
+        'string.email': 'El email del vendedor debe tener un formato válido',
+        'string.max': 'El email del vendedor no puede tener más de 100 caracteres'
+      }),
+    
+    // Información adicional del vendedor (OPCIONAL)
+    vendedor_dni: Joi.string()
+      .trim()
+      .max(20)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'El DNI del vendedor no puede tener más de 20 caracteres'
+      }),
+    
+    vendedor_direccion: Joi.string()
+      .trim()
+      .max(200)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'La dirección del vendedor no puede tener más de 200 caracteres'
+      }),
+    
+    vendedor_observaciones: Joi.string()
+      .trim()
+      .max(500)
+      .optional()
+      .allow('')
+      .messages({
+        'string.max': 'Las observaciones del vendedor no pueden tener más de 500 caracteres'
+      }),
+    
+    // Array de publicaciones (OPCIONAL - reemplaza todas las existentes)
+    publicaciones: Joi.array()
+      .items(
+        Joi.object({
+          plataforma: Joi.string()
+            .valid('facebook', 'web', 'mercadolibre', 'instagram', 'whatsapp', 'olx', 'autocosmos', 'otro')
+            .required()
+            .messages({
+              'any.only': 'La plataforma debe ser: facebook, web, mercadolibre, instagram, whatsapp, olx, autocosmos, otro',
+              'any.required': 'La plataforma es requerida'
+            }),
+          titulo: Joi.string()
+            .trim()
+            .min(1)
+            .max(200)
+            .required()
+            .messages({
+              'string.min': 'El título debe tener al menos 1 caracter',
+              'string.max': 'El título no puede tener más de 200 caracteres',
+              'any.required': 'El título es requerido'
+            }),
+          url_publicacion: Joi.string()
+            .uri()
+            .optional()
+            .allow('')
+            .messages({
+              'string.uri': 'La URL debe tener un formato válido'
+            }),
+          id_publicacion: Joi.string()
+            .trim()
+            .max(100)
+            .optional()
+            .allow('')
+            .messages({
+              'string.max': 'El ID de publicación no puede tener más de 100 caracteres'
+            }),
+          ficha_breve: Joi.string()
+            .trim()
+            .max(1000)
+            .optional()
+            .allow('')
+            .messages({
+              'string.max': 'La ficha breve no puede tener más de 1000 caracteres'
+            }),
+          activo: Joi.boolean()
+            .optional()
+            .default(true)
+        })
+      )
+      .optional()
+      .messages({
+        'array.base': 'Las publicaciones deben ser un array'
+      }),
+    
+    // Estado del vehículo
+    estado_codigo: Joi.string()
+      .valid('disponible', 'salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
+      .optional()
+      .messages({
+        'any.only': 'El estado debe ser: disponible, salon, consignacion, pyc, preparacion, vendido, entregado'
       }),
     estado_id: Joi.string()
       .uuid()
@@ -445,6 +597,14 @@ const vehiculoValidation = {
       .allow('')
       .messages({
         'string.max': 'Los comentarios no pueden tener más de 2000 caracteres'
+      }),
+    
+    // IDs directos (para compatibilidad hacia atrás)
+    modelo_id: Joi.string()
+      .uuid()
+      .optional()
+      .messages({
+        'string.guid': 'El modelo_id debe ser un UUID válido'
       }),
     vendedor_id: Joi.string()
       .uuid()

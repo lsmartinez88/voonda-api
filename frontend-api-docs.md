@@ -3021,9 +3021,14 @@ id: string (UUID, required)
 ```
 
 ### PUT /api/vehiculos/{id}
-**Descripción:** Actualizar un vehículo existente
+**Descripción:** Actualizar un vehículo existente con funcionalidad avanzada
 **Autenticación:** Requerida
 **Permisos:** vehiculos.editar
+
+**Funcionalidades especiales:**
+- **Auto-creación de vendedor**: Si se proporciona `vendedor_email` (y otros datos), se busca por email o se crea un nuevo vendedor
+- **Auto-creación de modelo**: Si se proporciona `marca`, `modelo`, `version`, se busca o se crea el modelo_auto correspondiente
+- **Gestión de publicaciones**: El array `publicaciones` reemplaza completamente las publicaciones existentes
 
 **Path Parameters:**
 ```
@@ -3033,19 +3038,91 @@ id: string (UUID, required)
 **Request Body (JSON, todos los campos opcionales):**
 ```json
 {
-  "modelo_id": "string (UUID, optional)",
-  "vehiculo_ano": "number (optional, min: 1950, max: current year + 1)",
-  "estado_codigo": "string (optional)", 
-  "estado_id": "string (UUID, optional)",
-  "patente": "string (optional, max: 15 chars)",
-  "kilometros": "number (optional, min: 0)",
-  "valor": "number (optional, positive)",
-  "moneda": "string (optional, max: 10 chars)",
-  "tipo_operacion": "string (optional)",
+  // Información del modelo (auto-creación/búsqueda)
+  "marca": "string (optional, 2-50 chars) - Nombre de la marca",
+  "modelo": "string (optional, 1-50 chars) - Nombre del modelo", 
+  "version": "string (optional, 1-50 chars) - Versión del modelo",
+  
+  // Información del vehículo
+  "vehiculo_ano": "number (optional, 1950-2025) - Año de fabricación",
+  "patente": "string (optional, max 15 chars) - Patente",
+  "kilometros": "number (optional, ≥0) - Kilometraje",
+  "valor": "number (optional, >0) - Precio",
+  "moneda": "string (optional, max 10 chars) - Moneda",
+  "estado_codigo": "string (optional) - disponible|salon|consignacion|pyc|preparacion|vendido|entregado",
+  "tipo_operacion": "string (optional) - Tipo de operación",
+  "fecha_ingreso": "string (ISO date, optional) - Fecha de ingreso",
+  "observaciones": "string (optional, max 1000 chars) - Observaciones",
+  "pendientes_preparacion": "string (optional, max 2000 chars) - Pendientes",
+  "comentarios": "string (optional, max 2000 chars) - Comentarios",
   "publicacion_web": "string (optional, 'true'|'false')",
   "publicacion_api_call": "string (optional, 'true'|'false')",
-  "fecha_ingreso": "string (ISO date, optional)",
-  "observaciones": "string (optional, max: 1000 chars)"
+  
+  // Información del vendedor (auto-creación/búsqueda)
+  "vendedor_nombre": "string (optional, 2-50 chars) - Nombre del vendedor",
+  "vendedor_apellido": "string (optional, 2-50 chars) - Apellido del vendedor",
+  "vendedor_telefono": "string (optional, 8-20 chars) - Teléfono del vendedor", 
+  "vendedor_email": "string (email, optional, max 100 chars) - Email del vendedor (clave para identificación)",
+  "vendedor_dni": "string (optional, max 20 chars) - DNI del vendedor",
+  "vendedor_direccion": "string (optional, max 200 chars) - Dirección del vendedor",
+  "vendedor_observaciones": "string (optional, max 500 chars) - Observaciones del vendedor",
+  
+  // Array de publicaciones (reemplazo completo)
+  "publicaciones": [
+    {
+      "plataforma": "string (required) - facebook|web|mercadolibre|instagram|whatsapp|olx|autocosmos|otro",
+      "titulo": "string (required, 1-200 chars) - Título de la publicación",
+      "url_publicacion": "string (optional, URI) - URL de la publicación", 
+      "id_publicacion": "string (optional, max 100 chars) - ID en la plataforma",
+      "ficha_breve": "string (optional, max 1000 chars) - Descripción breve",
+      "activo": "boolean (optional, default: true) - Estado activo"
+    }
+  ],
+  
+  // IDs directos (compatibilidad)
+  "modelo_id": "string (UUID, optional) - ID directo del modelo",
+  "vendedor_id": "string (UUID, optional) - ID directo del vendedor", 
+  "estado_id": "string (UUID, optional) - ID directo del estado",
+  "comprador_id": "string (UUID, optional) - ID del comprador"
+}
+```
+
+**Ejemplo de actualización mínima:**
+```json
+{
+  "valor": 26000000,
+  "kilometros": 52000
+}
+```
+
+**Ejemplo de actualización completa con auto-creación:**
+```json
+{
+  "marca": "Toyota",
+  "modelo": "Corolla Cross",
+  "version": "XEI", 
+  "vehiculo_ano": 2024,
+  "vendedor_nombre": "María",
+  "vendedor_apellido": "García",
+  "vendedor_telefono": "+54 11 9876-5432",
+  "vendedor_email": "maria.garcia@email.com",
+  "valor": 35000000,
+  "moneda": "ARS",
+  "kilometros": 15000,
+  "estado_codigo": "disponible",
+  "publicaciones": [
+    {
+      "plataforma": "web",
+      "titulo": "Toyota Corolla Cross XEI 2024 - Impecable",
+      "ficha_breve": "SUV compacto en excelente estado"
+    },
+    {
+      "plataforma": "facebook",
+      "titulo": "Toyota Corolla Cross XEI 2024",
+      "url_publicacion": "https://facebook.com/marketplace/item/456"
+    }
+  ],
+  "observaciones": "Vehículo actualizado completamente"
 }
 ```
 
@@ -3055,7 +3132,16 @@ id: string (UUID, required)
   "success": true,
   "message": "Vehículo actualizado exitosamente",
   "vehiculo": {
-    // Mismo formato que GET /api/vehiculos/{id}
+    // Mismo formato que GET /api/vehiculos/{id} con datos actualizados
+  },
+  "resumen": {
+    "vehiculo_actualizado": true,
+    "modelo_creado": true,
+    "modelo_encontrado": false,
+    "vendedor_creado": false,
+    "vendedor_encontrado": true,
+    "publicaciones_eliminadas": 1,
+    "publicaciones_creadas": 2
   }
 }
 ```

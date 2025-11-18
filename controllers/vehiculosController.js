@@ -6,7 +6,7 @@
 const { prisma } = require('../utils/prisma');
 const { validateId } = require('../utils/validations');
 const { successResponse } = require('../middleware/errorHandler');
-const { resolverEstadoId, getEstadoDefecto, getEstadoPorCodigo } = require('../utils/estadoVehiculo');
+const { resolverEstadoId, getEstadoDefecto, getEstadoPorCodigo, getEstadoPorId } = require('../utils/estadoVehiculo');
 
 /**
  * Sanitizar término de búsqueda para seguridad
@@ -625,16 +625,29 @@ exports.create = async function (req, res) {
       console.log('✅ Modelo auto existente encontrado:', modeloAuto.id);
     }
 
-    // 3. OBTENER ESTADO DISPONIBLE (por defecto)
-    console.log('🔄 Obteniendo estado DISPONIBLE...');
-    const estadoDefecto = await prisma.estadoVehiculo.findFirst({
-      where: { codigo: 'disponible' }
-    });
-
-    if (!estadoDefecto) {
+    // 3. OBTENER/VALIDAR ESTADO
+    console.log('🔄 Resolviendo estado del vehículo...');
+    let estado_id = null;
+    
+    try {
+      // Resolver estado desde los parámetros del usuario o usar el defecto
+      estado_id = await resolverEstadoId(req.body.estado_codigo, req.body.estado_id);
+      
+      // Si no se especifica estado, usar el por defecto (salon)
+      if (!estado_id) {
+        const estadoDefecto = await getEstadoDefecto();
+        estado_id = estadoDefecto.id;
+        console.log('✅ Usando estado por defecto:', estadoDefecto.codigo);
+      } else {
+        // Obtener información del estado para mostrar en log
+        const estado = await getEstadoPorId(estado_id);
+        console.log('✅ Estado especificado:', estado ? estado.codigo : 'desconocido');
+      }
+    } catch (error) {
       return res.status(400).json({
         success: false,
-        message: 'Estado DISPONIBLE no encontrado en el sistema'
+        error: 'Estado inválido',
+        message: error.message
       });
     }
 
@@ -644,7 +657,7 @@ exports.create = async function (req, res) {
       empresa_id,
       modelo_id: modeloAuto.id,
       vendedor_id: vendedor.id,
-      estado_id: estadoDefecto.id,
+      estado_id: estado_id,
       vehiculo_ano: req.body.vehiculo_ano,
       patente: req.body.patente?.trim() || null,
       kilometros: req.body.kilometros || 0,

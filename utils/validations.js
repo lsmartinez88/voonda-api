@@ -234,13 +234,17 @@ const vehiculoValidation = {
         'array.base': 'Las publicaciones deben ser un array'
       }),
     
-    // Estado del vehículo (OPCIONAL - siempre se asigna DISPONIBLE por defecto)
+    // Estado del vehículo (OPCIONAL - se valida contra la base de datos)
     estado_codigo: Joi.string()
-      .valid('disponible', 'salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
+      .trim()
+      .min(1)
+      .max(50)
       .optional()
       .default('disponible')
       .messages({
-        'any.only': 'El estado debe ser: disponible, salon, consignacion, pyc, preparacion, vendido, entregado'
+        'string.base': 'El código de estado debe ser texto',
+        'string.min': 'El código de estado debe tener al menos 1 caracter',
+        'string.max': 'El código de estado no puede tener más de 50 caracteres'
       }),
     
     // Información comercial y específica (OPCIONAL)
@@ -510,12 +514,16 @@ const vehiculoValidation = {
         'array.base': 'Las publicaciones deben ser un array'
       }),
     
-    // Estado del vehículo
+    // Estado del vehículo (OPCIONAL - se valida contra la base de datos)
     estado_codigo: Joi.string()
-      .valid('disponible', 'salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
+      .trim()
+      .min(1)
+      .max(50)
       .optional()
       .messages({
-        'any.only': 'El estado debe ser: disponible, salon, consignacion, pyc, preparacion, vendido, entregado'
+        'string.base': 'El código de estado debe ser texto',
+        'string.min': 'El código de estado debe tener al menos 1 caracter',
+        'string.max': 'El código de estado no puede tener más de 50 caracteres'
       }),
     estado_id: Joi.string()
       .uuid()
@@ -700,11 +708,15 @@ const filterValidation = {
         'string.guid': 'El estado debe ser un UUID válido'
       }),
     estado_codigo: Joi.string()
-      .valid('salon', 'consignacion', 'pyc', 'preparacion', 'vendido', 'entregado')
+      .trim()
+      .min(1)
+      .max(50)
       .optional()
       .allow('')
       .messages({
-        'any.only': 'El estado debe ser: salon, consignacion, pyc, preparacion, vendido, entregado'
+        'string.base': 'El código de estado debe ser texto',
+        'string.min': 'El código de estado debe tener al menos 1 caracter',
+        'string.max': 'El código de estado no puede tener más de 50 caracteres'
       }),
       
     // FILTROS DE RANGO (LEGACY)

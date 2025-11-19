@@ -2866,24 +2866,26 @@ id: string (UUID, required)
 **Descripción:** Crear nuevo vehículo con información del vendedor y modelo
 **Autenticación:** Requerida
 **Permisos:** vehiculos.crear
-**Funcionalidad:** 
-- ✅ Crea/reutiliza vendedor automáticamente por email
-- ✅ Crea/reutiliza modelo automáticamente por marca, modelo, versión y año  
-- ✅ Asigna estado DISPONIBLE por defecto
-- ✅ Asigna empresa del usuario logueado automáticamente
+
+**Funcionalidad Automática:**
+- ✅ **Vendedor:** Se crea/reutiliza automáticamente por email+empresa
+- ✅ **Modelo:** Se crea/reutiliza automáticamente por marca+modelo+versión+año
+- ✅ **Estado:** Se asigna estado especificado o 'disponible' por defecto  
+- ✅ **Empresa:** Se asigna automáticamente según el usuario logueado
+- ✅ **Publicaciones:** Se crean opcionalmente según el array proporcionado
 
 **Request Body (JSON):**
 ```json
 {
   // ==================== CAMPOS OBLIGATORIOS ====================
   
-  // INFORMACIÓN DEL MODELO (se verifica/crea en modelo_autos)
+  // INFORMACIÓN DEL MODELO (auto-creación en tabla modelo_autos)
   "marca": "string (required, 2-50 chars)", // Ej: "Toyota"
   "modelo": "string (required, 1-50 chars)", // Ej: "Corolla" 
   "version": "string (required, 1-50 chars)", // Ej: "XEI"
-  "vehiculo_ano": "number (required, min: 1950, max: current year + 1)", // Ej: 2023
+  "vehiculo_ano": "number (required, 1950 a año actual+1)", // Ej: 2024
   
-  // INFORMACIÓN DEL VENDEDOR (se crea/reutiliza por email+empresa)
+  // INFORMACIÓN DEL VENDEDOR (auto-creación en tabla vendedores)
   "vendedor_nombre": "string (required, 2-50 chars)", // Ej: "Juan"
   "vendedor_apellido": "string (required, 2-50 chars)", // Ej: "Pérez"
   "vendedor_telefono": "string (required, 8-20 chars)", // Ej: "+54 9 11 1234-5678"
@@ -2896,39 +2898,49 @@ id: string (UUID, required)
   "vendedor_direccion": "string (optional, max: 200 chars)", // Ej: "Av. Corrientes 1234"
   "vendedor_observaciones": "string (optional, max: 500 chars)", // Ej: "Vendedor confiable"
   
-  // INFORMACIÓN DEL VEHÍCULO
-  "estado_codigo": "string (optional, default: 'disponible')", // "disponible" | "salon" | "consignacion" | "pyc" | "preparacion" | "vendido" | "entregado"
+  // ESTADO DEL VEHÍCULO (validado contra BD - acepta cualquier código válido)
+  "estado_codigo": "string (optional, default: 'disponible')", // Ej: "disponible", "salon", "EN_REPARACION", etc.
+  
+  // INFORMACIÓN COMERCIAL DEL VEHÍCULO
   "patente": "string (optional, max: 15 chars)", // Ej: "ABC123"
   "kilometros": "number (optional, min: 0, default: 0)", // Ej: 15000
-  "valor": "number (optional, positive)", // Ej: 2500000
-  "moneda": "string (optional, max: 10 chars, default: 'ARS')", // Ej: "ARS"
-  "tipo_operacion": "string (optional)", // Ej: "Venta"
-  "fecha_ingreso": "string (ISO date, optional)",
-  "observaciones": "string (optional, max: 1000 chars)",
-  "pendientes_preparacion": "string (optional, max: 2000 chars)",
-  "comentarios": "string (optional, max: 2000 chars)",
+  "valor": "number (optional, positive, 2 decimals)", // Ej: 2500000.50
+  "moneda": "string (optional, max: 10 chars, default: 'ARS')", // Ej: "ARS", "USD"
+  "tipo_operacion": "string (optional)", // Ej: "Venta", "Consignación"
+  "fecha_ingreso": "string (ISO date, optional, default: now)", // Ej: "2024-11-18T10:30:00Z"
+  "observaciones": "string (optional, max: 1000 chars)", // Ej: "Vehículo en excelente estado"
+  "pendientes_preparacion": "array|string (optional, max: 2000 chars)", // Ej: ["Lavado", "Revision técnica"]
+  "comentarios": "string (optional, max: 2000 chars)", // Ej: "Contactar antes del mediodía"
   
-  // Array de publicaciones (OPCIONAL)
+  // IDs DIRECTOS (para usar entidades existentes en lugar de auto-crear)
+  "vendedor_id": "string (UUID, optional)", // Si se especifica, no se auto-crea vendedor
+  "comprador_id": "string (UUID, optional)", // Para asignar comprador existente
+  "estado_id": "string (UUID, optional)", // Para usar ID directo de estado
+  
+  // ARRAY DE PUBLICACIONES (opcional)
   "publicaciones": [
     {
       "plataforma": "string (required)", // "facebook" | "web" | "mercadolibre" | "instagram" | "whatsapp" | "olx" | "autocosmos" | "otro"
-      "titulo": "string (required, 1-200 chars)", // Ej: "Toyota Corolla XEI 2023 - Impecable"
+      "titulo": "string (required, 1-200 chars)", // Ej: "Toyota Corolla XEI 2024 - Impecable"
       "url_publicacion": "string (optional, URL format)", // Ej: "https://facebook.com/marketplace/item/123"
-      "id_publicacion": "string (optional, max: 100 chars)", // Ej: "fb_123456"
-      "ficha_breve": "string (optional, max: 1000 chars)", // Ej: "Vehículo en excelente estado"
-      "activo": "boolean (optional, default: true)"
+      "id_publicacion": "string (optional, max: 100 chars)", // Ej: "fb_123456", "MLA123456"
+      "ficha_breve": "string (optional, max: 1000 chars)", // Ej: "Vehículo en excelente estado, único dueño"
+      "activo": "boolean (optional, default: true)" // true/false
     }
-  ]
+  ],
+  
+  // CAMPO ESPECIAL PARA ADMIN GENERAL
+  "empresa_id": "string (UUID, required only for admin_general role)" // Solo admin general debe especificar empresa
 }
 ```
 
-**Ejemplo Mínimo:**
+**Ejemplo Mínimo (Campos Obligatorios):**
 ```json
 {
   "marca": "Toyota",
   "modelo": "Corolla", 
   "version": "XEI",
-  "vehiculo_ano": 2023,
+  "vehiculo_ano": 2024,
   "vendedor_nombre": "Juan",
   "vendedor_apellido": "Pérez", 
   "vendedor_telefono": "+54 9 11 1234-5678",
@@ -2942,65 +2954,146 @@ id: string (UUID, required)
   "marca": "Toyota",
   "modelo": "Corolla",
   "version": "XEI", 
-  "vehiculo_ano": 2023,
+  "vehiculo_ano": 2024,
   "vendedor_nombre": "Juan",
   "vendedor_apellido": "Pérez",
   "vendedor_telefono": "+54 9 11 1234-5678",
   "vendedor_email": "juan.perez@email.com",
   "vendedor_dni": "12345678",
   "vendedor_direccion": "Av. Corrientes 1234, CABA",
+  "vendedor_observaciones": "Vendedor confiable, entrega inmediata",
+  "estado_codigo": "salon",
   "patente": "ABC123",
   "kilometros": 15000,
-  "valor": 2500000,
+  "valor": 2500000.00,
   "moneda": "ARS",
-  "estado_codigo": "salon",
-  "observaciones": "Vehículo en excelente estado",
+  "tipo_operacion": "Venta",
+  "fecha_ingreso": "2024-11-18T10:30:00Z",
+  "observaciones": "Vehículo en excelente estado, service al día",
+  "pendientes_preparacion": ["Lavado exterior", "Revisión técnica", "Documentación"],
+  "comentarios": "Contactar al vendedor solo por las mañanas",
   "publicaciones": [
     {
       "plataforma": "web",
-      "titulo": "Toyota Corolla XEI 2023 - Impecable",
-      "ficha_breve": "Vehículo en excelente estado, único dueño, service completo"
+      "titulo": "Toyota Corolla XEI 2024 - Impecable Estado",
+      "ficha_breve": "Vehículo en excelente estado, único dueño, service completo en concesionario oficial"
     },
     {
       "plataforma": "facebook",
-      "titulo": "Toyota Corolla XEI 2023",
-      "url_publicacion": "https://facebook.com/marketplace/item/123456",
+      "titulo": "Toyota Corolla XEI 2024 - Oportunidad",
+      "url_publicacion": "https://facebook.com/marketplace/item/123456789",
       "id_publicacion": "fb_marketplace_123456",
-      "ficha_breve": "¡No te lo pierdas!"
+      "ficha_breve": "¡No te lo pierdas! Financiación disponible"
     },
     {
       "plataforma": "mercadolibre",
-      "titulo": "Toyota Corolla XEI 2023 - Financiación Disponible",
-      "url_publicacion": "https://articulo.mercadolibre.com.ar/MLA-123456",
-      "id_publicacion": "MLA123456789"
+      "titulo": "Toyota Corolla XEI 2024 - Financiación 100%",
+      "url_publicacion": "https://articulo.mercadolibre.com.ar/MLA-987654321",
+      "id_publicacion": "MLA987654321",
+      "ficha_breve": "Acepto permuta, financiación hasta 60 cuotas"
     }
   ]
 }
 ```
 
-**Response 201:**
+**Response 201 (Éxito):**
 ```json
 {
   "success": true,
   "message": "Vehículo creado exitosamente",
   "vehiculo": {
-    // Mismo formato que GET /api/vehiculos/{id}
+    "id": "string (UUID)",
+    "empresa_id": "string (UUID)",
+    "modelo_id": "string (UUID)",
+    "vendedor_id": "string (UUID)",
+    "estado_id": "string (UUID)",
+    "comprador_id": "string (UUID)|null",
+    "patente": "string|null",
+    "vehiculo_ano": "number",
+    "kilometros": "number",
+    "valor": "string (decimal)|null",
+    "moneda": "string",
+    "tipo_operacion": "string|null",
+    "fecha_ingreso": "string (ISO date)",
+    "observaciones": "string|null",
+    "pendientes_preparacion": ["string"],
+    "comentarios": "string|null",
+    "activo": "boolean",
+    "created_at": "string (ISO date)",
+    "updated_at": "string (ISO date)",
+    "empresa": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "descripcion": "string|null"
+    },
+    "modelo": {
+      "id": "string (UUID)",
+      "marca": "string",
+      "modelo": "string",
+      "version": "string|null",
+      "modelo_ano": "number",
+      "segmento_modelo": "string|null",
+      "motorizacion": "string|null",
+      "combustible": "string|null",
+      "caja": "string|null",
+      "traccion": "string|null",
+      "cilindrada": "number|null",
+      "potencia_hp": "number|null",
+      "torque_nm": "number|null",
+      "rendimiento_mixto": "string (decimal)|null",
+      "equipamiento": ["string"],
+      "asistencias_manejo": ["string"]
+    },
+    "estado": {
+      "id": "string (UUID)",
+      "codigo": "string",
+      "nombre": "string",
+      "descripcion": "string|null"
+    },
+    "vendedor": {
+      "id": "string (UUID)",
+      "nombre": "string",
+      "apellido": "string|null",
+      "telefono": "string|null",
+      "email": "string|null"
+    },
+    "comprador": {
+      "id": "string (UUID)",
+      "nombre": "string", 
+      "apellido": "string|null",
+      "telefono": "string|null",
+      "email": "string|null"
+    }|null
   },
   "resumen": {
-    "vendedor_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó vendedor
-    "modelo_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó modelo
-    "estado": "disponible", // Estado asignado
-    "publicaciones_creadas": 3 // Número de publicaciones creadas
-  }
+    "vendedor_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó vendedor existente
+    "modelo_creado": "nuevo|reutilizado", // Indica si se creó o reutilizó modelo existente
+    "estado_asignado": "string", // Código del estado asignado al vehículo
+    "publicaciones_creadas": "number" // Cantidad de publicaciones creadas exitosamente
+  },
+  "publicaciones": [
+    {
+      "id": "string (UUID)",
+      "vehiculo_id": "string (UUID)",
+      "plataforma": "string",
+      "titulo": "string",
+      "url_publicacion": "string|null",
+      "id_publicacion": "string|null", 
+      "ficha_breve": "string|null",
+      "activo": "boolean",
+      "created_at": "string (ISO date)",
+      "updated_at": "string (ISO date)"
+    }
+  ]
 }
 ```
 
-**Response 400:**
+**Response 400 (Validación):**
 ```json
 {
   "success": false,
   "error": "Datos inválidos",
-  "message": "La marca es requerida", 
+  "message": "Error en validación de datos", 
   "details": [
     {
       "field": "marca",
@@ -3009,8 +3102,56 @@ id: string (UUID, required)
     {
       "field": "vendedor_email", 
       "message": "El email del vendedor debe tener un formato válido"
+    },
+    {
+      "field": "vehiculo_ano",
+      "message": "El año del vehículo debe ser mayor a 1950"
     }
   ]
+}
+```
+
+**Response 400 (Estado inválido):**
+```json
+{
+  "success": false,
+  "error": "Estado inválido",
+  "message": "No se encontró un estado con el código: ESTADO_INEXISTENTE"
+}
+```
+
+**Response 400 (Admin sin empresa):**
+```json
+{
+  "success": false,
+  "message": "Debes especificar la empresa para este vehículo"
+}
+```
+
+**Response 401:**
+```json
+{
+  "success": false,
+  "error": "Token no válido",
+  "message": "El token de acceso ha expirado o es inválido"
+}
+```
+
+**Response 403:**
+```json
+{
+  "success": false,
+  "error": "Sin permisos",
+  "message": "No tienes permisos para crear vehículos"
+}
+```
+
+**Response 500:**
+```json
+{
+  "success": false,
+  "error": "Error interno del servidor",
+  "message": "Error al crear vehículo: [detalle del error]"
 }
 ```
 

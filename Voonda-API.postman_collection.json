@@ -142,263 +142,700 @@
 			"name": "🚗 Vehículos",
 			"item": [
 				{
-					"name": "Crear Vehículo (Ejemplo Mínimo)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
+					"name": "✅ Casos de Éxito",
+					"item": [
+						{
+							"name": "Crear Vehículo (Campos Obligatorios Mínimos)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "✅ Solo campos obligatorios - Debe funcionar correctamente"
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+							"response": []
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos"
-							]
-						},
-						"description": "Crear vehículo con campos mínimos obligatorios"
-					},
-					"response": []
-				},
-				{
-					"name": "Crear Vehículo (Ejemplo Completo)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
+						{
+							"name": "Crear Vehículo (Con Campos Opcionales Básicos)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Ford\",\n  \"modelo\": \"Focus\",\n  \"version\": \"SE\",\n  \"vehiculo_ano\": 2023,\n  \"vendedor_nombre\": \"María\",\n  \"vendedor_apellido\": \"González\",\n  \"vendedor_telefono\": \"+54 9 11 8765-4321\",\n  \"vendedor_email\": \"maria.gonzalez@email.com\",\n  \"vendedor_dni\": \"12345678\",\n  \"vendedor_direccion\": \"Av. Corrientes 1234, CABA\",\n  \"patente\": \"ABC123\",\n  \"kilometros\": 15000,\n  \"valor\": 1800000,\n  \"moneda\": \"ARS\",\n  \"estado_codigo\": \"salon\",\n  \"observaciones\": \"Vehículo en excelente estado\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "✅ Campos obligatorios + algunos opcionales básicos"
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\", \n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"vendedor_dni\": \"12345678\",\n  \"vendedor_direccion\": \"Av. Corrientes 1234, CABA\",\n  \"vendedor_observaciones\": \"Vendedor confiable, entrega inmediata\",\n  \"estado_codigo\": \"salon\",\n  \"patente\": \"ABC123\",\n  \"kilometros\": 15000,\n  \"valor\": 2500000.00,\n  \"moneda\": \"ARS\",\n  \"tipo_operacion\": \"Venta\",\n  \"fecha_ingreso\": \"2024-11-18T10:30:00Z\",\n  \"observaciones\": \"Vehículo en excelente estado, service al día\",\n  \"pendientes_preparacion\": [\"Lavado exterior\", \"Revisión técnica\", \"Documentación\"],\n  \"comentarios\": \"Contactar al vendedor solo por las mañanas\",\n  \"publicaciones\": [\n    {\n      \"plataforma\": \"web\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Impecable Estado\",\n      \"ficha_breve\": \"Vehículo en excelente estado, único dueño, service completo en concesionario oficial\"\n    },\n    {\n      \"plataforma\": \"facebook\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Oportunidad\",\n      \"url_publicacion\": \"https://facebook.com/marketplace/item/123456789\",\n      \"id_publicacion\": \"fb_marketplace_123456\",\n      \"ficha_breve\": \"¡No te lo pierdas! Financiación disponible\"\n    },\n    {\n      \"plataforma\": \"mercadolibre\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Financiación 100%\",\n      \"url_publicacion\": \"https://articulo.mercadolibre.com.ar/MLA-987654321\",\n      \"id_publicacion\": \"MLA987654321\",\n      \"ficha_breve\": \"Acepto permuta, financiación hasta 60 cuotas\"\n    }\n  ]\n}"
+							"response": []
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos"
-							]
-						},
-						"description": "Crear vehículo con todos los campos opcionales y publicaciones"
-					},
-					"response": []
-				},
-				{
-					"name": "Crear Vehículo (Estado EN_REPARACION)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
+						{
+							"name": "Crear Vehículo (Estado EN_REPARACION)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Volkswagen\",\n  \"modelo\": \"Golf\",\n  \"version\": \"Trendline\",\n  \"vehiculo_ano\": 2022,\n  \"vendedor_nombre\": \"Carlos\",\n  \"vendedor_apellido\": \"Rodriguez\",\n  \"vendedor_telefono\": \"+54 9 11 5555-6666\",\n  \"vendedor_email\": \"carlos.rodriguez@email.com\",\n  \"estado_codigo\": \"EN_REPARACION\",\n  \"patente\": \"DEF456\",\n  \"kilometros\": 25000,\n  \"valor\": 2200000,\n  \"observaciones\": \"Vehículo ingresó para reparación de motor\",\n  \"pendientes_preparacion\": [\"Reparación motor\", \"Cambio aceite\", \"Revisión general\"],\n  \"comentarios\": \"Contactar solo por las mañanas\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "✅ Prueba estado dinámico EN_REPARACION + pendientes como array"
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"marca\": \"Ford\",\n  \"modelo\": \"Focus\",\n  \"version\": \"SE\",\n  \"vehiculo_ano\": 2023,\n  \"vendedor_nombre\": \"María\",\n  \"vendedor_apellido\": \"González\",\n  \"vendedor_telefono\": \"+54 9 11 8765-4321\",\n  \"vendedor_email\": \"maria.gonzalez@email.com\",\n  \"estado_codigo\": \"EN_REPARACION\",\n  \"patente\": \"DEF456\",\n  \"kilometros\": 25000,\n  \"valor\": 1800000,\n  \"observaciones\": \"Vehículo ingresó para reparación de motor\",\n  \"pendientes_preparacion\": [\"Reparación motor\", \"Cambio aceite\", \"Revisión general\"]\n}"
+							"response": []
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos"
-							]
-						},
-						"description": "Crear vehículo con estado EN_REPARACION para probar estados dinámicos"
-					},
-					"response": []
-				},
-				{
-					"name": "Listar Vehículos",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos?page=1&limit=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
+						{
+							"name": "Crear Vehículo (Con Publicaciones Completas)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Chevrolet\",\n  \"modelo\": \"Cruze\",\n  \"version\": \"LTZ\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Ana\",\n  \"vendedor_apellido\": \"López\",\n  \"vendedor_telefono\": \"+54 9 11 7777-8888\",\n  \"vendedor_email\": \"ana.lopez@email.com\",\n  \"vendedor_dni\": \"87654321\",\n  \"vendedor_direccion\": \"Av. Santa Fe 2000, CABA\",\n  \"vendedor_observaciones\": \"Vendedora confiable, entrega inmediata\",\n  \"estado_codigo\": \"disponible\",\n  \"patente\": \"GHI789\",\n  \"kilometros\": 5000,\n  \"valor\": 3200000.50,\n  \"moneda\": \"ARS\",\n  \"tipo_operacion\": \"Venta\",\n  \"fecha_ingreso\": \"2024-11-18T10:30:00Z\",\n  \"observaciones\": \"Vehículo prácticamente nuevo, service al día\",\n  \"pendientes_preparacion\": [\"Lavado exterior\", \"Revisión técnica\"],\n  \"comentarios\": \"Acepta permuta por vehículo menor valor\",\n  \"publicaciones\": [\n    {\n      \"plataforma\": \"web\",\n      \"titulo\": \"Chevrolet Cruze LTZ 2024 - Como Nuevo\",\n      \"ficha_breve\": \"Vehículo prácticamente nuevo, único dueño, service completo en concesionario oficial\"\n    },\n    {\n      \"plataforma\": \"facebook\",\n      \"titulo\": \"Chevrolet Cruze LTZ 2024 - Oportunidad Única\",\n      \"url_publicacion\": \"https://facebook.com/marketplace/item/123456789\",\n      \"id_publicacion\": \"fb_marketplace_123456\",\n      \"ficha_breve\": \"¡No te lo pierdas! Financiación disponible, acepto permuta\"\n    },\n    {\n      \"plataforma\": \"mercadolibre\",\n      \"titulo\": \"Chevrolet Cruze LTZ 2024 - Financiación 100%\",\n      \"url_publicacion\": \"https://articulo.mercadolibre.com.ar/MLA-987654321\",\n      \"id_publicacion\": \"MLA987654321\",\n      \"ficha_breve\": \"Acepto permuta, financiación hasta 60 cuotas sin interés\"\n    },\n    {\n      \"plataforma\": \"instagram\",\n      \"titulo\": \"🚗 Cruze LTZ 2024 - Impecable!\",\n      \"ficha_breve\": \"📱 Contactanos por DM para más info\"\n    }\n  ]\n}"
 								},
-								{
-									"key": "limit",
-									"value": "10"
-								}
-							]
-						},
-						"description": "Obtener lista paginada de vehículos"
-					},
-					"response": []
-				},
-				{
-					"name": "Buscar Vehículos (Con filtros)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos?search=Toyota&marca=Toyota&estado=disponible&precio_min=1000000&precio_max=3000000",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "Toyota"
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
 								},
-								{
-									"key": "marca",
-									"value": "Toyota"
-								},
-								{
-									"key": "estado",
-									"value": "disponible"
-								},
-								{
-									"key": "precio_min",
-									"value": "1000000"
-								},
-								{
-									"key": "precio_max",
-									"value": "3000000"
-								}
-							]
-						},
-						"description": "Buscar vehículos con filtros múltiples"
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Vehículo por ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos",
-								"{{vehiculo_id}}"
-							]
-						},
-						"description": "Obtener un vehículo específico por su ID (establecer vehiculo_id en variables de entorno)"
-					},
-					"response": []
-				},
-				{
-					"name": "Actualizar Vehículo",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"description": "✅ Ejemplo completo con TODOS los campos opcionales y múltiples publicaciones"
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"patente\": \"XYZ789\",\n  \"kilometros\": 20000,\n  \"valor\": 2400000,\n  \"observaciones\": \"Vehículo actualizado - precio negociable\",\n  \"estado_codigo\": \"disponible\"\n}"
+							"response": []
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos",
-								"{{vehiculo_id}}"
-							]
-						},
-						"description": "Actualizar un vehículo existente"
-					},
-					"response": []
+						{
+							"name": "Crear Vehículo (Reutilizar Vendedor Existente)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Hilux\",\n  \"version\": \"SRV\",\n  \"vehiculo_ano\": 2023,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"patente\": \"JKL012\",\n  \"kilometros\": 30000,\n  \"valor\": 4500000,\n  \"estado_codigo\": \"consignacion\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "✅ Debe reutilizar el vendedor juan.perez@email.com creado anteriormente"
+							},
+							"response": []
+						}
+					],
+					"description": "Casos de prueba que deben funcionar correctamente"
 				},
 				{
-					"name": "Eliminar Vehículo",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"vehiculos",
-								"{{vehiculo_id}}"
-							]
+					"name": "❌ Casos de Error (Validación)",
+					"item": [
+						{
+							"name": "Error - Campo Obligatorio Faltante (marca)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Falta campo obligatorio 'marca'"
+							},
+							"response": []
 						},
-						"description": "Eliminar un vehículo (soft delete)"
-					},
-					"response": []
+						{
+							"name": "Error - Email Vendedor Inválido",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"email-invalido\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Email con formato inválido"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Año Vehículo Inválido (muy antiguo)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 1949,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Año debe ser >= 1950"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Año Vehículo Futuro",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2027,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Año no puede ser mayor a año actual + 1"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Nombre Vendedor Muy Corto",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"J\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Nombre debe tener al menos 2 caracteres"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Teléfono Muy Corto",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"123\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Teléfono debe tener al menos 8 caracteres"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Valor Negativo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"valor\": -1000000\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - El valor debe ser positivo"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Kilómetros Negativos",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"kilometros\": -5000\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Los kilómetros no pueden ser negativos"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Estado Inexistente",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"estado_codigo\": \"ESTADO_INEXISTENTE\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Estado no existe en la base de datos"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Sin Autenticación",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 401 - No incluye token de autorización"
+							},
+							"response": []
+						},
+						{
+							"name": "Error - Publicación con Plataforma Inválida",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"publicaciones\": [\n    {\n      \"plataforma\": \"plataforma_inexistente\",\n      \"titulo\": \"Toyota Corolla XEI 2024\"\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									]
+								},
+								"description": "❌ Error 400 - Plataforma debe ser: facebook, web, mercadolibre, instagram, whatsapp, olx, autocosmos, otro"
+							},
+							"response": []
+						}
+					],
+					"description": "Casos de prueba que deben devolver errores específicos"
+				},
+				{
+					"name": "🔍 Casos de Búsqueda y Consulta",
+					"item": [
+						{
+							"name": "Listar Vehículos (Sin filtros)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos?page=1&limit=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								},
+								"description": "✅ Lista todos los vehículos con paginación"
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar por Marca (Toyota)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos?marca=Toyota",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									],
+									"query": [
+										{
+											"key": "marca",
+											"value": "Toyota"
+										}
+									]
+								},
+								"description": "✅ Filtrar solo vehículos Toyota"
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar por Estado (salon)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos?estado=salon",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									],
+									"query": [
+										{
+											"key": "estado",
+											"value": "salon"
+										}
+									]
+								},
+								"description": "✅ Filtrar vehículos en estado 'salon'"
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar por Rango de Precios",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos?precio_min=1000000&precio_max=3000000",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									],
+									"query": [
+										{
+											"key": "precio_min",
+											"value": "1000000"
+										},
+										{
+											"key": "precio_max",
+											"value": "3000000"
+										}
+									]
+								},
+								"description": "✅ Filtrar vehículos entre $1.000.000 y $3.000.000"
+							},
+							"response": []
+						},
+						{
+							"name": "Búsqueda Combinada (Marca + Estado + Precio)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/vehiculos?marca=Toyota&estado=disponible&precio_min=2000000&search=Corolla",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"vehiculos"
+									],
+									"query": [
+										{
+											"key": "marca",
+											"value": "Toyota"
+										},
+										{
+											"key": "estado",
+											"value": "disponible"
+										},
+										{
+											"key": "precio_min",
+											"value": "2000000"
+										},
+										{
+											"key": "search",
+											"value": "Corolla"
+										}
+									]
+								},
+								"description": "✅ Búsqueda compleja con múltiples filtros"
+							},
+							"response": []
+						}
+					],
+					"description": "Casos para probar filtros y búsquedas"
 				}
 			],
 			"description": "CRUD completo de vehículos con auto-creación de vendedores y modelos"

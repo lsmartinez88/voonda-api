@@ -1,6 +1,38 @@
-﻿# 📮 Voonda API - Colección de Postman
+﻿# 📮 Voonda API - Colección de Postman Completa
 
-## 🚀 Importar en Postman
+## 🎯 Casos de Prueba Incluidos
+
+Esta colección contiene **casos de prueba exhaustivos** organizados en 3 categorías principales:
+
+### ✅ **Casos de Éxito** (6 ejemplos)
+1. **Campos Obligatorios Mínimos** - Solo campos requeridos
+2. **Con Campos Opcionales Básicos** - Algunos campos adicionales  
+3. **Estado EN_REPARACION** - Prueba estados dinámicos + arrays
+4. **Con Publicaciones Completas** - Todas las opciones disponibles
+5. **Reutilizar Vendedor Existente** - Validar lógica de vendedor duplicado
+6. **CRUD Completo** - Obtener/Actualizar/Eliminar
+
+### ❌ **Casos de Error** (11 validaciones)
+1. **Campo Obligatorio Faltante** (marca)
+2. **Email Vendedor Inválido** (formato incorrecto)
+3. **Año Vehículo Muy Antiguo** (< 1950)
+4. **Año Vehículo Futuro** (> año actual + 1)
+5. **Nombre Vendedor Muy Corto** (< 2 caracteres)
+6. **Teléfono Muy Corto** (< 8 caracteres) 
+7. **Valor Negativo** (< 0)
+8. **Kilómetros Negativos** (< 0)
+9. **Estado Inexistente** (no existe en BD)
+10. **Sin Autenticación** (401 error)
+11. **Publicación con Plataforma Inválida**
+
+### � **Casos de Búsqueda** (5 ejemplos)
+1. **Listar Sin Filtros** - Paginación básica
+2. **Buscar por Marca** - Filtro simple
+3. **Buscar por Estado** - Filtro de estado
+4. **Rango de Precios** - Filtros numéricos
+5. **Búsqueda Combinada** - Múltiples filtros
+
+## 🚀 Configuración Inicial
 
 ### 1. **Importar la Colección**
 - Abrir Postman
@@ -10,45 +42,215 @@
 ### 2. **Importar el Environment**
 - Clic en **"Import"** nuevamente
 - Arrastrar o seleccionar el archivo: `Voonda-API-Local.postman_environment.json`
-- En la esquina superior derecha, seleccionar **"Voonda API - Local Development"**
+- En la esquina superior derecha, seleccionar **"Voonda API - Local"**
 
-## 🔑 Autenticación
+## 🔑 Proceso de Autenticación
 
 ### **Paso 1: Login**
-1. Ir a **🔐 Autenticación > Login**
-2. El body ya tiene credenciales predeterminadas:
-   ```json
-   {
-     "email": "admin@voonda.com",
-     "password": "123456"
-   }
-   ```
-3. Ejecutar la request (Send)
-4. ✅ **El token se guarda automáticamente** en la variable de environment
+1. Ir a **🔐 Autenticación > Login (Admin)**
+2. Ejecutar la request (Send)
+3. ✅ **El token se guarda automáticamente** en variables de entorno
 
 ### **Paso 2: Verificar autenticación**
 - Ejecutar **🔐 Autenticación > Me (Usuario actual)** para verificar que el token funciona
 
-## 🚗 Probar Creación de Vehículos
+## 📋 Flujo de Prueba Recomendado
 
-### **Opción 1: Ejemplo Mínimo**
-- **🚗 Vehículos > Crear Vehículo (Ejemplo Mínimo)**
-- Solo campos obligatorios:
+### 1️⃣ **Configuración Inicial**
+```
+🔐 Autenticación → Login (Admin)
+📊 Dashboard → Obtener Marcas Disponibles  
+📊 Dashboard → Listar Estados de Vehículos
+```
+
+### 2️⃣ **Casos de Éxito (En orden)**
+```
+✅ Crear Vehículo (Campos Obligatorios Mínimos)
+✅ Crear Vehículo (Con Campos Opcionales Básicos)
+✅ Crear Vehículo (Estado EN_REPARACION) 
+✅ Crear Vehículo (Con Publicaciones Completas)
+✅ Crear Vehículo (Reutilizar Vendedor Existente)
+```
+
+### 3️⃣ **Verificar Creaciones**
+```
+🔍 Listar Vehículos (Sin filtros)
+🔍 Buscar por Marca (Toyota)
+🔍 Buscar por Estado (salon)
+```
+
+### 4️⃣ **Probar Validaciones**
+```
+❌ Error - Campo Obligatorio Faltante (marca)
+❌ Error - Email Vendedor Inválido
+❌ Error - Año Vehículo Inválido (muy antiguo)
+❌ Error - Estado Inexistente
+❌ Error - Sin Autenticación
+```
+
+### 5️⃣ **CRUD Completo**
+```
+🚗 Obtener Vehículo por ID
+🚗 Actualizar Vehículo
+🚗 Eliminar Vehículo
+```
+
+## 🎯 Qué Esperar en Cada Caso
+
+### ✅ **Casos de Éxito** - Deben retornar:
+- **Status Code:** 201 (Created) para creación, 200 (OK) para consultas
+- **Response:** JSON con el vehículo creado/consultado
+- **Auto-save:** `vehiculo_id` se guarda automáticamente para usar en otros endpoints
+- **Campos incluidos:** `id`, `marca`, `modelo`, `vendedor`, `publicaciones`, etc.
+
+### ❌ **Casos de Error** - Deben retornar:
+- **Status Code:** 400 (Bad Request) o 401 (Unauthorized)
+- **Response:** JSON con mensaje de error específico
+- **Ejemplo:**
   ```json
   {
-    "marca": "Toyota",
-    "modelo": "Corolla",
-    "version": "XEI",
-    "vehiculo_ano": 2024,
-    "vendedor_nombre": "Juan",
-    "vendedor_apellido": "Pérez",
-    "vendedor_telefono": "+54 9 11 1234-5678",
-    "vendedor_email": "juan.perez@email.com"
+    "error": "\"marca\" es obligatorio"
   }
   ```
 
-### **Opción 2: Ejemplo Completo**
-- **🚗 Vehículos > Crear Vehículo (Ejemplo Completo)**
+### 🔍 **Casos de Búsqueda** - Deben retornar:
+- **Status Code:** 200 (OK)
+- **Response:** Array de vehículos + metadata de paginación
+- **Filtros aplicados:** Según parámetros enviados
+
+## 🔧 Variables de Entorno
+
+```javascript
+{
+  "baseUrl": "http://localhost:3001",
+  "token": "", // Se actualiza automáticamente al hacer login
+  "vehiculo_id": "", // Se actualiza al crear un vehículo
+  "adminEmail": "admin@test.com",
+  "adminPassword": "123456"
+}
+```
+
+## ⚠️ Validaciones Importantes
+
+### **Campos Obligatorios**
+```javascript
+{
+  "marca": "String (min 1 carácter)",
+  "modelo": "String (min 1 carácter)",
+  "version": "String (min 1 carácter)", 
+  "vehiculo_ano": "Number (1950 ≤ año ≤ año_actual+1)",
+  "vendedor_nombre": "String (min 2 caracteres)",
+  "vendedor_apellido": "String (min 2 caracteres)",
+  "vendedor_telefono": "String (min 8 caracteres)",
+  "vendedor_email": "Email válido"
+}
+```
+
+### **Campos Opcionales con Validaciones**
+```javascript
+{
+  "valor": "Number positivo",
+  "kilometros": "Number ≥ 0", 
+  "estado_codigo": "String existente en BD",
+  "vendedor_dni": "String (3-20 caracteres)",
+  "patente": "String (3-20 caracteres)",
+  "publicaciones": "Array de objetos con plataforma válida"
+}
+```
+
+### **Plataformas Válidas para Publicaciones**
+- `"facebook"`, `"web"`, `"mercadolibre"`, `"instagram"`, `"whatsapp"`, `"olx"`, `"autocosmos"`, `"otro"`
+
+## � Solución de Problemas
+
+### Error 500: "estadoDefecto is not defined"
+- ✅ **SOLUCIONADO** - Era un error en el código del backend
+
+### Error 400: "Estado EN_REPARACION no válido"
+- ✅ **SOLUCIONADO** - Se implementó validación dinámica de estados
+
+### Error 401: "Token inválido"
+- 🔄 **Solución:** Ejecutar nuevamente "Login (Admin)" para obtener token fresco
+
+### Error de Conexión
+- ✅ **Verificar:** El servidor está corriendo en `http://localhost:3001`
+- ✅ **Comando:** `npm run dev` en el directorio del proyecto
+
+### Vehículo ID no encontrado
+- 🔄 **Solución:** Crear un vehículo primero para obtener un ID válido
+- 🔄 **Automático:** La variable `vehiculo_id` se actualiza automáticamente
+
+## 💡 Notas Técnicas
+
+- **Auto-creación de Vendedores:** Si un email ya existe, se reutiliza el vendedor
+- **Auto-creación de Modelos:** Si marca+modelo no existe, se crea automáticamente
+- **Estados Dinámicos:** Se validan contra la tabla `EstadoVehiculo` en tiempo real
+- **Publicaciones:** Array opcional, cada elemento requiere `plataforma` y `titulo` como mínimo
+- **Arrays como Strings:** `pendientes_preparacion` se puede enviar como array o string con comas
+
+## ✨ Ejemplos de Respuesta
+
+### Login Exitoso
+```json
+{
+  "message": "Login exitoso",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "email": "admin@test.com",
+    "nombre": "Admin",
+    "rol": "admin"
+  }
+}
+```
+
+### Vehículo Creado Exitosamente
+```json
+{
+  "id": 123,
+  "marca": "Toyota",
+  "modelo": "Corolla",
+  "version": "XEI",
+  "vehiculo_ano": 2024,
+  "vendedor": {
+    "id": 45,
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan.perez@email.com",
+    "vendedorCreado": true
+  },
+  "modelo_auto": {
+    "id": 67,
+    "nombre": "Corolla", 
+    "modeloCreado": true
+  },
+  "publicaciones": [
+    {
+      "id": 1,
+      "plataforma": "web",
+      "titulo": "Toyota Corolla XEI 2024"
+    }
+  ]
+}
+```
+
+### Error de Validación
+```json
+{
+  "error": "\"vendedor_email\" debe ser un email válido"
+}
+```
+
+## 🎉 Próximos Pasos
+
+1. ✅ **Importar colección** y environment en Postman
+2. ✅ **Autenticarse** con Login (Admin) 
+3. 🧪 **Probar casos de éxito** para validar funcionalidad
+4. ❌ **Probar casos de error** para validar validaciones
+5. 🔍 **Explorar filtros** con casos de búsqueda
+6. 🎨 **Personalizar** según necesidades específicas
+
+¡La colección está lista para pruebas inmediatas! 🚀
 - Incluye todos los campos opcionales y publicaciones
 
 ### **Opción 3: Estado EN_REPARACION**

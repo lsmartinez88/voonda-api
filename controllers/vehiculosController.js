@@ -586,11 +586,13 @@ exports.create = async function (req, res) {
       }
     });
 
+    let vendedorCreado = false;
     if (!vendedor) {
       // Crear nuevo vendedor si no existe
       vendedor = await prisma.vendedor.create({
         data: vendedorData
       });
+      vendedorCreado = true;
       console.log('✅ Vendedor creado:', vendedor.id);
     } else {
       console.log('✅ Vendedor existente encontrado:', vendedor.id);
@@ -615,11 +617,13 @@ exports.create = async function (req, res) {
       }
     });
 
+    let modeloCreado = false;
     if (!modeloAuto) {
       // Crear nuevo modelo si no existe
       modeloAuto = await prisma.modeloAuto.create({
         data: modeloData
       });
+      modeloCreado = true;
       console.log('✅ Modelo auto creado:', modeloAuto.id);
     } else {
       console.log('✅ Modelo auto existente encontrado:', modeloAuto.id);
@@ -793,11 +797,12 @@ exports.create = async function (req, res) {
     return successResponse(res, { 
       vehiculo: newVehiculo,
       resumen: {
-        vendedor_creado: vendedor ? 'reutilizado' : 'nuevo',
-        modelo_creado: modeloAuto ? 'reutilizado' : 'nuevo',
-        estado: estadoDefecto.codigo,
+        vendedor_creado: vendedorCreado ? 'nuevo' : 'reutilizado',
+        modelo_creado: modeloCreado ? 'nuevo' : 'reutilizado',
+        estado_asignado: newVehiculo.estado ? newVehiculo.estado.codigo : 'desconocido',
         publicaciones_creadas: publicacionesCreadas.count || 0
-      }
+      },
+      publicaciones: newVehiculo.publicaciones || []
     }, 'Vehículo creado exitosamente', 201);
   } catch (error) {
     console.error('❌ Error al crear vehículo:', error);

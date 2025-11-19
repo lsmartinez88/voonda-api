@@ -1,0 +1,620 @@
+﻿{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Voonda API - Complete Collection",
+		"description": "Colección completa de la API de Voonda con autenticación JWT y CRUD de vehículos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "🔐 Autenticación",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.token) {",
+									"        pm.environment.set('token', response.token);",
+									"        console.log('Token guardado:', response.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@voonda.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Iniciar sesión y obtener token JWT"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"nuevo@voonda.com\",\n  \"password\": \"123456\",\n  \"nombre\": \"Usuario\",\n  \"apellido\": \"Prueba\",\n  \"telefono\": \"+54 9 11 1234-5678\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registrar nuevo usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "Me (Usuario actual)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Obtener información del usuario actual"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Cerrar sesión"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación JWT"
+		},
+		{
+			"name": "🚗 Vehículos",
+			"item": [
+				{
+					"name": "Crear Vehículo (Ejemplo Mínimo)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\",\n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos"
+							]
+						},
+						"description": "Crear vehículo con campos mínimos obligatorios"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Vehículo (Ejemplo Completo)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"version\": \"XEI\", \n  \"vehiculo_ano\": 2024,\n  \"vendedor_nombre\": \"Juan\",\n  \"vendedor_apellido\": \"Pérez\",\n  \"vendedor_telefono\": \"+54 9 11 1234-5678\",\n  \"vendedor_email\": \"juan.perez@email.com\",\n  \"vendedor_dni\": \"12345678\",\n  \"vendedor_direccion\": \"Av. Corrientes 1234, CABA\",\n  \"vendedor_observaciones\": \"Vendedor confiable, entrega inmediata\",\n  \"estado_codigo\": \"salon\",\n  \"patente\": \"ABC123\",\n  \"kilometros\": 15000,\n  \"valor\": 2500000.00,\n  \"moneda\": \"ARS\",\n  \"tipo_operacion\": \"Venta\",\n  \"fecha_ingreso\": \"2024-11-18T10:30:00Z\",\n  \"observaciones\": \"Vehículo en excelente estado, service al día\",\n  \"pendientes_preparacion\": [\"Lavado exterior\", \"Revisión técnica\", \"Documentación\"],\n  \"comentarios\": \"Contactar al vendedor solo por las mañanas\",\n  \"publicaciones\": [\n    {\n      \"plataforma\": \"web\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Impecable Estado\",\n      \"ficha_breve\": \"Vehículo en excelente estado, único dueño, service completo en concesionario oficial\"\n    },\n    {\n      \"plataforma\": \"facebook\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Oportunidad\",\n      \"url_publicacion\": \"https://facebook.com/marketplace/item/123456789\",\n      \"id_publicacion\": \"fb_marketplace_123456\",\n      \"ficha_breve\": \"¡No te lo pierdas! Financiación disponible\"\n    },\n    {\n      \"plataforma\": \"mercadolibre\",\n      \"titulo\": \"Toyota Corolla XEI 2024 - Financiación 100%\",\n      \"url_publicacion\": \"https://articulo.mercadolibre.com.ar/MLA-987654321\",\n      \"id_publicacion\": \"MLA987654321\",\n      \"ficha_breve\": \"Acepto permuta, financiación hasta 60 cuotas\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos"
+							]
+						},
+						"description": "Crear vehículo con todos los campos opcionales y publicaciones"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Vehículo (Estado EN_REPARACION)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"marca\": \"Ford\",\n  \"modelo\": \"Focus\",\n  \"version\": \"SE\",\n  \"vehiculo_ano\": 2023,\n  \"vendedor_nombre\": \"María\",\n  \"vendedor_apellido\": \"González\",\n  \"vendedor_telefono\": \"+54 9 11 8765-4321\",\n  \"vendedor_email\": \"maria.gonzalez@email.com\",\n  \"estado_codigo\": \"EN_REPARACION\",\n  \"patente\": \"DEF456\",\n  \"kilometros\": 25000,\n  \"valor\": 1800000,\n  \"observaciones\": \"Vehículo ingresó para reparación de motor\",\n  \"pendientes_preparacion\": [\"Reparación motor\", \"Cambio aceite\", \"Revisión general\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos"
+							]
+						},
+						"description": "Crear vehículo con estado EN_REPARACION para probar estados dinámicos"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Vehículos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos?page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Obtener lista paginada de vehículos"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Vehículos (Con filtros)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos?search=Toyota&marca=Toyota&estado=disponible&precio_min=1000000&precio_max=3000000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Toyota"
+								},
+								{
+									"key": "marca",
+									"value": "Toyota"
+								},
+								{
+									"key": "estado",
+									"value": "disponible"
+								},
+								{
+									"key": "precio_min",
+									"value": "1000000"
+								},
+								{
+									"key": "precio_max",
+									"value": "3000000"
+								}
+							]
+						},
+						"description": "Buscar vehículos con filtros múltiples"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Vehículo por ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos",
+								"{{vehiculo_id}}"
+							]
+						},
+						"description": "Obtener un vehículo específico por su ID (establecer vehiculo_id en variables de entorno)"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Vehículo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patente\": \"XYZ789\",\n  \"kilometros\": 20000,\n  \"valor\": 2400000,\n  \"observaciones\": \"Vehículo actualizado - precio negociable\",\n  \"estado_codigo\": \"disponible\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos",
+								"{{vehiculo_id}}"
+							]
+						},
+						"description": "Actualizar un vehículo existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Vehículo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehiculos/{{vehiculo_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehiculos",
+								"{{vehiculo_id}}"
+							]
+						},
+						"description": "Eliminar un vehículo (soft delete)"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD completo de vehículos con auto-creación de vendedores y modelos"
+		},
+		{
+			"name": "🧑‍💼 Vendedores",
+			"item": [
+				{
+					"name": "Listar Vendedores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vendedores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vendedores"
+							]
+						},
+						"description": "Obtener lista de vendedores"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Vendedor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"Rodriguez\",\n  \"telefono\": \"+54 9 11 5555-6666\",\n  \"email\": \"carlos.rodriguez@email.com\",\n  \"dni\": \"87654321\",\n  \"direccion\": \"Av. Santa Fe 2000, CABA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vendedores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vendedores"
+							]
+						},
+						"description": "Crear nuevo vendedor"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de vendedores"
+		},
+		{
+			"name": "🚙 Modelos de Auto",
+			"item": [
+				{
+					"name": "Listar Modelos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/modelo-autos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"modelo-autos"
+							]
+						},
+						"description": "Obtener lista de modelos de autos"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar por Marca",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/modelo-autos?marca=Toyota",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"modelo-autos"
+							],
+							"query": [
+								{
+									"key": "marca",
+									"value": "Toyota"
+								}
+							]
+						},
+						"description": "Buscar modelos por marca específica"
+					},
+					"response": []
+				}
+			],
+			"description": "Consulta de modelos de automóviles"
+		},
+		{
+			"name": "🏷️ Estados de Vehículo",
+			"item": [
+				{
+					"name": "Listar Estados",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/estados-vehiculo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"estados-vehiculo"
+							]
+						},
+						"description": "Obtener todos los estados de vehículo disponibles"
+					},
+					"response": []
+				}
+			],
+			"description": "Estados disponibles para vehículos (disponible, salon, EN_REPARACION, etc.)"
+		},
+		{
+			"name": "🏥 Health Check",
+			"item": [
+				{
+					"name": "Status del Servidor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Verificar estado del servidor (no requiere autenticación)"
+					},
+					"response": []
+				}
+			],
+			"description": "Verificación del estado del servidor"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "vehiculo_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -2767,8 +2767,6 @@ search: string (max: 100 chars, busca en marca/modelo)
       "valor": "string (decimal)|null",
       "moneda": "string",
       "tipo_operacion": "string|null",
-      "publicacion_web": "string", // "true" | "false"
-      "publicacion_api_call": "string", // "true" | "false"
       "fecha_ingreso": "string (ISO date)|null",
       "observaciones": "string|null",
       "created_at": "string (ISO date)",
@@ -2822,8 +2820,6 @@ id: string (UUID, required)
     "valor": "string (decimal)|null",
     "moneda": "string",
     "tipo_operacion": "string|null",
-    "publicacion_web": "string",
-    "publicacion_api_call": "string", 
     "fecha_ingreso": "string (ISO date)|null",
     "observaciones": "string|null",
     "created_at": "string (ISO date)",
@@ -2907,8 +2903,6 @@ id: string (UUID, required)
   "valor": "number (optional, positive)", // Ej: 2500000
   "moneda": "string (optional, max: 10 chars, default: 'ARS')", // Ej: "ARS"
   "tipo_operacion": "string (optional)", // Ej: "Venta"
-  "publicacion_web": "string (optional, 'true'|'false', default: 'false')",
-  "publicacion_api_call": "string (optional, 'true'|'false', default: 'false')", 
   "fecha_ingreso": "string (ISO date, optional)",
   "observaciones": "string (optional, max: 1000 chars)",
   "pendientes_preparacion": "string (optional, max: 2000 chars)",
@@ -3055,8 +3049,6 @@ id: string (UUID, required)
   "observaciones": "string (optional, max 1000 chars) - Observaciones",
   "pendientes_preparacion": "string (optional, max 2000 chars) - Pendientes",
   "comentarios": "string (optional, max 2000 chars) - Comentarios",
-  "publicacion_web": "string (optional, 'true'|'false')",
-  "publicacion_api_call": "string (optional, 'true'|'false')",
   
   // Información del vendedor (auto-creación/búsqueda)
   "vendedor_nombre": "string (optional, 2-50 chars) - Nombre del vendedor",

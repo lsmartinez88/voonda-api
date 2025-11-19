@@ -664,18 +664,19 @@ exports.create = async function (req, res) {
       valor: req.body.valor || null,
       moneda: req.body.moneda || 'ARS',
       tipo_operacion: req.body.tipo_operacion?.trim() || null,
-      fecha_ingreso: req.body.fecha_ingreso || new Date(),
+      fecha_ingreso: req.body.fecha_ingreso ? new Date(req.body.fecha_ingreso) : new Date(),
       observaciones: req.body.observaciones?.trim() || null,
-      pendientes_preparacion: req.body.pendientes_preparacion?.trim() || null,
+      pendientes_preparacion: req.body.pendientes_preparacion ? 
+        (Array.isArray(req.body.pendientes_preparacion) ? 
+          req.body.pendientes_preparacion : [req.body.pendientes_preparacion.trim()]) : [],
       comentarios: req.body.comentarios?.trim() || null,
-      publicacion_web: req.body.publicacion_web === 'true',
-      publicacion_api_call: req.body.publicacion_api_call === 'true',
       activo: true
     };
 
-    // Limpiar campos undefined
+    // Limpiar campos undefined pero preservar valores booleanos false
     Object.keys(vehiculoData).forEach(key => {
-      if (vehiculoData[key] === undefined || vehiculoData[key] === '') {
+      if (vehiculoData[key] === undefined || 
+          (vehiculoData[key] === '' && typeof vehiculoData[key] !== 'boolean')) {
         delete vehiculoData[key];
       }
     });
@@ -683,6 +684,13 @@ exports.create = async function (req, res) {
     const newVehiculo = await prisma.vehiculo.create({
       data: vehiculoData,
       include: {
+        empresa: {
+          select: {
+            id: true,
+            nombre: true,
+            descripcion: true
+          }
+        },
         modelo: {
           select: {
             id: true,

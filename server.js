@@ -11,7 +11,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./swagger.config');
+const swaggerSpecs = require('./documentacion-y-pruebas/swagger/swagger.config');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const { prisma } = require('./utils/prisma');

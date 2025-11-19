@@ -17,8 +17,13 @@ API REST completa para gestión de vehículos con autenticación JWT y sistema m
 ## 📖 Documentación
 
 - **Swagger UI:** `https://api.fratelli.voonda.net/api-docs`
-- **Documentación Frontend:** [`frontend-api-docs.md`](./frontend-api-docs.md)
-- **Guía de Deploy:** [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md)
+- **📚 Documentación Completa:** [`documentacion-y-pruebas/`](./documentacion-y-pruebas/)
+  - **Frontend Developers:** [`documentacion-y-pruebas/frontend/frontend-api-docs.md`](./documentacion-y-pruebas/frontend/frontend-api-docs.md)
+  - **Testing con Postman:** [`documentacion-y-pruebas/postman/`](./documentacion-y-pruebas/postman/)
+  - **Tests Manuales:** [`documentacion-y-pruebas/tests-manuales/`](./documentacion-y-pruebas/tests-manuales/)
+  - **Deploy en Vercel:** [`documentacion-y-pruebas/deployment/VERCEL_DEPLOYMENT.md`](./documentacion-y-pruebas/deployment/VERCEL_DEPLOYMENT.md)
+  - **Configuración Swagger:** [`documentacion-y-pruebas/swagger/`](./documentacion-y-pruebas/swagger/)
+  - **Documentación Prisma:** [`documentacion-y-pruebas/prisma/README-PRISMA.md`](./documentacion-y-pruebas/prisma/README-PRISMA.md)
 - **API Base:** `https://api.fratelli.voonda.net`
 
 ## 🛠️ Tecnologías
@@ -77,7 +82,7 @@ npm run dev
    ```
 3. ¡Deploy automático!
 
-Ver guía completa: [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md)
+Ver guía completa: [`documentacion-y-pruebas/deployment/VERCEL_DEPLOYMENT.md`](./documentacion-y-pruebas/deployment/VERCEL_DEPLOYMENT.md)
 
 ## 📚 Endpoints Principales
 
@@ -240,15 +245,22 @@ Credenciales de prueba:
 
 ```
 voonda-api/
-├── controllers/         # Lógica de negocio
-├── middleware/         # Auth, CORS, errores
-├── prisma/            # Schema y migraciones
-├── routes/            # Definición de rutas
-├── utils/             # Utilidades y validaciones
-├── server.js          # Servidor principal
-├── swagger.config.js  # Configuración Swagger
-├── vercel.json       # Configuración Vercel
-└── package.json      # Dependencias y scripts
+├── controllers/              # Lógica de negocio
+├── middleware/              # Auth, CORS, errores
+├── prisma/                 # Schema y migraciones
+├── routes/                 # Definición de rutas
+├── utils/                  # Utilidades y validaciones
+├── documentacion-y-pruebas/ # 📚 Documentación y testing
+│   ├── frontend/           #   └── Docs para developers frontend
+│   ├── postman/           #   └── Colecciones y casos de prueba
+│   ├── tests-manuales/    #   └── Scripts de prueba manual
+│   ├── swagger/           #   └── Configuración Swagger UI
+│   ├── deployment/        #   └── Guías de deploy
+│   ├── prisma/           #   └── Documentación de BD
+│   └── README.md          #   └── Índice de documentación
+├── server.js              # Servidor principal
+├── vercel.json           # Configuración Vercel
+└── package.json          # Dependencias y scripts
 ```
 
 ## 🚨 Variables de Entorno
@@ -280,6 +292,6 @@ MIT License - ver [`LICENSE`](LICENSE) para detalles.
 - **Documentación Swagger:** `/api-docs`
 - **Prisma Studio:** `npx prisma studio`
 - **Logs de desarrollo:** `npm run dev`
-- **Deploy Vercel:** [Guía completa](./VERCEL_DEPLOYMENT.md)
+- **Deploy Vercel:** [Guía completa](./documentacion-y-pruebas/deployment/VERCEL_DEPLOYMENT.md)
 
 ¡Tu API Voonda está lista para escalar! 🎉# Force redeploy after env vars Wed Nov 12 00:22:43 -03 2025

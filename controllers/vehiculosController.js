@@ -7,6 +7,7 @@ const { prisma } = require('../utils/prisma');
 const { validateId } = require('../utils/validations');
 const { successResponse } = require('../middleware/errorHandler');
 const { resolverEstadoId, getEstadoDefecto, getEstadoPorCodigo, getEstadoPorId } = require('../utils/estadoVehiculo');
+const auditSystem = require('../utils/auditSystem');
 
 /**
  * Sanitizar término de búsqueda para seguridad
@@ -430,7 +431,6 @@ exports.getById = async function (req, res) {
             caja: true,
             motorizacion: true,
             traccion: true,
-            puertas: true,
             segmento_modelo: true,
             cilindrada: true,
             potencia_hp: true,
@@ -455,9 +455,7 @@ exports.getById = async function (req, res) {
             telefono: true,
             email: true,
             dni: true,
-            direccion: true,
-            ciudad: true,
-            provincia: true
+            direccion: true
           }
         },
         comprador: {
@@ -468,9 +466,7 @@ exports.getById = async function (req, res) {
             telefono: true,
             email: true,
             dni: true,
-            direccion: true,
-            ciudad: true,
-            provincia: true
+            direccion: true
           }
         },
         publicaciones: {
@@ -745,6 +741,9 @@ exports.create = async function (req, res) {
     });
 
     console.log('✅ Vehículo creado exitosamente:', newVehiculo.id);
+    
+    // Log de auditoría para creación de vehículo
+    await auditSystem.logCreateVehiculo(req.user, newVehiculo, req);
 
     // 5. CREAR PUBLICACIONES si se proporcionaron
     let publicacionesCreadas = [];
@@ -1033,10 +1032,12 @@ exports.update = async function (req, res) {
       tipo_operacion: req.body.tipo_operacion?.trim() || existingVehiculo.tipo_operacion,
       fecha_ingreso: req.body.fecha_ingreso ? new Date(req.body.fecha_ingreso) : existingVehiculo.fecha_ingreso,
       observaciones: req.body.observaciones?.trim() ?? existingVehiculo.observaciones,
-      pendientes_preparacion: req.body.pendientes_preparacion?.trim() ?? existingVehiculo.pendientes_preparacion,
-      comentarios: req.body.comentarios?.trim() ?? existingVehiculo.comentarios,
-      publicacion_web: req.body.publicacion_web === 'true' || req.body.publicacion_web === true,
-      publicacion_api_call: req.body.publicacion_api_call === 'true' || req.body.publicacion_api_call === true
+      pendientes_preparacion: req.body.pendientes_preparacion !== undefined ? 
+        (Array.isArray(req.body.pendientes_preparacion) ? 
+          req.body.pendientes_preparacion : 
+          req.body.pendientes_preparacion === '' || req.body.pendientes_preparacion === null ? [] : [req.body.pendientes_preparacion.toString().trim()]
+        ) : existingVehiculo.pendientes_preparacion,
+      comentarios: req.body.comentarios?.trim() ?? existingVehiculo.comentarios
     };
 
     // Agregar estado si se resolvió
@@ -1113,6 +1114,9 @@ exports.update = async function (req, res) {
 
     console.log('🎉 Vehículo actualizado exitosamente');
 
+    // Log de auditoría para actualización de vehículo
+    await auditSystem.logUpdateVehiculo(req.user, existingVehiculo, updatedVehiculo, req);
+
     return successResponse(res, { 
       vehiculo: updatedVehiculo,
       resumen: resumenCambios
@@ -1175,6 +1179,9 @@ exports.delete = async function (req, res) {
         activo: false
       }
     });
+
+    // Log de auditoría para eliminación de vehículo
+    await auditSystem.logDeleteVehiculo(req.user, existingVehiculo, req);
 
     return successResponse(res, {}, 'Vehículo eliminado exitosamente');
   } catch (error) {

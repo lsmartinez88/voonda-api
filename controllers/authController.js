@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../utils/prisma');
 const { successResponse } = require('../middleware/errorHandler');
+const auditSystem = require('../utils/auditSystem');
 
 /**
  * Generar token JWT con información de empresa y rol
@@ -139,6 +140,9 @@ exports.login = async function (req, res) {
     });
 
     if (!user) {
+      // Log intento de login fallido
+      await auditSystem.logLoginFailed(email, req, new Error('Usuario no encontrado'));
+      
       return res.status(401).json({
         success: false,
         error: 'Credenciales inválidas',
@@ -147,6 +151,9 @@ exports.login = async function (req, res) {
     }
 
     if (!user.activo) {
+      // Log intento de acceso con usuario desactivado
+      await auditSystem.logLoginFailed(email, req, new Error('Usuario desactivado'));
+      
       return res.status(401).json({
         success: false,
         error: 'Usuario desactivado',
@@ -156,6 +163,9 @@ exports.login = async function (req, res) {
 
     // Verificar si está bloqueado
     if (user.bloqueado_hasta && new Date() < user.bloqueado_hasta) {
+      // Log intento de acceso con usuario bloqueado
+      await auditSystem.logLoginFailed(email, req, new Error('Usuario bloqueado'));
+      
       return res.status(423).json({
         success: false,
         error: 'Usuario bloqueado',
@@ -167,6 +177,9 @@ exports.login = async function (req, res) {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
+      // Log intento de login fallido por contraseña incorrecta
+      await auditSystem.logLoginFailed(email, req, new Error('Contraseña incorrecta'));
+      
       // Incrementar intentos fallidos
       await prisma.usuario.update({
         where: { id: user.id },
@@ -198,6 +211,9 @@ exports.login = async function (req, res) {
     // Generar token JWT
     const token = generateToken(user);
 
+    // Log de auditoría para login exitoso
+    await auditSystem.logLogin(user, req);
+
     // Respuesta exitosa (sin incluir la contraseña)
     const userResponse = {
       id: user.id,
@@ -225,10 +241,19 @@ exports.login = async function (req, res) {
  * Cerrar sesión
  */
 exports.logout = async function (req, res) {
-  // En una implementación real, aquí agregarías el token a una blacklist
-  // Por ahora, simplemente confirmamos el logout exitoso
-  
-  return successResponse(res, {}, 'Sesión cerrada exitosamente');
+  try {
+    // Log de auditoría para logout
+    if (req.user) {
+      await auditSystem.logLogout(req.user, req);
+    }
+    
+    // En una implementación real, aquí agregarías el token a una blacklist
+    // Por ahora, simplemente confirmamos el logout exitoso
+    
+    return successResponse(res, {}, 'Sesión cerrada exitosamente');
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**

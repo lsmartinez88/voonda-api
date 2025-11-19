@@ -14,6 +14,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./documentacion-y-pruebas/swagger/swagger.config');
 
 const { errorHandler } = require('./middleware/errorHandler');
+const { auditAccessDenied } = require('./middleware/audit');
 const { prisma } = require('./utils/prisma');
 
 // Crear aplicación Express
@@ -69,6 +70,9 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Middleware de auditoría para accesos denegados
+app.use(auditAccessDenied);
 
 // Swagger Documentation
 try {

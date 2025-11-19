@@ -23,6 +23,7 @@ model Empresa {
   vendedores  Vendedor[]
   compradores Comprador[]
   operaciones Operacion[]
+  registros_auditoria RegistroAuditoria[]
 
   @@index([activa])
   @@map("empresas")
@@ -62,6 +63,8 @@ model Usuario {
   bloqueado_hasta   DateTime? @db.Timestamptz(6)
   created_at        DateTime  @default(now()) @db.Timestamptz(6)
   updated_at        DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  registros_auditoria RegistroAuditoria[]
 
   @@index([empresa_id])
   @@index([rol_id])
@@ -292,4 +295,53 @@ model Imagen {
   @@index([tipo])
   @@index([activo])
   @@map("imagenes")
+}
+
+model RegistroAuditoria {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  
+  // Información de la acción
+  accion           String   @db.VarChar(100) // "LOGIN", "CREATE_VEHICULO", "UPDATE_VEHICULO", etc.
+  entidad_tipo     String   @db.VarChar(50)  // "USUARIO", "VEHICULO", "VENDEDOR", etc.
+  entidad_id       String?  @db.Uuid         // ID del registro afectado
+  descripcion      String   @db.Text         // Descripción detallada de la acción
+  
+  // Información del usuario que realiza la acción
+  usuario_id       String?  @db.Uuid         // Usuario que realiza la acción
+  usuario_email    String?  @db.VarChar(255) // Email del usuario (por si se elimina el usuario)
+  usuario_nombre   String?  @db.VarChar(200) // Nombre del usuario
+  empresa_id       String?  @db.Uuid         // Empresa del usuario
+  
+  // Metadatos de la acción
+  ip_address       String?  @db.Inet         // Dirección IP del cliente
+  user_agent       String?  @db.Text         // User Agent del navegador
+  endpoint         String?  @db.VarChar(255) // Endpoint llamado
+  metodo_http      String?  @db.VarChar(10)  // GET, POST, PUT, DELETE
+  
+  // Datos de la acción
+  datos_anteriores Json?    @db.JsonB        // Estado anterior (para updates/deletes)
+  datos_nuevos     Json?    @db.JsonB        // Estado nuevo (para creates/updates)
+  datos_adicionales Json?   @db.JsonB        // Información adicional contextual
+  
+  // Información técnica
+  resultado        String   @db.VarChar(20)  // "EXITO", "ERROR", "BLOQUEADO"
+  codigo_respuesta Int?                      // Código HTTP de respuesta
+  tiempo_ejecucion Int?                      // Tiempo de ejecución en ms
+  error_mensaje    String?  @db.Text         // Mensaje de error si falló
+  
+  // Auditoría de la auditoría
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relaciones
+  usuario Usuario? @relation(fields: [usuario_id], references: [id], onDelete: SetNull)
+  empresa Empresa? @relation(fields: [empresa_id], references: [id], onDelete: SetNull)
+  
+  @@index([usuario_id])
+  @@index([empresa_id])
+  @@index([accion])
+  @@index([entidad_tipo])
+  @@index([entidad_id])
+  @@index([created_at])
+  @@index([resultado])
+  @@map("registros_auditoria")
 }

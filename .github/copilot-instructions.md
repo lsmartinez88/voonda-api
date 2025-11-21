@@ -6,9 +6,16 @@ Este es un proyecto API completo usando Next.js con autenticación JWT y CRUD de
 - **Autenticación**: JWT con endpoints de login, register, logout, me
 - **CRUD Vehículos**: Operaciones completas con filtros, paginación y búsqueda
 - **Base de datos**: Supabase con tablas de vehículos y modelo_autos
-- **Validaciones**: Joi para validación de datos
-- **Middleware**: Autenticación y CORS
+- **Validaciones**: Joi para validación de datos (con validaciones flexibles para arrays)
+- **Middleware**: Autenticación, CORS y sistema de auditoría
+- **Sistema de Auditoría**: Logging completo de actividades de usuarios
+- **Helpers**: Utilities para procesamiento de datos (ej: vehiculoHelpers.js)
 - **Puerto**: 3001
+
+## Características Específicas
+- **pendientes_preparacion**: Campo flexible que acepta arrays, strings y strings multilínea
+- **Sistema de auditoría**: Tracking automático de login, CRUD de vehículos
+- **Validaciones flexibles**: Joi configurado para aceptar múltiples formatos de entrada
 
 ## Variables de entorno requeridas
 - SUPABASE_URL

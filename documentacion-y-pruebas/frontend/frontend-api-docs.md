@@ -2909,7 +2909,7 @@ id: string (UUID, required)
   "tipo_operacion": "string (optional)", // Ej: "Venta", "Consignación"
   "fecha_ingreso": "string (ISO date, optional, default: now)", // Ej: "2024-11-18T10:30:00Z"
   "observaciones": "string (optional, max: 1000 chars)", // Ej: "Vehículo en excelente estado"
-  "pendientes_preparacion": "array|string (optional, max: 2000 chars)", // Ej: ["Lavado", "Revision técnica"]
+  "pendientes_preparacion": "array|string (flexible format)", // Ver detalles de formatos más abajo
   "comentarios": "string (optional, max: 2000 chars)", // Ej: "Contactar antes del mediodía"
   
   // IDs DIRECTOS (para usar entidades existentes en lugar de auto-crear)
@@ -2995,6 +2995,54 @@ id: string (UUID, required)
   ]
 }
 ```
+
+### 📝 **Formatos Flexibles para `pendientes_preparacion`**
+
+El campo `pendientes_preparacion` es extremadamente flexible y acepta múltiples formatos:
+
+#### **Formato 1: Array de Strings (Recomendado)**
+```json
+{
+  "pendientes_preparacion": ["Revisión mecánica", "Limpieza completa", "Documentos al día"]
+}
+```
+
+#### **Formato 2: String con Saltos de Línea**
+```json
+{
+  "pendientes_preparacion": "Revisión mecánica\nLimpieza completa\nDocumentos al día"
+}
+```
+
+#### **Formato 3: String Simple**
+```json
+{
+  "pendientes_preparacion": "Revisión mecánica general"
+}
+```
+
+#### **Formato 4: Valores Vacíos**
+```json
+{
+  "pendientes_preparacion": null
+}
+// o
+{
+  "pendientes_preparacion": ""
+}
+// o simplemente omitir el campo
+```
+
+#### **Procesamiento Automático:**
+- ✅ **Strings multilínea** se dividen automáticamente por `\n`
+- ✅ **Líneas vacías** se filtran automáticamente  
+- ✅ **Espacios extra** se eliminan (trim)
+- ✅ **Elementos null** se filtran del resultado
+
+#### **Validaciones:**
+- **Array**: Máximo 500 caracteres por elemento
+- **String**: Máximo 2000 caracteres total
+- **Resultado**: Siempre se almacena como array en BD
 
 **Response 201 (Éxito):**
 ```json

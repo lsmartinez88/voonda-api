@@ -186,7 +186,11 @@ Esta colección contiene **casos de prueba exhaustivos** organizados en 3 catego
 - **Auto-creación de Modelos:** Si marca+modelo no existe, se crea automáticamente
 - **Estados Dinámicos:** Se validan contra la tabla `EstadoVehiculo` en tiempo real
 - **Publicaciones:** Array opcional, cada elemento requiere `plataforma` y `titulo` como mínimo
-- **Arrays como Strings:** `pendientes_preparacion` se puede enviar como array o string con comas
+- **Pendientes Flexibles:** `pendientes_preparacion` acepta múltiples formatos:
+  - **Array de strings**: `["Revisión mecánica", "Limpieza", "Documentos"]`
+  - **String multilínea**: `"Revisión mecánica\\nLimpieza\\nDocumentos"`
+  - **String simple**: `"Revisión mecánica"`
+  - **Vacío**: `null`, `""`, `[]`
 
 ## ✨ Ejemplos de Respuesta
 
@@ -314,6 +318,66 @@ Esta colección contiene **casos de prueba exhaustivos** organizados en 3 catego
 ### **Permisos**
 - La mayoría de endpoints requieren autenticación
 - Los permisos dependen del rol del usuario
+
+## 📝 Formatos Soportados para Pendientes
+
+### **Campo `pendientes_preparacion`**
+
+Este campo es extremadamente flexible y acepta múltiples formatos de entrada:
+
+#### **1. Array de Strings (Recomendado)**
+```json
+{
+  "pendientes_preparacion": ["Revisión mecánica", "Limpieza completa", "Documentos", "Cambio de aceite"]
+}
+```
+
+#### **2. String con Saltos de Línea**
+```json
+{
+  "pendientes_preparacion": "Revisión mecánica\nLimpieza completa\nDocumentos\nCambio de aceite"
+}
+```
+
+#### **3. String Simple**
+```json
+{
+  "pendientes_preparacion": "Revisión mecánica general"
+}
+```
+
+#### **4. Valores Vacíos**
+```json
+{
+  "pendientes_preparacion": null
+}
+// o
+{
+  "pendientes_preparacion": ""
+}
+// o simplemente omitir el campo
+```
+
+### **Procesamiento Automático**
+- **Strings multilínea** se dividen automáticamente por `\n`
+- **Líneas vacías** se filtran automáticamente
+- **Espacios extra** se eliminan automáticamente (trim)
+- **Elementos null/undefined** se filtran del resultado final
+
+### **Ejemplos de Transformación**
+
+| Input Frontend | Resultado en BD |
+|----------------|-----------------|
+| `["A", "B", "C"]` | `["A", "B", "C"]` |
+| `"A\nB\nC"` | `["A", "B", "C"]` |
+| `"A\n\nB\n  \nC"` | `["A", "B", "C"]` |
+| `"Solo uno"` | `["Solo uno"]` |
+| `""` o `null` | `[]` |
+
+### **Validaciones**
+- **Array**: Máximo 500 caracteres por elemento
+- **String**: Máximo 2000 caracteres total
+- **Tipos permitidos**: String, Array, null, undefined
 
 ## 🐛 Solución de Problemas
 

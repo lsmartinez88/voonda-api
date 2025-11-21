@@ -438,9 +438,18 @@ router.post('/',
  *                 maxLength: 1000
  *                 description: "Observaciones generales"
  *               pendientes_preparacion:
- *                 type: string
- *                 maxLength: 2000
- *                 description: "Lista de pendientes de preparación"
+ *                 oneOf:
+ *                   - type: array
+ *                     items:
+ *                       type: string
+ *                       maxLength: 500
+ *                     description: "Array de pendientes de preparación"
+ *                     example: ["Revisión mecánica", "Limpieza completa", "Documentos"]
+ *                   - type: string
+ *                     maxLength: 2000
+ *                     description: "String con pendientes separados por saltos de línea (\\n)"
+ *                     example: "Revisión mecánica\\nLimpieza completa\\nDocumentos"
+ *                 description: "Pendientes de preparación. Acepta array de strings o string multilínea"
  *               comentarios:
  *                 type: string
  *                 maxLength: 2000

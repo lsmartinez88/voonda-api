@@ -209,7 +209,7 @@
 							"response": []
 						},
 						{
-							"name": "Crear Vehículo (Estado EN_REPARACION)",
+							"name": "Crear Vehículo (Pendientes como String Multilínea)",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -224,7 +224,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"marca\": \"Volkswagen\",\n  \"modelo\": \"Golf\",\n  \"version\": \"Trendline\",\n  \"vehiculo_ano\": 2022,\n  \"vendedor_nombre\": \"Carlos\",\n  \"vendedor_apellido\": \"Rodriguez\",\n  \"vendedor_telefono\": \"+54 9 11 5555-6666\",\n  \"vendedor_email\": \"carlos.rodriguez@email.com\",\n  \"estado_codigo\": \"EN_REPARACION\",\n  \"patente\": \"DEF456\",\n  \"kilometros\": 25000,\n  \"valor\": 2200000,\n  \"observaciones\": \"Vehículo ingresó para reparación de motor\",\n  \"pendientes_preparacion\": [\"Reparación motor\", \"Cambio aceite\", \"Revisión general\"],\n  \"comentarios\": \"Contactar solo por las mañanas\"\n}"
+									"raw": "{\n  \"marca\": \"Volkswagen\",\n  \"modelo\": \"Golf\",\n  \"version\": \"Trendline\",\n  \"vehiculo_ano\": 2022,\n  \"vendedor_nombre\": \"Carlos\",\n  \"vendedor_apellido\": \"Rodriguez\",\n  \"vendedor_telefono\": \"+54 9 11 5555-6666\",\n  \"vendedor_email\": \"carlos.rodriguez@email.com\",\n  \"estado_codigo\": \"EN_REPARACION\",\n  \"patente\": \"DEF456\",\n  \"kilometros\": 25000,\n  \"valor\": 2200000,\n  \"observaciones\": \"Vehículo ingresó para reparación de motor\",\n  \"pendientes_preparacion\": \"Reparación motor\\nCambio aceite\\nRevisión general\\nLimpieza interior\",\n  \"comentarios\": \"Contactar solo por las mañanas. NOTA: pendientes_preparacion como string multilínea\"\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/api/vehiculos",

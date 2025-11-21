@@ -311,13 +311,15 @@ const vehiculoValidation = {
       }),
     
     // Nuevos campos agregados
-    pendientes_preparacion: Joi.string()
-      .max(2000)
-      .optional()
-      .allow('')
-      .messages({
-        'string.max': 'Los pendientes de preparación no pueden tener más de 2000 caracteres'
-      }),
+    pendientes_preparacion: Joi.alternatives().try(
+      Joi.array().items(Joi.string().max(500).trim()),  // Arrays de strings
+      Joi.string().max(2000),                           // Strings (incluye \n)
+      Joi.valid(null, '')                               // Solo null y string vacío
+    ).optional().messages({
+      'array.base': 'pendientes_preparacion debe ser un array de strings o un string',
+      'string.max': 'Cada pendiente no puede tener más de 500 caracteres',
+      'alternatives.match': 'pendientes_preparacion debe ser un array de strings, un string, o estar vacío'
+    }),
     comentarios: Joi.string()
       .max(2000)
       .optional()
@@ -592,13 +594,15 @@ const vehiculoValidation = {
       }),
     
     // Nuevos campos agregados
-    pendientes_preparacion: Joi.string()
-      .max(2000)
-      .optional()
-      .allow('')
-      .messages({
-        'string.max': 'Los pendientes de preparación no pueden tener más de 2000 caracteres'
-      }),
+    pendientes_preparacion: Joi.alternatives().try(
+      Joi.array().items(Joi.string().max(500).trim()),  // Arrays de strings
+      Joi.string().max(2000),                           // Strings (incluye \n)
+      Joi.valid(null, '')                               // Solo null y string vacío
+    ).optional().messages({
+      'array.base': 'pendientes_preparacion debe ser un array de strings o un string',
+      'string.max': 'Cada pendiente no puede tener más de 500 caracteres',
+      'alternatives.match': 'pendientes_preparacion debe ser un array de strings, un string, o estar vacío'
+    }),
     comentarios: Joi.string()
       .max(2000)
       .optional()

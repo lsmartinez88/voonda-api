@@ -8,6 +8,7 @@ const { validateId } = require('../utils/validations');
 const { successResponse } = require('../middleware/errorHandler');
 const { resolverEstadoId, getEstadoDefecto, getEstadoPorCodigo, getEstadoPorId } = require('../utils/estadoVehiculo');
 const auditSystem = require('../utils/auditSystem');
+const { processPendientesPreparacion } = require('../utils/vehiculoHelpers');
 
 /**
  * Sanitizar término de búsqueda para seguridad
@@ -666,9 +667,7 @@ exports.create = async function (req, res) {
       tipo_operacion: req.body.tipo_operacion?.trim() || null,
       fecha_ingreso: req.body.fecha_ingreso ? new Date(req.body.fecha_ingreso) : new Date(),
       observaciones: req.body.observaciones?.trim() || null,
-      pendientes_preparacion: req.body.pendientes_preparacion ? 
-        (Array.isArray(req.body.pendientes_preparacion) ? 
-          req.body.pendientes_preparacion : [req.body.pendientes_preparacion.trim()]) : [],
+      pendientes_preparacion: processPendientesPreparacion(req.body.pendientes_preparacion),
       comentarios: req.body.comentarios?.trim() || null,
       activo: true
     };
@@ -1033,10 +1032,7 @@ exports.update = async function (req, res) {
       fecha_ingreso: req.body.fecha_ingreso ? new Date(req.body.fecha_ingreso) : existingVehiculo.fecha_ingreso,
       observaciones: req.body.observaciones?.trim() ?? existingVehiculo.observaciones,
       pendientes_preparacion: req.body.pendientes_preparacion !== undefined ? 
-        (Array.isArray(req.body.pendientes_preparacion) ? 
-          req.body.pendientes_preparacion : 
-          req.body.pendientes_preparacion === '' || req.body.pendientes_preparacion === null ? [] : [req.body.pendientes_preparacion.toString().trim()]
-        ) : existingVehiculo.pendientes_preparacion,
+        processPendientesPreparacion(req.body.pendientes_preparacion) : existingVehiculo.pendientes_preparacion,
       comentarios: req.body.comentarios?.trim() ?? existingVehiculo.comentarios
     };
 
